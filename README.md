@@ -42,4 +42,8 @@ node scripts/import-next-generation.mjs "原项目路径/dist"
 
 ## 永劫无间征神图鉴
 
-作品页已收录独立站点 https://zhengshen-jade-atlas.jojozzzz.chatgpt.site/ 。当前站点要求登录 ChatGPT，入口文案已注明。博客只维护作品入口，不复制该站点内容；源站更新会直接体现在图鉴中。
+作品页入口为 `zhengshen-atlas/`。已从本地图鉴项目转换为静态子站，无需 ChatGPT 登录或服务端，包含魂玉检索、词条详情、潜能推演和配装面板。三个页面均可返回博客作品页。配装和潜能方案保存在当前浏览器；原托管域名的数据不会自动迁移。
+
+部署时保留整个 `zhengshen-atlas` 目录；资源及页面链接使用相对路径，兼容独立域名与 GitHub Pages 仓库子路径。原始资料及计算口径沿用项目内容，此次迁移不更新游戏数值。
+
+图鉴 React 入口及数据保留在 `sources/zhengshen-atlas/`，在该目录安装依赖后运行 `npm run build` 可重新生成首页。静态图片、潜能页与配装页直接维护于 `zhengshen-atlas/`；构建不会清空这些文件。

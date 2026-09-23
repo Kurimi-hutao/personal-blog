@@ -7,12 +7,12 @@
       {
         title: "永劫无间征神图鉴",
         category: "H5 与网页作品",
-        description: "永劫无间征神之路魂玉图鉴。前往独立图鉴站查看，目前访问需登录 ChatGPT。",
+        description: "检索征神之路魂玉与词条，查看原始效果截图，搭配 48 点潜能并联动实时配装面板。",
         tech: ["征神之路", "魂玉图鉴"],
         date: "2026-09",
-        demo: "https://zhengshen-jade-atlas.jojozzzz.chatgpt.site/",
+        demo: "./zhengshen-atlas/",
         demoLabel: "进入图鉴",
-        cover: "./assets/ink-scroll.webp",
+        cover: "./zhengshen-atlas/hero.png",
       },
       {
         title: "下一代，来信了",
@@ -61,7 +61,7 @@
       {
         date: "2026-09-23",
         title: "永劫无间征神图鉴加入作品卷宗",
-        description: "新增征神之路魂玉图鉴入口，可从作品页前往独立图鉴站。",
+        description: "征神图鉴以博客子站接入，魂玉检索、潜能推演与配装面板无需登录即可使用。",
       },
       {
         date: "2026-09-22",

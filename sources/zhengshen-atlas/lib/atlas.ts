@@ -1,0 +1,5 @@
+export const categoryOptions=['元素','攻击','防御','四象','效果'];
+type Classification={category:string;subcategory:string};
+type Searchable={kind:string;name:string;effect:string;element:string;classifications:Classification[]};
+export function subcategoryOptions(entries:Searchable[],category:string){return [...new Set(entries.flatMap(r=>r.classifications.filter(c=>category==='全部'||c.category===category).map(c=>c.subcategory)))];}
+export function filterEntries<T extends Searchable>(entries:T[],filters:{tab:string;query:string;category:string;subcategory:string;element:string}):T[]{const {tab,query,category,subcategory,element}=filters;const keywords=query.trim().toLowerCase().split(/\s+/).filter(Boolean);return entries.filter(r=>r.kind===tab&&(element==='全部'||r.element===element)&&r.classifications.some(c=>(category==='全部'||c.category===category)&&(subcategory==='全部'||c.subcategory===subcategory))&&keywords.every(k=>[r.name,r.effect,...r.classifications.flatMap(c=>[c.category,c.subcategory])].join(' ').toLowerCase().includes(k)));}

@@ -16,7 +16,7 @@ SITE.mkdir(parents=True)
 for path in ROOT.iterdir():
     if path.is_file() and (path.suffix in {".html", ".css", ".js", ".webmanifest"} or path.name in {"robots.txt", "sitemap.xml", "rss.xml", ".nojekyll"}):
         shutil.copy2(path, SITE / path.name)
-for name in ("assets", "next-generation-letter"):
+for name in ("assets", "next-generation-letter", "zhengshen-atlas"):
     shutil.copytree(ROOT / name, SITE / name)
 
 # The repository ships WOFF2 fonts only; remove absent legacy fallbacks.

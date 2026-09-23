@@ -1,0 +1,378 @@
+[
+  {
+    "name": "攻击",
+    "max": 4,
+    "unit": "%",
+    "kind": "普通副属性",
+    "maxScope": "单条基础满值，不包含合道",
+    "status": "社区表待游戏复核",
+    "sources": [
+      "community-table"
+    ]
+  },
+  {
+    "name": "暴击率",
+    "max": 3,
+    "unit": "%",
+    "kind": "普通副属性",
+    "maxScope": "单条基础满值，不包含合道",
+    "status": "社区表待游戏复核",
+    "sources": [
+      "community-table"
+    ]
+  },
+  {
+    "name": "暴击伤害",
+    "max": 25,
+    "unit": "%",
+    "kind": "普通副属性",
+    "maxScope": "单条基础满值，不包含合道",
+    "status": "社区表待游戏复核",
+    "sources": [
+      "community-table"
+    ]
+  },
+  {
+    "name": "体力",
+    "max": 15,
+    "unit": "%",
+    "kind": "普通副属性",
+    "maxScope": "单条基础满值，不包含合道",
+    "status": "社区表待游戏复核",
+    "sources": [
+      "community-table"
+    ]
+  },
+  {
+    "name": "护甲",
+    "max": 200,
+    "unit": "点",
+    "kind": "普通副属性",
+    "maxScope": "单条基础满值，不包含合道",
+    "status": "社区表待游戏复核",
+    "sources": [
+      "community-table"
+    ]
+  },
+  {
+    "name": "近抗",
+    "max": 4,
+    "unit": "%",
+    "kind": "普通副属性",
+    "maxScope": "单条基础满值，不包含合道",
+    "status": "社区表待游戏复核",
+    "sources": [
+      "community-table"
+    ]
+  },
+  {
+    "name": "远抗",
+    "max": 10,
+    "unit": "%",
+    "kind": "普通副属性",
+    "maxScope": "单条基础满值，不包含合道",
+    "status": "社区表待游戏复核",
+    "sources": [
+      "community-table"
+    ]
+  },
+  {
+    "name": "对首领伤害增加",
+    "max": 5,
+    "unit": "%",
+    "kind": "普通副属性",
+    "maxScope": "单条基础满值，不包含合道",
+    "status": "社区表待游戏复核",
+    "sources": [
+      "community-table"
+    ]
+  },
+  {
+    "name": "对非首领伤害增加",
+    "max": 5,
+    "unit": "%",
+    "kind": "普通副属性",
+    "maxScope": "单条基础满值，不包含合道",
+    "status": "社区表待游戏复核",
+    "sources": [
+      "community-table"
+    ]
+  },
+  {
+    "name": "受到首领伤害减免",
+    "max": 5,
+    "unit": "%",
+    "kind": "普通副属性",
+    "maxScope": "单条基础满值，不包含合道",
+    "status": "社区表待游戏复核",
+    "sources": [
+      "community-table"
+    ]
+  },
+  {
+    "name": "受到非首领伤害减免",
+    "max": 5,
+    "unit": "%",
+    "kind": "普通副属性",
+    "maxScope": "单条基础满值，不包含合道",
+    "status": "社区表待游戏复核",
+    "sources": [
+      "community-table"
+    ]
+  },
+  {
+    "name": "近战武器招式增伤",
+    "max": 5,
+    "unit": "%",
+    "kind": "普通副属性",
+    "maxScope": "单条基础满值，不包含合道",
+    "status": "社区表待游戏复核",
+    "sources": [
+      "community-table"
+    ]
+  },
+  {
+    "name": "远程武器招式增伤",
+    "max": 5,
+    "unit": "%",
+    "kind": "普通副属性",
+    "maxScope": "单条基础满值，不包含合道",
+    "status": "社区表待游戏复核",
+    "sources": [
+      "community-table"
+    ]
+  },
+  {
+    "name": "蓄力攻击伤害",
+    "max": 4,
+    "unit": "%",
+    "kind": "普通副属性",
+    "maxScope": "单条基础满值，不包含合道",
+    "status": "社区表待游戏复核",
+    "sources": [
+      "community-table"
+    ]
+  },
+  {
+    "name": "非蓄力攻击伤害",
+    "max": 4,
+    "unit": "%",
+    "kind": "普通副属性",
+    "maxScope": "单条基础满值，不包含合道",
+    "status": "社区表待游戏复核",
+    "sources": [
+      "community-table"
+    ]
+  },
+  {
+    "name": "罡气伤害",
+    "max": 4,
+    "unit": "%",
+    "kind": "普通副属性",
+    "maxScope": "单条基础满值，不包含合道",
+    "status": "社区表待游戏复核",
+    "sources": [
+      "community-table"
+    ]
+  },
+  {
+    "name": "蓄力罡气伤害",
+    "max": 8,
+    "unit": "%",
+    "kind": "普通副属性",
+    "maxScope": "单条基础满值，不包含合道",
+    "status": "社区表待游戏复核",
+    "sources": [
+      "community-table"
+    ]
+  },
+  {
+    "name": "非蓄力罡气伤害",
+    "max": 8,
+    "unit": "%",
+    "kind": "普通副属性",
+    "maxScope": "单条基础满值，不包含合道",
+    "status": "社区表待游戏复核",
+    "sources": [
+      "community-table"
+    ]
+  },
+  {
+    "name": "冰爆伤害",
+    "max": 30,
+    "unit": "%",
+    "kind": "普通副属性",
+    "maxScope": "单条基础满值，不包含合道",
+    "status": "社区表待游戏复核",
+    "sources": [
+      "community-table"
+    ]
+  },
+  {
+    "name": "天雷伤害",
+    "max": 30,
+    "unit": "%",
+    "kind": "普通副属性",
+    "maxScope": "单条基础满值，不包含合道",
+    "status": "社区表待游戏复核",
+    "sources": [
+      "community-table"
+    ]
+  },
+  {
+    "name": "毒爆伤害",
+    "max": 30,
+    "unit": "%",
+    "kind": "普通副属性",
+    "maxScope": "单条基础满值，不包含合道",
+    "status": "社区表待游戏复核",
+    "sources": [
+      "community-table"
+    ]
+  },
+  {
+    "name": "技能冷却速度",
+    "max": 6,
+    "unit": "%",
+    "kind": "普通副属性",
+    "maxScope": "单条基础满值，不包含合道",
+    "status": "社区表待游戏复核",
+    "sources": [
+      "community-table"
+    ]
+  },
+  {
+    "name": "每秒精力回复",
+    "max": 3,
+    "unit": "%",
+    "kind": "普通副属性",
+    "maxScope": "单条基础满值，不包含合道",
+    "status": "社区表待游戏复核",
+    "sources": [
+      "community-table"
+    ]
+  },
+  {
+    "name": "每秒怒气回复",
+    "max": 40,
+    "unit": "%",
+    "kind": "普通副属性",
+    "maxScope": "单条基础满值，不包含合道",
+    "status": "社区表待游戏复核",
+    "sources": [
+      "community-table"
+    ]
+  },
+  {
+    "name": "伤害怒气转化",
+    "max": 7,
+    "unit": "%",
+    "kind": "普通副属性",
+    "maxScope": "单条基础满值，不包含合道",
+    "status": "社区表待游戏复核",
+    "sources": [
+      "community-table"
+    ]
+  },
+  {
+    "name": "神射值积攒效率",
+    "max": 10,
+    "unit": "%",
+    "kind": "普通副属性",
+    "maxScope": "单条基础满值，不包含合道",
+    "status": "社区表待游戏复核",
+    "sources": [
+      "community-table"
+    ]
+  },
+  {
+    "name": "使用道具不消耗概率",
+    "max": 12,
+    "unit": "%",
+    "kind": "普通副属性",
+    "maxScope": "单条基础满值，不包含合道",
+    "status": "社区表待游戏复核",
+    "sources": [
+      "community-table"
+    ]
+  },
+  {
+    "name": "振刀触发恢复",
+    "max": 200,
+    "unit": "点",
+    "kind": "普通副属性",
+    "maxScope": "单条基础满值，不包含合道",
+    "status": "社区表待游戏复核",
+    "sources": [
+      "community-table"
+    ]
+  },
+  {
+    "name": "四象招式触发恢复",
+    "max": 200,
+    "unit": "点",
+    "kind": "普通副属性",
+    "maxScope": "单条基础满值，不包含合道",
+    "status": "社区表待游戏复核",
+    "sources": [
+      "community-table"
+    ]
+  },
+  {
+    "name": "幸运值",
+    "max": 500,
+    "unit": "点",
+    "kind": "普通副属性",
+    "maxScope": "单条基础满值，不包含合道",
+    "status": "社区表待游戏复核",
+    "sources": [
+      "community-table"
+    ]
+  },
+  {
+    "name": "合道",
+    "max": 50,
+    "unit": "%",
+    "kind": "稀有副属性",
+    "maxScope": "单条满值",
+    "status": "社区表待游戏复核",
+    "sources": [
+      "community-table"
+    ]
+  },
+  {
+    "name": "化气",
+    "max": 25,
+    "unit": "%",
+    "kind": "稀有副属性",
+    "maxScope": "单条满值",
+    "status": "社区表待游戏复核",
+    "sources": [
+      "community-table"
+    ]
+  },
+  {
+    "name": "火正",
+    "max": 3,
+    "unit": "级",
+    "kind": "稀有副属性",
+    "maxScope": "单条满值",
+    "status": "社区表待游戏复核",
+    "sources": [
+      "community-table"
+    ]
+  },
+  {
+    "name": "枚卜",
+    "max": 20,
+    "unit": "%",
+    "kind": "稀有副属性",
+    "maxScope": "单条触发概率",
+    "totalCap": 100,
+    "status": "赛季介绍转载，待游戏复核",
+    "sources": [
+      "official-season",
+      "season-reprint"
+    ]
+  }
+]
