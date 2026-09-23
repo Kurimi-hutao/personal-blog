@@ -5,6 +5,16 @@
     categories: ["全部", "H5 与网页作品", "Manim 与动画", "Live2D 与桌宠", "AI 视觉实验", "比赛项目"],
     works: [
       {
+        title: "永劫无间征神图鉴",
+        category: "H5 与网页作品",
+        description: "永劫无间征神之路魂玉图鉴。前往独立图鉴站查看，目前访问需登录 ChatGPT。",
+        tech: ["征神之路", "魂玉图鉴"],
+        date: "2026-09",
+        demo: "https://zhengshen-jade-atlas.jojozzzz.chatgpt.site/",
+        demoLabel: "进入图鉴",
+        cover: "./assets/ink-scroll.webp",
+      },
+      {
         title: "下一代，来信了",
         category: "比赛项目",
         description: "2026 重庆青年写给红岩英烈的一封回信。展开信封，沿着历史与当下交织的长卷，读懂属于下一代的回答。",
@@ -48,6 +58,11 @@
       },
     ],
     logs: [
+      {
+        date: "2026-09-23",
+        title: "永劫无间征神图鉴加入作品卷宗",
+        description: "新增征神之路魂玉图鉴入口，可从作品页前往独立图鉴站。",
+      },
       {
         date: "2026-09-22",
         title: "《下一代，来信了》加入作品卷宗",

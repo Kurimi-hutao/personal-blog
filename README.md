@@ -39,3 +39,7 @@ node scripts/import-next-generation.mjs "原项目路径/dist"
 `anon key` 可以公开在前端；真正的文章管理权限由 `supabase-schema.sql` 中的 RLS 策略限制为唯一站长。评论附件仅在前端允许图片、TXT 和 PDF，单个不超过 5 MB；生产环境还应在 Supabase Storage 中配置相同的 MIME 限制。不要把 `service_role key` 写入本项目。
 
 页边 AI 助手使用 DeepSeek 免费网页版的安全跳转方案：它会把包含当前页面上下文的问题复制到剪贴板，并打开 `chat.deepseek.com`。免费网页端没有可供静态站点直接调用的公开免密接口，因此本站不会在前端保存 DeepSeek 账号、Cookie 或 API Key。
+
+## 永劫无间征神图鉴
+
+作品页已收录独立站点 https://zhengshen-jade-atlas.jojozzzz.chatgpt.site/ 。当前站点要求登录 ChatGPT，入口文案已注明。博客只维护作品入口，不复制该站点内容；源站更新会直接体现在图鉴中。
