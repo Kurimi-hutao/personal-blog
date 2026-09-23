@@ -191,6 +191,10 @@
       );
       searchResultAnimation.onfinish = () => {
         draw();
+        // The outgoing animation belongs to the parent; release its opacity
+        // before animating the newly inserted children.
+        searchResultAnimation.cancel();
+        searchResultAnimation = null;
         Array.from(searchResults.children).forEach((item, index) => {
           item.animate(
             [
@@ -288,7 +292,15 @@
   updateBackToTop();
 
   const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let reducedMotion = reducedMotionQuery.matches;
+  reducedMotionQuery.addEventListener("change", (event) => {
+    reducedMotion = event.matches;
+    document.documentElement.classList.toggle("cursor-ready", finePointer && !reducedMotion);
+    document.querySelectorAll(".ink-cursor-trail").forEach((trail) => {
+      trail.getAnimations().forEach((animation) => animation.cancel());
+      trail.remove();
+    });
+  });
 
   function setupMobileScrollChrome() {
     const mobileQuery = window.matchMedia("(max-width: 900px)");
@@ -484,17 +496,18 @@
   });
   setupFloatingControls();
 
-  if (finePointer && !reducedMotion && !document.querySelector(".ink-cursor")) {
+  if (finePointer && !document.querySelector(".ink-cursor")) {
     const cursor = document.createElement("div");
     cursor.className = "ink-cursor";
     cursor.setAttribute("aria-hidden", "true");
     cursor.innerHTML = '<span class="ink-cursor-ring"></span><span class="ink-cursor-dot"></span>';
     document.body.appendChild(cursor);
-    document.documentElement.classList.add("cursor-ready");
+    document.documentElement.classList.toggle("cursor-ready", !reducedMotion);
 
     let trailAt = 0;
 
     window.addEventListener("pointermove", (event) => {
+      if (reducedMotion) return;
       cursor.style.transform = `translate3d(${event.clientX}px, ${event.clientY}px, 0)`;
       cursor.style.opacity = "1";
 

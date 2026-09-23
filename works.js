@@ -27,6 +27,7 @@
       image.src = work.cover;
       image.alt = "";
       image.loading = "lazy";
+      image.style.objectPosition = work.coverPosition || "center";
       cover.appendChild(image);
     } else {
       const mark = document.createElement("span");

@@ -3,9 +3,23 @@
 
   if (!document.body.classList.contains("home-page")) return;
 
-  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const reduceQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+  let reduced = reduceQuery.matches;
   const compact = window.matchMedia("(max-width: 840px), (pointer: coarse)").matches;
   const sessionKey = "hutao-home-opened";
+  let openingTimer;
+
+  function finishOpening() {
+    window.clearTimeout(openingTimer);
+    document.body.classList.remove("motion-home-opening");
+    document.body.classList.add("motion-home-ready");
+    sessionStorage.setItem(sessionKey, "true");
+  }
+
+  reduceQuery.addEventListener("change", (event) => {
+    reduced = event.matches;
+    if (reduced && document.body.classList.contains("motion-home-opening")) finishOpening();
+  });
 
   function onReady(callback) {
     if (document.readyState === "loading") {
@@ -17,15 +31,11 @@
 
   function setupOpening() {
     const seen = sessionStorage.getItem(sessionKey) === "true";
-    const duration = reduced ? 60 : seen ? 760 : compact ? 1750 : 2300;
+    const duration = reduced ? 0 : seen ? 400 : compact ? 650 : 900;
     document.body.style.setProperty("--home-open-duration", `${duration}ms`);
     document.body.classList.add("motion-home-opening");
 
-    window.setTimeout(() => {
-      document.body.classList.remove("motion-home-opening");
-      document.body.classList.add("motion-home-ready");
-      sessionStorage.setItem(sessionKey, "true");
-    }, duration);
+    openingTimer = window.setTimeout(finishOpening, duration);
   }
 
   function createRoute() {
@@ -86,7 +96,7 @@
   }
 
   function setupHeroParallax() {
-    if (reduced || compact) return;
+    if (compact) return;
     const hero = document.querySelector(".home-page .hero");
     if (!hero) return;
 
@@ -96,11 +106,13 @@
 
     function render() {
       frame = 0;
+      if (reduced) return;
       hero.style.setProperty("--home-parallax-x", `${targetX.toFixed(2)}px`);
       hero.style.setProperty("--home-parallax-y", `${targetY.toFixed(2)}px`);
     }
 
     hero.addEventListener("pointermove", (event) => {
+      if (reduced) return;
       const rect = hero.getBoundingClientRect();
       targetX = ((event.clientX - rect.left) / rect.width - 0.5) * 12;
       targetY = ((event.clientY - rect.top) / rect.height - 0.5) * 8;
@@ -112,10 +124,15 @@
       targetY = 0;
       if (!frame) frame = window.requestAnimationFrame(render);
     });
+    reduceQuery.addEventListener("change", () => {
+      targetX = targetY = 0;
+      hero.style.setProperty("--home-parallax-x", "0px");
+      hero.style.setProperty("--home-parallax-y", "0px");
+    });
   }
 
   onReady(() => {
-    setupOpening();
+    Promise.resolve(window.InkLottie?.loaded).then(setupOpening);
     setupRouteProgress();
     setupHeroParallax();
   });

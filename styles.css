@@ -140,6 +140,7 @@ svg {
 }
 
 .theme-toggle {
+  color: var(--ink);
   position: fixed;
   z-index: var(--z-floating);
   bottom: max(24px, env(safe-area-inset-bottom));
@@ -2184,7 +2185,9 @@ footer {
 }
 
 .home-page .hero-verse {
-  max-width: 23rem;
+  max-width: 100%;
+  font-size: clamp(22px, 1.9vw, 28px);
+  text-wrap: balance;
 }
 
 .home-page .section {

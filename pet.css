@@ -5,6 +5,34 @@
   --pet-paper: #f7eedb;
 }
 
+[data-theme="dark"] .pet-page {
+  --pet-red: #e7a396;
+  color: var(--ink);
+  background: radial-gradient(circle at 16% 12%, #342c26, transparent 28rem),
+    linear-gradient(160deg, #1c2420, #171c19);
+}
+
+[data-theme="dark"] .pet-page::before {
+  opacity: 0.06;
+  mix-blend-mode: screen;
+}
+
+[data-theme="dark"] .pet-page :is(.pet-heading h1, .pet-notes h2,
+  .pet-archive h2, .pet-archive h3, .pet-archive strong) {
+  color: var(--ink);
+}
+
+[data-theme="dark"] .pet-page :is(.pet-heading p, .pet-now span, .pet-now small,
+  .pet-notes p, .pet-archive p) {
+  color: var(--ink-soft);
+}
+
+[data-theme="dark"] .pet-page :is(.pet-now, .pet-entry-replay, .pet-notes article,
+  .pet-archive, .pet-archive-grid article) {
+  background: #252e28;
+  border-color: var(--line);
+}
+
 .pet-entry-active {
   height: 100vh;
   overflow: hidden;

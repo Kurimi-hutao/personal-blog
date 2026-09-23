@@ -1304,3 +1304,95 @@ body {
     font-synthesis: weight style;
   }
 }
+
+/* Night paper shares the same palette as the rest of the site. */
+html[data-theme="dark"] {
+  --hutao-ink: var(--ink);
+  --hutao-muted: var(--ink-soft);
+  --hutao-paper: rgba(29, 37, 33, 0.94);
+  --hutao-paper-solid: #202824;
+  --hutao-line: var(--line);
+  --hutao-seal: #e89182;
+  --hutao-jade: #b0c9bb;
+  --hutao-shadow: 0 18px 52px rgba(0, 0, 0, 0.22);
+}
+
+html[data-theme="dark"] body {
+  color: var(--ink);
+  background: linear-gradient(160deg, #19221e, #111714) !important;
+}
+
+html[data-theme="dark"] .site-header,
+html[data-theme="dark"] body.home-page .site-header,
+html[data-theme="dark"] body.is-scrolled .site-header,
+html[data-theme="dark"] .site-header.scrolled {
+  background: rgba(22, 30, 26, 0.96) !important;
+  border-color: var(--line);
+}
+
+html[data-theme="dark"] .site-nav a {
+  color: var(--ink) !important;
+}
+
+html[data-theme="dark"] .site-nav a.active,
+html[data-theme="dark"] .site-nav a:hover {
+  color: var(--hutao-seal) !important;
+}
+
+html[data-theme="dark"] body.home-page :is(.hero-copy, .article-card, .home-video-card,
+  .achievement-cards article, .friend-card, .guestbook-list article, .about-copy,
+  .message-inner, .portrait-panel, .friend-group, .achievement-section, .links-section,
+  .hutao-state, .article-state) {
+  background: linear-gradient(135deg, #28332d, #1c2520) !important;
+  border-color: var(--line) !important;
+  box-shadow: var(--hutao-shadow) !important;
+}
+
+html[data-theme="dark"] .hero h1 {
+  text-shadow: none;
+}
+
+html[data-theme="dark"] .home-page .about-section {
+  background: linear-gradient(160deg, #25312a, #18211c);
+}
+
+html[data-theme="dark"] body.home-page :is(.article-card h3, .home-video-card h3,
+  .friend-card strong, .friend-group h3, .guestbook-list article strong,
+  .achievement-cards strong, .achievement-cards span,
+  .about-copy h2, .message-inner h2, .achievement-copy h2) {
+  color: var(--ink) !important;
+}
+
+html[data-theme="dark"] body.home-page :is(.home-video-card small, .article-card time,
+  .guestbook-list time, .guestbook-list article p, .message-inner > p,
+  .message-form label > span, .friend-group p, .friend-card small, .hutao-state, .article-state) {
+  color: var(--ink-soft) !important;
+}
+
+html[data-theme="dark"] body.home-page :is(.about-copy blockquote, blockquote) {
+  color: var(--ink) !important;
+  background: var(--surface) !important;
+  border-color: var(--hutao-seal) !important;
+}
+
+html[data-theme="dark"] .message-form :is(input, textarea)::placeholder {
+  color: var(--ink-soft);
+}
+
+html[data-theme="dark"] :is(.theme-toggle, .wind-toggle, .back-to-top) {
+  color: var(--ink);
+  background: #26332c;
+  border-color: var(--line);
+}
+
+html[data-theme="dark"] .home-page .ink-button {
+  color: #f2eadb !important;
+  background: #354d40 !important;
+  border-color: #829d8d;
+}
+
+@media (max-width: 1080px) {
+  html[data-theme="dark"] .site-header .site-nav {
+    background: linear-gradient(160deg, #202b24, #141c17) !important;
+  }
+}

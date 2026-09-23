@@ -366,6 +366,16 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html.cursor-ready,
+  html.cursor-ready body,
+  html.cursor-ready body * {
+    cursor: auto;
+  }
+
+  .ink-cursor,
+  .ink-cursor-trail {
+    display: none !important;
+  }
   .motion-reveal,
   .motion-reveal.is-visible,
   .motion-reveal.visible {

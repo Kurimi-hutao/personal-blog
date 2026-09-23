@@ -1,4 +1,6 @@
-const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const homeMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+let reducedMotion = homeMotionQuery.matches;
+const ambientMotions = new Set();
 const hasGsap = typeof window.gsap !== "undefined";
 const field = document.querySelector("#petalField");
 const header = document.querySelector(".site-header");
@@ -407,6 +409,7 @@ function createClickEffect(x, y, source) {
 }
 
 function createCursorTrail(x, y) {
+  if (reducedMotion) return;
   const now = performance.now();
   if (now - lastCursorTrailAt < 34) return;
   lastCursorTrailAt = now;
@@ -448,7 +451,7 @@ function createCursorTrail(x, y) {
 }
 
 function setupFlowingLandscape() {
-  if (!hasGsap || reducedMotion || compactMotion || lowPowerDevice) return;
+  if (!hasGsap || compactMotion || lowPowerDevice) return;
   const hero = document.querySelector(".hero");
   const far = document.querySelector(".landscape-far");
   const near = document.querySelector(".landscape-near");
@@ -456,29 +459,30 @@ function setupFlowingLandscape() {
   if (!hero || !far || !near) return;
 
   const motion = gsap.timeline({ repeat: -1, yoyo: true, defaults: { ease: "sine.inOut" } });
+  ambientMotions.add(motion);
   motion
     .to(far, { xPercent: -2.2, yPercent: 1.2, scaleX: 1.025, duration: 16 }, 0)
     .to(near, { xPercent: 2.8, yPercent: -1.5, scaleX: 1.035, duration: 13 }, 0)
     .to(mists, { xPercent: (index) => index ? 16 : -12, autoAlpha: (index) => index ? 0.28 : 0.5, duration: 11, stagger: 1.2 }, 0);
 
   const visibilityObserver = new IntersectionObserver(([entry]) => {
-    if (entry.isIntersecting && !document.hidden) motion.resume();
+    if (entry.isIntersecting && !document.hidden && !reducedMotion) motion.resume();
     else motion.pause();
   }, { threshold: 0.05 });
   visibilityObserver.observe(hero);
   document.addEventListener("visibilitychange", () => {
-    if (document.hidden) motion.pause();
+    if (document.hidden || reducedMotion) motion.pause();
     else if (hero.getBoundingClientRect().bottom > 0) motion.resume();
   });
 }
 
 function setupAmbientInk() {
-  if (!hasGsap || reducedMotion || compactMotion || lowPowerDevice) return;
+  if (!hasGsap || compactMotion || lowPowerDevice) return;
   const drifts = gsap.utils.toArray(".ink-drift");
   if (!drifts.length) return;
 
   drifts.forEach((drift, index) => {
-    gsap.to(drift, {
+    ambientMotions.add(gsap.to(drift, {
       xPercent: index % 2 ? -18 : 20,
       yPercent: index % 2 ? 14 : -12,
       rotation: index % 2 ? "+=9" : "-=8",
@@ -488,7 +492,7 @@ function setupAmbientInk() {
       repeat: -1,
       yoyo: true,
       ease: "sine.inOut",
-    });
+    }));
   });
 }
 
@@ -593,7 +597,7 @@ function setWind(active) {
   windToggle.setAttribute("aria-pressed", String(active));
   windLabel.textContent = active ? "风起" : "风止";
 
-  if (hasGsap) {
+  if (hasGsap && !reducedMotion) {
     gsap.to(".wind-icon", {
       rotation: active ? 12 : 0,
       x: active ? 3 : 0,
@@ -792,13 +796,14 @@ function setupLinksToggle() {
   });
 }
 
-if (hasGsap && !reducedMotion) {
+if (hasGsap) {
   if (finePointer && !lowPowerDevice) {
     document.documentElement.classList.add("cursor-ready");
     const cursorX = gsap.quickTo(cursor, "x", { duration: 0.12, ease: "power3.out" });
     const cursorY = gsap.quickTo(cursor, "y", { duration: 0.12, ease: "power3.out" });
 
     window.addEventListener("pointermove", (event) => {
+      if (reducedMotion) return;
       cursorX(event.clientX);
       cursorY(event.clientY);
       createCursorTrail(event.clientX, event.clientY);
@@ -812,6 +817,7 @@ if (hasGsap && !reducedMotion) {
     });
 
     document.addEventListener("pointerover", (event) => {
+      if (reducedMotion) return;
       const interactive = event.target.closest("a, button, input, textarea, .falling-piece");
       gsap.to(cursorRing, {
         scale: interactive ? 1.55 : 1,
@@ -829,19 +835,20 @@ if (hasGsap && !reducedMotion) {
     });
 
     document.documentElement.addEventListener("mouseleave", () => {
+      if (reducedMotion) return;
       lastTrailPoint = null;
       gsap.to(cursor, { autoAlpha: 0, duration: 0.2 });
     });
   }
 
-  gsap.to(".scroll-cue i", {
+  ambientMotions.add(gsap.to(".scroll-cue i", {
     scaleY: 0.45,
     transformOrigin: "top",
     repeat: -1,
     yoyo: true,
     duration: 1.25,
     ease: "sine.inOut",
-  });
+  }));
 
   window.setInterval(() => {
     if (!document.hidden) createPiece();
@@ -887,3 +894,23 @@ setupInkHoverEffects();
 setupFlowingLandscape();
 setupAmbientInk();
 setupLinksToggle();
+
+function applyHomeMotionPreference() {
+  reducedMotion = homeMotionQuery.matches;
+  document.documentElement.classList.toggle("cursor-ready", !reducedMotion && finePointer && !lowPowerDevice);
+  ambientMotions.forEach((motion) => motion.paused(reducedMotion || document.hidden));
+  if (!reducedMotion || !hasGsap) return;
+  pieces.forEach((piece) => { gsap.killTweensOf(piece); piece.remove(); });
+  pieces.clear();
+  document.querySelectorAll(".ink-cursor-trail").forEach((trail) => {
+    gsap.killTweensOf(trail);
+    trail.remove();
+  });
+  window.clearTimeout(cursorIdleTimer);
+  gsap.killTweensOf([cursor, cursorRing, cursorDot, ".wind-icon"]);
+  gsap.set(cursor, { autoAlpha: 0 });
+  lastTrailPoint = null;
+}
+homeMotionQuery.addEventListener("change", applyHomeMotionPreference);
+document.addEventListener("visibilitychange", applyHomeMotionPreference);
+applyHomeMotionPreference();

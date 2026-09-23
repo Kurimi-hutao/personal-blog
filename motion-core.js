@@ -21,6 +21,18 @@
   const selectInstances = new WeakMap();
   const listAnimations = new WeakMap();
 
+  reduceQuery.addEventListener("change", (event) => {
+    state.reduced = event.matches;
+    if (!state.reduced) return;
+    document.querySelectorAll(".motion-reveal").forEach((element) => {
+      element.classList.add("is-visible", "visible");
+      element.getAnimations().forEach((animation) => {
+        if (animation.effect?.getTiming().iterations !== Infinity) animation.finish();
+      });
+    });
+    document.querySelectorAll(".click-petal, .ink-click-core, .ink-click-ripple").forEach((element) => element.remove());
+  });
+
   const revealSelector = [
     ".reveal",
     ".page-title",

@@ -34,6 +34,7 @@
         demo: "./kurumi.html",
         source: "https://github.com/Kurimi-hutao/personal-blog",
         cover: "./assets/kurumi-portrait-red-moon.webp",
+        coverPosition: "50% 18%",
       },
       {
         title: "Live2D 桌宠小屋",

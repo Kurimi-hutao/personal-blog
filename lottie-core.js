@@ -47,6 +47,7 @@
   async function createAnimation(container, options = {}) {
     if (!container || isReduced() || typeof window.lottie === "undefined") return null;
     const data = options.animationData || await loadData(options.name);
+    if (!container.isConnected || isReduced()) return null;
     const instance = window.lottie.loadAnimation({
       container,
       renderer: options.renderer || "svg",
@@ -72,7 +73,7 @@
     });
     return Promise.allSettled(
       images.map((image) => {
-        if (image.complete && image.naturalWidth > 0) return Promise.resolve();
+        if (image.complete) return Promise.resolve();
         return new Promise((resolve) => {
           image.addEventListener("load", resolve, { once: true });
           image.addEventListener("error", resolve, { once: true });
@@ -100,36 +101,44 @@
 
     const animationNode = loader.querySelector(".ink-site-loader__animation");
     let animation = null;
-    try {
-      animation = await createAnimation(animationNode, {
+    const animationReady = createAnimation(animationNode, {
         name: config.inkLoading,
         loop: true,
         preserveAspectRatio: "xMidYMid meet",
-      });
-    } catch (error) {
+      }).then((instance) => { animation = instance; }).catch((error) => {
       console.warn("[InkLottie] loading animation failed", error);
       animationNode.classList.add("ink-site-loader__fallback");
-    }
+    });
 
     await Promise.allSettled([
       wait(isReduced() ? 120 : 680),
-      withTimeout(Promise.allSettled([criticalImagesReady(), fontsReady()]), 3600),
+      withTimeout(Promise.allSettled([criticalImagesReady(), fontsReady(), animationReady]), 2400),
     ]);
     await wait(isReduced() ? 80 : 120);
     loader.classList.add("is-leaving");
-    loader.addEventListener("transitionend", () => {
-      animation?.destroy();
-      loader.remove();
-    }, { once: true });
-    window.setTimeout(() => {
-      animation?.destroy();
-      loader.remove();
-    }, 900);
+    await new Promise((resolve) => {
+      const finish = () => {
+        window.clearTimeout(timer);
+        animation?.destroy();
+        loader.remove();
+        resolve();
+      };
+      const timer = window.setTimeout(finish, 650);
+      loader.addEventListener("transitionend", (event) => {
+        if (event.target === loader && event.propertyName === "opacity") finish();
+      });
+    });
   }
 
   document.addEventListener("visibilitychange", () => {
     instances.forEach((instance) => {
-      if (document.hidden) instance.pause();
+      if (document.hidden || isReduced()) instance.pause();
+      else if (instance.__inkLottieLoop) instance.play();
+    });
+  });
+  reduceQuery.addEventListener("change", () => {
+    instances.forEach((instance) => {
+      if (isReduced() || document.hidden) instance.pause();
       else if (instance.__inkLottieLoop) instance.play();
     });
   });
@@ -142,5 +151,5 @@
     createAnimation,
   };
 
-  setupSiteLoader();
+  window.InkLottie.loaded = setupSiteLoader();
 }());
