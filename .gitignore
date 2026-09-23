@@ -3,3 +3,5 @@ package-lock.json
 test-results/
 mobile-qa*.js
 mobile-qa*.spec.js
+.download/
+blog-source.zip

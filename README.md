@@ -12,6 +12,18 @@ python -m http.server 8000
 
 然后访问 `http://localhost:8000`。
 
+## 《下一代，来信了》子站
+
+作品页 `works.html` 已收录子站，入口为 `next-generation-letter/`。子站使用独立样式与脚本，顶部“返回作品”链接回到博客。整个博客作为静态文件部署时，保留这个目录即可，无需额外服务。
+
+当前版本来自 `Kurimi-hutao/next-generation-letter` 的 `13aa883` 提交。更新时，在原项目安装依赖并执行 `npm run build`，然后在博客目录运行：
+
+```powershell
+node scripts/import-next-generation.mjs "原项目路径/dist"
+```
+
+导入脚本复制构建文件、接入返回导航并更新作品封面。原项目需保持 Vite 的 `base: "./"`，以兼容博客域名及 GitHub Pages 子路径。`.download/` 为本地下载和构建临时目录，不需要部署。
+
 ## 配置网站数据
 
 1. 创建一个 Supabase 项目。

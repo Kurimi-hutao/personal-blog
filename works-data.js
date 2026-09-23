@@ -5,6 +5,17 @@
     categories: ["全部", "H5 与网页作品", "Manim 与动画", "Live2D 与桌宠", "AI 视觉实验", "比赛项目"],
     works: [
       {
+        title: "下一代，来信了",
+        category: "比赛项目",
+        description: "2026 重庆青年写给红岩英烈的一封回信。展开信封，沿着历史与当下交织的长卷，读懂属于下一代的回答。",
+        tech: ["叙事长页", "交互动画", "GSAP"],
+        date: "2026-09",
+        demo: "./next-generation-letter/",
+        demoLabel: "进入子站",
+        source: "https://github.com/Kurimi-hutao/next-generation-letter",
+        cover: "./assets/next-generation-letter-cover.webp",
+      },
+      {
         title: "个人博客",
         category: "H5 与网页作品",
         description: "当前这座水墨江湖博客，包含文章、视频、留言、搜索、明暗主题与后台管理。",
@@ -36,6 +47,11 @@
       },
     ],
     logs: [
+      {
+        date: "2026-09-22",
+        title: "《下一代，来信了》加入作品卷宗",
+        description: "以独立子站收录这封写给红岩英烈的回信，从作品页即可进入阅读。",
+      },
       {
         date: "2026-06-28",
         title: "第一轮 UI 与动效整理",

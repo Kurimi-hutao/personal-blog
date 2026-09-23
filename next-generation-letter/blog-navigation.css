@@ -1,0 +1,7 @@
+
+.story-shell { grid-template-columns: auto auto auto; }
+.blog-return { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; white-space: nowrap; }
+@media (max-width: 768px) {
+  .story-shell { grid-template-columns: minmax(0, 1fr) auto auto; }
+  .story-shell__title { max-width: calc(100vw - 245px); }
+}

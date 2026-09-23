@@ -16,8 +16,12 @@
     const card = document.createElement("article");
     card.className = "work-card reveal";
 
-    const cover = document.createElement("div");
+    const cover = document.createElement(work.demo ? "a" : "div");
     cover.className = "work-cover";
+    if (work.demo) {
+      cover.href = work.demo;
+      cover.setAttribute("aria-label", `进入${work.title}`);
+    }
     if (work.cover) {
       const image = document.createElement("img");
       image.src = work.cover;
@@ -35,7 +39,14 @@
     const category = document.createElement("small");
     category.textContent = work.category;
     const title = document.createElement("h2");
-    title.textContent = work.title;
+    if (work.demo) {
+      const titleLink = document.createElement("a");
+      titleLink.href = work.demo;
+      titleLink.textContent = work.title;
+      title.appendChild(titleLink);
+    } else {
+      title.textContent = work.title;
+    }
     const description = document.createElement("p");
     description.textContent = work.description;
     const tech = document.createElement("div");
@@ -50,7 +61,7 @@
     if (work.demo) {
       const demo = document.createElement("a");
       demo.href = work.demo;
-      demo.textContent = "在线体验";
+      demo.textContent = work.demoLabel || "在线体验";
       actions.appendChild(demo);
     }
     if (work.source) {
