@@ -1,0 +1,21 @@
+const {chromium}=require('C:/Users/emmmm/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
+const fs=require('fs'),path=require('path');
+const {installFixtures}=require('./review-fixtures.cjs');
+const phase=process.argv[2]||'before';
+const out=path.resolve('screenshots',phase);fs.mkdirSync(out,{recursive:true});
+const pages=['articles.html','article.html','videos.html','works.html','kurumi.html','pet.html','404.html','zhengshen-atlas/','zhengshen-atlas/potential/','zhengshen-atlas/calculator/'].filter(file=>!process.env.REVIEW_ONLY||process.env.REVIEW_ONLY.split(',').includes(file));
+const sizes=phase==='before'?[[1440,900],[390,844]]:[[375,812],[390,844],[430,932],[768,1024],[1366,768],[1440,900],[1920,1080],[1920,1200],[844,390]];
+(async()=>{const browser=await chromium.launch({executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe',headless:true});const results=process.env.REVIEW_ONLY&&fs.existsSync(path.join(out,'results.json'))?JSON.parse(fs.readFileSync(path.join(out,'results.json'))).filter(row=>!pages.includes(row.file)):[];
+for(const [width,height] of sizes){const context=await browser.newContext({viewport:{width,height},deviceScaleFactor:1,isMobile:width<600,hasTouch:width<900,serviceWorkers:'block',reducedMotion:'reduce'});
+await context.route('**/*',r=>['GET','HEAD','OPTIONS'].includes(r.request().method())?r.continue():r.abort());
+if(phase==='final')await installFixtures(context);
+for(const file of pages){const page=await context.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
+try{await page.goto('http://localhost:8000/'+file+(phase==='final'&&file==='article.html'?'?slug=review-0':''),{waitUntil:'domcontentloaded'});await page.waitForTimeout(file==='pet.html'?4500:1300);if(file==='pet.html'&&await page.locator('#petEntrySkip').isVisible())await page.locator('#petEntrySkip').click();
+await page.evaluate(async()=>{await document.fonts.ready});
+const slug=file.replaceAll('/','-').replace('.html','');
+await page.screenshot({path:path.join(out,`${slug}-${width}x${height}-top.png`)});
+const h=await page.evaluate(()=>document.documentElement.scrollHeight);
+for(let y=0;y<h;y+=height*.8){await page.evaluate(y=>scrollTo(0,y),y);await page.waitForTimeout(65)}
+await page.screenshot({path:path.join(out,`${slug}-${width}x${height}-full.png`),fullPage:true});
+results.push({file,width,height,fixture:phase==='final'&&['articles.html','article.html','videos.html'].includes(file),scrollWidth:await page.evaluate(()=>document.documentElement.scrollWidth),errors,text:(await page.locator('body').innerText()).slice(0,900),brokenImages:await page.evaluate(()=>[...document.images].filter(i=>i.complete&&!i.naturalWidth&&i.getAttribute('src')).map(i=>i.src))});
+}catch(e){results.push({file,width,height,error:e.message,errors})}await page.close();fs.writeFileSync(path.join(out,'results.json'),JSON.stringify(results,null,2));console.log(file,width,height)}await context.close()}await browser.close()})().catch(e=>{console.error(e);process.exit(1)});

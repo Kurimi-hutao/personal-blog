@@ -14,7 +14,7 @@
 
   function createWorkCard(work) {
     const card = document.createElement("article");
-    card.className = "work-card reveal";
+    card.className = `work-card reveal${work.featured ? " work-card-featured" : ""}`;
 
     const cover = document.createElement(work.demo ? "a" : "div");
     cover.className = "work-cover";
@@ -38,7 +38,7 @@
     const copy = document.createElement("div");
     copy.className = "work-copy";
     const category = document.createElement("small");
-    category.textContent = work.category;
+    category.textContent = work.featured ? `本辑主作 · ${work.category}` : work.category;
     const title = document.createElement("h2");
     if (work.demo) {
       const titleLink = document.createElement("a");
@@ -97,11 +97,12 @@
     categories.forEach((category) => {
       const button = document.createElement("button");
       button.type = "button";
+      button.setAttribute("aria-pressed", String(category === active));
       button.textContent = category;
       button.classList.toggle("active", category === active);
       button.addEventListener("click", () => {
         active = category;
-        toolbar.querySelectorAll("button").forEach((item) => item.classList.toggle("active", item === button));
+        toolbar.querySelectorAll("button").forEach((item) => { item.classList.toggle("active", item === button); item.setAttribute("aria-pressed", String(item === button)); });
         renderWorks();
       });
       toolbar.appendChild(button);

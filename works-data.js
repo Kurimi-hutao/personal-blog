@@ -6,6 +6,7 @@
     works: [
       {
         title: "永劫无间征神图鉴",
+        featured: true,
         category: "H5 与网页作品",
         description: "检索征神之路魂玉与词条，查看原始效果截图，搭配 48 点潜能并联动实时配装面板。",
         tech: ["征神之路", "魂玉图鉴"],

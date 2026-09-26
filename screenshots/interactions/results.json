@@ -1,0 +1,154 @@
+[
+  {
+    "width": 390,
+    "name": "atlas search empty clear",
+    "pass": true
+  },
+  {
+    "width": 390,
+    "name": "atlas category and stable record number",
+    "pass": true
+  },
+  {
+    "width": 390,
+    "name": "atlas detail modal keyboard focus",
+    "pass": true
+  },
+  {
+    "width": 390,
+    "name": "atlas pagination and tabs",
+    "pass": true
+  },
+  {
+    "width": 390,
+    "name": "articles content filters empty reset",
+    "pass": true
+  },
+  {
+    "width": 390,
+    "name": "mobile navigation and theme",
+    "pass": true
+  },
+  {
+    "width": 390,
+    "name": "article typography toc table code math",
+    "pass": true
+  },
+  {
+    "width": 390,
+    "name": "article bookmark like share comments fixture",
+    "pass": true
+  },
+  {
+    "width": 390,
+    "name": "video covers missing fallback and search",
+    "pass": true
+  },
+  {
+    "width": 390,
+    "name": "works featured and filter empty",
+    "pass": true
+  },
+  {
+    "width": 390,
+    "name": "gallery open close",
+    "pass": true
+  },
+  {
+    "width": 390,
+    "name": "pet live2d actions scene and visitor",
+    "pass": true
+  },
+  {
+    "width": 390,
+    "name": "potential points touch picker save and dialog",
+    "pass": true
+  },
+  {
+    "width": 390,
+    "name": "calculator selection and local persistence",
+    "pass": true
+  },
+  {
+    "width": 390,
+    "name": "uncaught errors",
+    "pass": true,
+    "errors": []
+  },
+  {
+    "width": 1440,
+    "name": "atlas search empty clear",
+    "pass": true
+  },
+  {
+    "width": 1440,
+    "name": "atlas category and stable record number",
+    "pass": true
+  },
+  {
+    "width": 1440,
+    "name": "atlas detail modal keyboard focus",
+    "pass": true
+  },
+  {
+    "width": 1440,
+    "name": "atlas pagination and tabs",
+    "pass": true
+  },
+  {
+    "width": 1440,
+    "name": "articles content filters empty reset",
+    "pass": true
+  },
+  {
+    "width": 1440,
+    "name": "mobile navigation and theme",
+    "pass": true
+  },
+  {
+    "width": 1440,
+    "name": "article typography toc table code math",
+    "pass": true
+  },
+  {
+    "width": 1440,
+    "name": "article bookmark like share comments fixture",
+    "pass": true
+  },
+  {
+    "width": 1440,
+    "name": "video covers missing fallback and search",
+    "pass": true
+  },
+  {
+    "width": 1440,
+    "name": "works featured and filter empty",
+    "pass": true
+  },
+  {
+    "width": 1440,
+    "name": "gallery open close",
+    "pass": true
+  },
+  {
+    "width": 1440,
+    "name": "pet live2d actions scene and visitor",
+    "pass": true
+  },
+  {
+    "width": 1440,
+    "name": "potential points touch picker save and dialog",
+    "pass": true
+  },
+  {
+    "width": 1440,
+    "name": "calculator selection and local persistence",
+    "pass": true
+  },
+  {
+    "width": 1440,
+    "name": "uncaught errors",
+    "pass": true,
+    "errors": []
+  }
+]

@@ -260,6 +260,7 @@ function createToc(body) {
     list.appendChild(item);
   });
   toc.appendChild(list);
+  body.before(toc);
   toc.hidden = false;
   const links = [...list.querySelectorAll("a")];
   const observer = new IntersectionObserver((entries) => {

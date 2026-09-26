@@ -34,11 +34,17 @@ function createVideoCard(video) {
   const visual = document.createElement("div");
   visual.className = "video-card-visual";
   const poster = video.video_poster || articleService.firstImage(video)?.url;
+  const fallback = document.createElement("span");
+  fallback.className = "video-no-poster";
+  fallback.textContent = "影像未题图";
+  visual.appendChild(fallback);
   if (poster) {
     const image = document.createElement("img");
     image.src = poster;
     image.alt = "";
     image.loading = "lazy";
+    image.addEventListener("load", () => { fallback.hidden = true; });
+    image.addEventListener("error", () => { image.remove(); fallback.hidden = false; });
     visual.appendChild(image);
   }
   const play = document.createElement("span");
@@ -66,7 +72,7 @@ function createVideoCard(video) {
     : "";
   stats.textContent = `${video.view_count || 0} 次播放 · ${video.like_count || 0} 人点赞${duration}`;
 
-  copy.append(meta, title, excerpt, stats);
+  copy.append(title, meta, excerpt, stats);
   link.append(visual, copy);
   return link;
 }

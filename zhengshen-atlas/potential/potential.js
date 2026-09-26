@@ -263,3 +263,16 @@ $('file').onchange=async e=>{
   }catch(e){toast('导入失败：请检查点数、前置关系、元素及外圈档位')}finally{$('file').value=''}
 };
 $('tree').setAttribute('tabindex','-1');draw();if(migrationNotice){save();toast(migrationNotice)}
+
+// Touch users can select every node without hitting small SVG targets.
+const touchNode=document.getElementById('touch-node');
+if(touchNode){
+ for(let b=0;b<groups.length;b++){
+  const group=document.createElement('optgroup');group.label=groups[b].name+'经脉';
+  for(const n of nodes.filter(n=>n.b===b)){const option=document.createElement('option');option.value=String(n.id);option.textContent=n.code+' · '+n.name;group.append(option)}
+  touchNode.append(group);
+ }
+ touchNode.addEventListener('change',()=>{if(touchNode.value==='')return;inspectNode(Number(touchNode.value));document.querySelector('.detail').scrollIntoView({block:'center',behavior:'instant'})});
+}
+const arena=document.querySelector('.arena');
+if(matchMedia('(max-width:600px)').matches&&arena)requestAnimationFrame(()=>{arena.scrollLeft=(arena.scrollWidth-arena.clientWidth)/2});

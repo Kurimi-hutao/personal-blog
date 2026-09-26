@@ -1,346 +1,332 @@
 .works-page main {
-  width: min(1180px, calc(100% - 32px));
-  margin: 110px auto 72px;
+  width: min(1180px,calc(100% - 64px));
+  margin: 132px auto 72px
 }
-
 .works-hero {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.8fr);
-  gap: clamp(22px, 4vw, 54px);
-  align-items: end;
-  padding: clamp(28px, 5vw, 64px) 0 34px;
-  border-bottom: 1px solid var(--line);
+  grid-template-columns: minmax(0,1fr) 180px;
+  gap: 48px;
+  align-items: center;
+  padding: 26px 0 38px;
+  border-bottom: 1px solid var(--line)
 }
-
 .works-hero h1 {
   margin: 0;
-  font: 400 clamp(3.1rem, 9vw, 7rem)/0.92 var(--brush);
-  color: var(--cinnabar);
+  font: 400 clamp(56px,7vw,92px)/1.1 var(--brush);
+  color: var(--cinnabar)
 }
-
+.works-hero .eyebrow {
+  font-size: 12px;
+  letter-spacing: .2em;
+  margin-bottom: 18px
+}
 .works-hero p {
-  margin: 16px 0 0;
-  max-width: 680px;
+  margin: 18px 0 0;
+  max-width: 620px;
   color: var(--ink-soft);
+  font-size: 15px;
+  line-height: 1.9
 }
-
 .works-hero-mark {
-  min-height: 210px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background:
-    radial-gradient(circle at 62% 42%, color-mix(in srgb, var(--cinnabar) 18%, transparent), transparent 28%),
-    linear-gradient(135deg, color-mix(in srgb, var(--paper-deep) 72%, transparent), transparent),
-    url("./assets/hutao-ink/PaperTexture.webp") center / 560px auto repeat;
   position: relative;
-  overflow: hidden;
+  justify-self: end;
+  width: 130px;
+  height: 170px;
+  border-inline: 1px solid var(--line);
+  background: url('./assets/hutao-ink/PaperTexture.webp') center/520px;
+  display: grid;
+  place-items: center
 }
-
-.works-hero-mark::before {
-  content: "";
+.works-hero-mark:before {
+  content: '拾趣成卷';
+  writing-mode: vertical-rl;
+  font: 30px/1.4 var(--brush);
+  letter-spacing: 9px;
+  color: var(--ink-soft)
+}
+.works-hero-mark:after {
+  content: '造物';
   position: absolute;
-  inset: 22px;
-  border: 2px solid color-mix(in srgb, var(--cinnabar) 44%, transparent);
-  border-radius: 50%;
-  transform: rotate(-14deg);
+  right: -12px;
+  bottom: 16px;
+  writing-mode: vertical-rl;
+  border: 1px solid var(--cinnabar);
+  padding: 6px 4px;
+  font: 13px var(--serif);
+  color: var(--cinnabar)
 }
-
 .works-toolbar {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
-  margin: 28px 0 24px;
+  gap: 6px 20px;
+  margin: 22px 0 28px
 }
-
 .works-toolbar button {
   min-height: 44px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  padding: 8px 16px;
-  background: color-mix(in srgb, var(--paper) 82%, transparent);
-  cursor: pointer;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: none;
+  color: var(--ink-soft);
+  padding: 8px 2px;
+  font: 14px var(--serif);
+  cursor: pointer
 }
-
 .works-toolbar button.active {
-  color: var(--paper);
-  border-color: var(--cinnabar);
-  background: var(--cinnabar);
+  color: var(--cinnabar);
+  border-color: var(--cinnabar)
 }
-
 .works-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 18px;
-  min-height: 280px;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: 34px 30px;
+  min-height: 240px
 }
-
 .work-card {
   position: relative;
   display: grid;
   grid-template-rows: auto 1fr;
   min-width: 0;
-  min-height: 100%;
-  overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: color-mix(in srgb, var(--surface) 82%, var(--paper));
-  box-shadow: 0 18px 42px rgba(24, 32, 29, 0.08);
+  border-bottom: 1px solid var(--line);
+  background: transparent;
+  box-shadow: none;
+  transition: border-color 240ms
 }
-
-.work-card > * {
+.work-card:hover {
+  border-color: var(--cinnabar)
+}
+.work-card>* {
   min-width: 0;
-  max-width: 100%;
+  max-width: 100%
 }
-
 .work-cover {
   position: relative;
   width: 100%;
-  min-height: 0;
+  aspect-ratio: 16/9;
   overflow: hidden;
-  aspect-ratio: 16 / 9;
-  background:
-    linear-gradient(135deg, color-mix(in srgb, var(--moss) 18%, transparent), transparent),
-    url("./assets/hutao-ink/PaperTexture.webp") center / 460px auto repeat;
+  background: var(--paper-deep);
   display: grid;
-  place-items: center;
+  place-items: center
 }
-
 .work-cover img {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: filter 240ms
 }
-
+.work-cover:hover img {
+  filter: contrast(1.06)
+}
 .work-cover span {
-  color: color-mix(in srgb, var(--cinnabar) 72%, var(--ink));
-  font: 400 2.6rem/1 var(--brush);
+  font: 48px var(--brush);
+  color: var(--cinnabar)
 }
-
 .work-copy {
-  padding: 18px;
+  padding: 24px 0 26px
 }
-
 .work-copy small {
   color: var(--cinnabar);
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: .08em
 }
-
 .work-copy h2 {
-  margin: 8px 0 8px;
-  font-size: clamp(1.1rem, 1.6vw, 1.35rem);
+  font-size: clamp(23px,2.2vw,30px);
+  font-weight: 500;
+  line-height: 1.5;
+  margin: 10px 0 12px
 }
-
 .work-copy p {
   margin: 0;
   color: var(--ink-soft);
+  font-size: 14px;
+  line-height: 1.95
 }
-
 .work-tech {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 14px;
+  gap: 8px 14px;
+  margin-top: 16px
 }
-
 .work-tech span {
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  padding: 2px 8px;
   color: var(--ink-soft);
-  font-size: 0.82rem;
+  font-size: 11px
 }
-
 .work-actions {
   display: flex;
+  gap: 22px;
   flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 16px;
+  margin-top: 14px
 }
-
 .work-actions a {
-  min-height: 38px;
+  min-height: 44px;
   display: inline-flex;
   align-items: center;
-  border-bottom: 1px solid currentColor;
+  border-bottom: 1px solid var(--line);
   color: var(--cinnabar);
-  font-weight: 700;
+  font-size: 14px
 }
-
+.work-card-featured {
+  grid-column: 1/-1;
+  grid-template-columns: minmax(0,1.35fr) minmax(0,1fr);
+  grid-template-rows: auto;
+  gap: 38px;
+  padding-bottom: 34px
+}
+.work-card-featured .work-copy {
+  align-self: center;
+  padding: 8px 0
+}
+.work-card-featured .work-copy h2 {
+  font-size: clamp(28px,3vw,42px)
+}
+.work-card-featured .work-cover {
+  aspect-ratio: 4/3
+}
+.work-card-featured .work-cover img {
+  object-position: 65% center
+}
 .works-state {
-  grid-column: 1 / -1;
-  border: 1px dashed var(--line);
-  border-radius: 8px;
-  padding: 28px;
+  grid-column: 1/-1;
+  padding: 44px 24px;
+  border-block: 1px solid var(--line);
   color: var(--ink-soft);
-  text-align: center;
+  text-align: center
 }
-
 .works-log {
-  margin-top: 48px;
-  padding-top: 28px;
-  border-top: 1px solid var(--line);
+  margin-top: 64px;
+  padding-top: 32px;
+  border-top: 1px solid var(--line)
 }
-
 .works-log h2 {
-  margin: 0 0 18px;
-  font: 400 clamp(2rem, 4vw, 3.8rem)/1 var(--brush);
+  margin: 0 0 26px;
+  font: 400 clamp(32px,4vw,50px)/1.2 var(--brush)
 }
-
 .works-log-list {
   display: grid;
-  gap: 14px;
-  position: relative;
+  gap: 0
 }
-
 .works-log-item {
   display: grid;
-  grid-template-columns: 120px minmax(0, 1fr);
-  gap: 18px;
-  padding: 16px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: color-mix(in srgb, var(--paper) 84%, transparent);
+  grid-template-columns: 130px minmax(0,1fr);
+  gap: 24px;
+  padding: 22px 0;
+  border-bottom: 1px solid var(--line)
 }
-
 .works-log-item time {
   color: var(--cinnabar);
-  font-weight: 700;
+  font-size: 13px
 }
-
 .works-log-item h3 {
-  margin: 0 0 4px;
+  font-size: 18px;
+  font-weight: 500;
+  margin: 0 0 6px
 }
-
 .works-log-item p {
-  margin: 0;
   color: var(--ink-soft);
+  font-size: 14px;
+  margin: 0
 }
-
-@media (max-width: 920px) {
-  .works-hero {
-    grid-template-columns: 1fr;
-  }
-
-  .works-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+.works-page :where(.work-copy,.works-log-item)>* {
+  overflow-wrap: anywhere
 }
-
-@media (max-width: 620px) {
+@media(max-width:840px) {
   .works-page main {
-    width: min(100% - 24px, 1180px);
-    margin-top: 92px;
+    width: calc(100% - 40px);
+    margin-top: 112px
   }
-
-  .works-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .works-log-item {
-    grid-template-columns: 1fr;
-    gap: 6px;
-  }
-}
-/* ===== Remaining pages responsive repair v3: works ===== */
-.works-page :where(.work-card, .work-copy, .work-actions, .work-tech, .works-log-item > div) {
-  min-width: 0;
-}
-
-.works-page :where(.work-copy h2, .work-copy p, .work-actions a, .work-tech span, .works-log-item h3, .works-log-item p) {
-  overflow-wrap: anywhere;
-}
-
-@media (max-width: 920px) {
   .works-hero {
-    align-items: start;
-    padding-top: 24px;
+    grid-template-columns: 1fr 100px;
+    gap: 20px;
+    padding: 10px 0 28px
   }
-
-  .works-hero h1 {
-    font-size: clamp(3rem, 12vw, 5.4rem);
-    line-height: 1;
-  }
-
   .works-hero-mark {
-    min-height: 160px;
+    width: 80px;
+    height: 140px
+  }
+  .works-hero-mark:before {
+    font-size: 25px
+  }
+  .works-hero h1 {
+    font-size: 62px
+  }
+  .works-grid {
+    gap: 28px 24px
+  }
+  .work-card-featured {
+    gap: 24px
+  }
+  .work-card-featured .work-copy h2 {
+    font-size: 30px
+  }
+  .works-toolbar {
+    gap: 6px 16px
   }
 }
-
-@media (max-width: 620px) {
+@media(max-width:620px) {
   .works-page main {
-    margin-top: calc(104px + env(safe-area-inset-top));
-    margin-bottom: 52px;
+    width: calc(100% - 36px);
+    margin-top: 112px;
+    margin-bottom: 48px
   }
-
   .works-hero {
-    gap: 14px;
-    padding: 18px 0 24px;
+    grid-template-columns: 1fr
   }
-
+  .works-hero-mark {
+    display: none
+  }
   .works-hero h1 {
-    font-size: clamp(46px, 15vw, 68px);
+    font-size: 54px
   }
-
   .works-hero p {
-    margin-top: 12px;
     font-size: 14px;
-    line-height: 1.75;
+    margin-top: 14px
   }
-
-  .works-hero-mark {
-    display: none;
-  }
-
   .works-toolbar {
     flex-wrap: nowrap;
-    max-width: 100%;
-    margin: 20px 0 18px;
     overflow-x: auto;
-    padding-bottom: 4px;
-    scrollbar-width: none;
+    max-width: 100%;
+    scrollbar-width: thin;
+    margin: 18px 0 24px
   }
-
-  .works-toolbar::-webkit-scrollbar {
-    display: none;
-  }
-
   .works-toolbar button {
-    flex: 0 0 auto;
+    flex-shrink: 0;
     white-space: nowrap;
+    font-size: 13px
   }
-
   .works-grid {
-    gap: 14px;
+    grid-template-columns: 1fr;
+    gap: 28px
   }
-
+  .work-card-featured {
+    grid-template-columns: 1fr;
+    gap: 0;
+    padding-bottom: 0
+  }
+  .work-card-featured .work-cover {
+    aspect-ratio: 16/10
+  }
+  .work-card-featured .work-copy {
+    padding: 22px 0 26px
+  }
+  .work-copy h2,.work-card-featured .work-copy h2 {
+    font-size: 27px
+  }
   .work-copy {
-    padding: 16px;
+    padding: 20px 0 24px
   }
-
-  .work-copy h2 {
-    font-size: 1.16rem;
-    line-height: 1.45;
-  }
-
-  .work-copy p {
-    font-size: 14px;
-    line-height: 1.75;
-  }
-
-  .work-actions {
-    gap: 8px 12px;
-  }
-
   .works-log {
-    margin-top: 38px;
-    padding-top: 22px;
+    margin-top: 42px
   }
-
   .works-log-item {
-    padding: 14px;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 20px 0
+  }
+}
+@media(prefers-reduced-motion:reduce) {
+  .work-card,.work-cover img {
+    transition: none
   }
 }

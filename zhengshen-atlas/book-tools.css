@@ -1,0 +1,243 @@
+/* Companion volumes share the archive's warm paper, thin rules and cinnabar marks. */
+body {
+  background: #171715;
+  color: #e5dfd0;
+  font-family: 'Blog Serif','STKaiti',serif;
+  --gold: #c6ae7f;
+  --muted: #b3ad9f;
+  --line: #b9a77a30
+}
+header,.atlas-header {
+  background: #171715;
+  border-color: var(--line)
+}
+.brand,.atlas-brand {
+  font-family: 'Blog Serif',serif
+}
+.atlas-nav a,header nav a {
+  min-height: 44px
+}
+.intro h1 {
+  font-family: 'Blog Brush','KaiTi',serif;
+  font-size: 44px
+}
+.intro .eyebrow {
+  letter-spacing: .16em
+}
+.intro p {
+  color: var(--muted)
+}
+.box,.slot,.detail {
+  border-radius: 0;
+  box-shadow: none;
+  background: #b9a77a05;
+  border-color: var(--line)
+}
+.slot-number {
+  border-radius: 0;
+  background: none;
+  border: 0
+}
+.slot:focus-within {
+  box-shadow: none;
+  border-color: #b9a77a80
+}
+.summary {
+  border-radius: 0;
+  box-shadow: none
+}
+.summary article {
+  background: #22221d
+}
+.summary article:before {
+  display: none
+}
+.summary strong {
+  font-size: 36px
+}
+.pill {
+  border-radius: 0;
+  border: 0;
+  border-left: 2px solid #ad5043;
+  padding: 4px 12px
+}
+.check {
+  border-radius: 0
+}
+.box h2,.slot-head {
+  color: #d6c7a9
+}
+.fold-trigger {
+  min-height: 44px;
+  color: var(--gold)
+}
+button,input,select {
+  border-radius: 0;
+  min-height: 44px
+}
+input,select {
+  background: #22221d
+}
+button {
+  transition: color 220ms,background-color 220ms,border-color 220ms
+}
+button:hover {
+  background: #b9a77a12
+}
+.detail {
+  border-top: 2px solid #ad5043
+}
+.detail p {
+  color: var(--muted)
+}
+.detail .adjust button {
+  height: 44px;
+  width: 48px
+}
+.allocation-meter i {
+  background: #ad5043
+}
+.node.active .orb {
+  filter: none
+}
+.node.locked {
+  opacity: .52
+}
+dialog {
+  border-radius: 0;
+  background: #22221e
+}
+dialog::backdrop {
+  backdrop-filter: none
+}
+.atlas-header {
+  gap: 20px
+}
+.touch-node-picker {
+  display: none
+}
+.arena {
+  min-width: 0
+}
+.changed {
+  animation: ink-number 250ms ease-out
+}
+@keyframes ink-number {
+  from {
+    opacity: .4
+  }
+  to {
+    opacity: 1
+  }
+}
+@media(max-width:1050px) {
+  header,.atlas-header {
+    flex-wrap: wrap;
+    height: auto;
+    min-height: 86px;
+    padding-block: 12px
+  }
+  .atlas-nav,header nav {
+    flex-wrap: wrap;
+    gap: 8px 22px
+  }
+  .atlas-nav a {
+    padding: 8px 0
+  }
+  .summary strong {
+    font-size: 30px
+  }
+}
+@media(max-width:600px) {
+  .atlas-header {
+    padding-bottom: 0
+  }
+  .atlas-nav {
+    gap: 10px;
+    min-height: 44px;
+    height: auto
+  }
+  .atlas-nav a {
+    font-size: 12px
+  }
+  .intro h1 {
+    font-size: 34px
+  }
+  .summary article {
+    padding: 16px
+  }
+  .summary strong {
+    font-size: 30px
+  }
+  .summary p {
+    font-size: 11px
+  }
+  .box,.slot {
+    padding: 16px 12px
+  }
+  .actions button {
+    min-height: 44px
+  }
+  .touch-node-picker {
+    display: grid;
+    gap: 8px;
+    grid-column: 1;
+    grid-row: 3;
+    padding: 16px 0;
+    font-size: 12px;
+    color: var(--gold)
+  }
+  .touch-node-picker select {
+    width: 100%;
+    min-width: 0;
+    font-size: 16px
+  }
+  .touch-node-picker small {
+    font-size: 11px;
+    color: var(--muted)
+  }
+  .arena {
+    grid-row: 4;
+    scroll-snap-type: x proximity
+  }
+  .mobile-help {
+    grid-row: 5
+  }
+  .legend {
+    grid-row: 6
+  }
+  .detail {
+    grid-row: 7
+  }
+  .legend button {
+    min-height: 44px
+  }
+  .arena>svg {
+    width: 1000px
+  }
+  .detail h2 {
+    font-size: 27px
+  }
+  .affix-row select,.manual-row select {
+    font-size: 14px
+  }
+  header nav {
+    gap: 8px 18px
+  }
+  header nav a {
+    display: inline-flex;
+    align-items: center
+  }
+  .table-wrap {
+    overscroll-behavior-inline: contain
+  }
+  #toast {
+    bottom: max(16px,env(safe-area-inset-bottom))
+  }
+}
+@media(prefers-reduced-motion:reduce) {
+  *,*::before,*::after {
+    animation: none!important;
+    transition: none!important
+  }
+}

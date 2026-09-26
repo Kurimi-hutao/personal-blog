@@ -44,6 +44,8 @@
     let inCode = false;
     let code = [];
     let headingIndex = 0;
+    let tableEnd = -1;
+    const cells = (row) => row.trim().replace(/^\|/, "").replace(/\|$/, "").split(/(?<!\\)\|/).map((cell) => cell.trim().replace(/\\\|/g, "|"));
 
     const flushParagraph = () => {
       if (!paragraph.length) return;
@@ -56,7 +58,8 @@
       listType = "";
     };
 
-    lines.forEach((line) => {
+    lines.forEach((line, index) => {
+      if (index <= tableEnd) return;
       if (line.startsWith("```")) {
         flushParagraph();
         closeList();
@@ -69,6 +72,23 @@
       }
       if (inCode) {
         code.push(line);
+        return;
+      }
+
+      // Keep wide tables inside their own keyboard-accessible scroll region.
+      const headerCells = cells(line);
+      const divider = cells(lines[index + 1] || "");
+      if (line.includes("|") && divider.length === headerCells.length && divider.every((cell) => /^:?-{3,}:?$/.test(cell))) {
+        flushParagraph();
+        closeList();
+        const align = divider.map((cell) => cell.startsWith(":") && cell.endsWith(":") ? "center" : cell.endsWith(":") ? "right" : "left");
+        const row = (values, tag) => `<tr>${headerCells.map((_, i) => `<${tag}${tag === "th" ? ' scope="col"' : ""} style="text-align:${align[i]}">${inline(values[i] || "")}</${tag}>`).join("")}</tr>`;
+        output.push('<div class="article-table-scroll" role="region" aria-label="文章表格，可横向滚动" tabindex="0"><table><thead>', row(headerCells, "th"), '</thead><tbody>');
+        tableEnd = index + 1;
+        while (tableEnd + 1 < lines.length && lines[tableEnd + 1].includes("|") && lines[tableEnd + 1].trim()) {
+          output.push(row(cells(lines[++tableEnd]), "td"));
+        }
+        output.push('</tbody></table></div>');
         return;
       }
 

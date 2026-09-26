@@ -1,21 +1,21 @@
 :root{--motion-ease:cubic-bezier(.22,1,.36,1);--motion-fast:180ms;--motion-panel:360ms}
 button,a,input,select{transition:color .2s,background-color .2s,border-color .2s,box-shadow .2s,transform .2s}
-button:not(:disabled):active{transform:translateY(1px) scale(.98)}
+button:not(:disabled):active{transform:translateY(1px)}
 /* Native customizable pickers retain platform keyboard / select semantics. */
 @supports (appearance:base-select){
 select,select::picker(select){appearance:base-select}
 select{align-items:center;gap:8px}
-select::picker(select){color:#e8e3d9;background:#20211f;border:1px solid #ad916b77;border-radius:8px;padding:6px;box-shadow:0 16px 50px #0009;max-height:340px;opacity:0;transform:translateY(-7px);transition:opacity .22s,transform .28s var(--motion-ease),display .28s allow-discrete,overlay .28s allow-discrete}
+select::picker(select){color:#e8e3d9;background:#20211f;border:1px solid #ad916b77;border-radius:0;padding:6px;box-shadow:0 16px 50px #0009;max-height:340px;opacity:0;transform:translateY(-7px);transition:opacity .22s,transform .28s var(--motion-ease),display .28s allow-discrete,overlay .28s allow-discrete}
 select:open::picker(select){opacity:1;transform:translateY(0)}
 @starting-style{select:open::picker(select){opacity:0;transform:translateY(-7px)}}
 select::picker-icon{color:#c9ae80;transition:rotate .25s}select:open::picker-icon{rotate:180deg}
-select option{padding:9px 12px;border-radius:4px;transition:background .16s}select option:hover,select option:focus{background:#cfb17c20}select option:checked{color:#efd19c;background:#cfb17c15}select option::checkmark{color:#d1b37e}
+select option{padding:9px 12px;border-radius:0;transition:background .16s}select option:hover,select option:focus{background:#cfb17c20}select option:checked{color:#efd19c;background:#cfb17c15}select option::checkmark{color:#d1b37e}
 }
-dialog{animation:none!important;opacity:0;transform:translateY(14px) scale(.975);transition:opacity .24s,transform .32s var(--motion-ease),display .32s allow-discrete,overlay .32s allow-discrete;box-shadow:0 25px 100px #000a;border-radius:10px}
+dialog{animation:none!important;opacity:0;transform:translateY(14px);transition:opacity .24s,transform .32s var(--motion-ease),display .32s allow-discrete,overlay .32s allow-discrete;box-shadow:0 25px 100px #000a;border-radius:0}
 dialog[open]{opacity:1;transform:translateY(0) scale(1)}
-dialog::backdrop{background:#090b0bcc;backdrop-filter:blur(5px);opacity:0;transition:opacity .28s,display .32s allow-discrete,overlay .32s allow-discrete}
+dialog::backdrop{background:#090b0bcc;backdrop-filter:none;opacity:0;transition:opacity .28s,display .32s allow-discrete,overlay .32s allow-discrete}
 dialog[open]::backdrop{opacity:1}
-@starting-style{dialog[open]{opacity:0;transform:translateY(14px) scale(.975)}dialog[open]::backdrop{opacity:0}}
+@starting-style{dialog[open]{opacity:0;transform:translateY(14px)}dialog[open]::backdrop{opacity:0}}
 .fold-trigger{display:flex;align-items:center;justify-content:space-between;width:100%;background:transparent;border:0;border-top:1px solid #d1b58125;padding:12px 0 3px;color:#c5b293;text-align:left;font-size:12px}
 .fold-trigger::after,details.motion-details>summary::after{content:'⌄';font-size:18px;line-height:1;transition:transform .3s var(--motion-ease);transform:rotate(0)}
 .fold-trigger[aria-expanded=true]::after,details.motion-details[open]>summary::after{transform:rotate(180deg)}

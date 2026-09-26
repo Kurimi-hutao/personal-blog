@@ -1,0 +1,55 @@
+/* Preserve the exhibit composition; correct only reading and image framing. */
+.kurumi-page .site-nav a {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center
+}
+.kurumi-page .gallery-image-button:focus-visible {
+  outline: 2px solid var(--cinnabar);
+  outline-offset: 5px
+}
+.kurumi-page .kurumi-art-card img {
+  object-position: center;
+  transition: filter 240ms
+}
+.kurumi-page .kurumi-art-card.tall img {
+  object-position: center 28%
+}
+.kurumi-page .lightbox-close {
+  min-width: 44px;
+  min-height: 44px
+}
+@media(max-width:620px) {
+  .kurumi-page .kurumi-hero-gif {
+    object-position: 68% center
+  }
+  .kurumi-page .kurumi-art-card.wide img {
+    object-fit: contain;
+    background: var(--paper-deep)
+  }
+  .kurumi-page .kurumi-art-card.tall img {
+    object-fit: contain;
+    background: var(--paper-deep)
+  }
+  .kurumi-page .kurumi-profile-art img {
+    object-fit: contain
+  }
+  .kurumi-page .kurumi-gallery-section {
+    scroll-margin-top: 80px
+  }
+  .kurumi-page .image-lightbox {
+    padding-bottom: max(16px,env(safe-area-inset-bottom))
+  }
+}
+@media(orientation:landscape) and (max-height:500px) {
+  .kurumi-page .kurumi-page-hero {
+    min-height: 580px
+  }
+  .kurumi-page .kurumi-hero-gif {
+    object-position: 65% 35%
+  }
+  .kurumi-page .kurumi-page-hero-copy {
+    max-width: 54%
+  }
+}
+
