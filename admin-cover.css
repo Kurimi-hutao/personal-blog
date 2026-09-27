@@ -1,0 +1,32 @@
+.cover-editor { padding: clamp(1rem, 3vw, 1.8rem); border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent); background: color-mix(in srgb, var(--paper) 92%, var(--ink) 8%); }
+.cover-editor h2, .cover-editor h3 { margin: 0; }
+.cover-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1.5rem; align-items: center; }
+.cover-preview { position: relative; aspect-ratio: 16 / 9; overflow: hidden; display: grid; place-items: center; text-align: center; border: 1px solid color-mix(in srgb, var(--ink) 12%, transparent); background: radial-gradient(ellipse at 20% 100%, color-mix(in srgb, var(--ink) 16%, transparent), transparent 65%), var(--paper); }
+.cover-preview img { width: 100%; height: 100%; position: absolute; object-fit: cover; }
+.cover-preview small { display: block; margin-top: .7rem; color: var(--ink-soft); }
+.cover-seal { position: absolute; right: .7rem; bottom: .7rem; padding: .1rem .35rem; background: var(--cinnabar); color: var(--paper); font-family: serif; border: 1px solid currentColor; transform: rotate(-5deg); }
+.cover-controls { display: grid; gap: .9rem; min-width: 0; }
+#coverStatus, .frame-hint { color: var(--ink-soft); font-size: .85rem; line-height: 1.8; margin: 0; }
+#coverStatus.error { color: var(--cinnabar); }
+.frame-picker { border-top: 1px dashed color-mix(in srgb, var(--ink) 22%, transparent); margin-top: 1.5rem; padding-top: 1rem; }
+.frame-picker video { display: block; width: 100%; max-height: 360px; margin: 1rem 0; background: #171b19; }
+.frame-controls { display: flex; gap: 1.5rem; align-items: end; margin-top: 1rem; }
+.frame-controls label { flex: 1; min-width: 0; }
+.frame-controls output { font-variant-numeric: tabular-nums; margin-left: .8rem; }
+.frame-controls input { accent-color: var(--cinnabar); padding: .5rem 0; }
+.cover-editor [hidden] { display: none !important; }
+body[data-page="admin"] button:disabled { opacity: .5; cursor: not-allowed; }
+body[data-page="admin"] :is(button, input, textarea) { transition: background-color .25s, border-color .25s, box-shadow .25s, transform .25s; }
+body[data-page="admin"] :is(input, textarea):focus-visible { outline: 2px solid color-mix(in srgb, var(--cinnabar) 55%, transparent); outline-offset: 3px; }
+@media (prefers-reduced-motion: no-preference) {
+  body[data-page="admin"] .admin-tab-panel.active { animation: ink-panel-in .38s ease-out; }
+  body[data-page="admin"] .admin-tabs button { position: relative; }
+  body[data-page="admin"] .admin-tabs button::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at bottom, color-mix(in srgb, var(--cinnabar) 12%, transparent), transparent 75%); opacity: 0; transition: opacity .3s; }
+  body[data-page="admin"] .admin-tabs button:is(:hover, .active)::after { opacity: 1; }
+  body[data-page="admin"] button:not(:disabled):active { transform: translateY(2px); }
+  .cover-preview.is-changing img { animation: ink-cover-in .5s ease-out; }
+  @keyframes ink-panel-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  @keyframes ink-cover-in { from { opacity: .3; filter: blur(3px); transform: scale(1.02); } to { opacity: 1; filter: blur(0); transform: none; } }
+}
+@media (prefers-reduced-motion: reduce) { body[data-page="admin"] :is(button, input, textarea) { transition: none; } }
+@media (max-width: 640px) { .cover-layout { grid-template-columns: 1fr; } .frame-controls { flex-direction: column; align-items: stretch; } .cover-editor .admin-list-heading { flex-wrap: wrap; gap: .7rem; } }

@@ -68,7 +68,7 @@ function renderArticle(article) {
   renderArticleMath(body);
 
   const attachments = article.attachments || [];
-  const images = attachments.filter((file) => file.type?.startsWith("image/"));
+  const images = attachments.filter((file) => file.role !== "cover" && file.type?.startsWith("image/"));
   const files = attachments.filter((file) => !file.type?.startsWith("image/"));
   if (images.length) {
     const gallery = document.createElement("div");

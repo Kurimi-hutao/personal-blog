@@ -1,4 +1,4 @@
-const CACHE_NAME = "hutao-blog-v70";
+const CACHE_NAME = "hutao-blog-v71";
 
 const APP_SHELL = [
   "./",
@@ -10,6 +10,8 @@ const APP_SHELL = [
   "./kurumi.html",
   "./pet.html",
   "./admin.html",
+  "./admin-cover.css",
+  "./admin-cover.js",
   "./404.html",
   "./manifest.webmanifest",
   "./fonts.css",

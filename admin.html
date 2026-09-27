@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="./motion-core.css?v=6" />
     <link rel="stylesheet" href="./lottie-core.css?v=4" />
     <link rel="stylesheet" href="./article-pages.css?v=13" />
+    <link rel="stylesheet" href="./admin-cover.css?v=1" />
     <script defer src="./assets/vendor/lottie-web/lottie_light-5.13.0.min.js"></script>
     <script defer src="./lottie-core.js?v=5"></script>
   </head>
@@ -159,9 +160,25 @@
                 </div>
               </div>
               <label><span>或填写视频直链</span><input type="url" name="videoUrl" placeholder="https://example.com/video.mp4" /></label>
-              <label><span>封面图片地址</span><input type="url" name="videoPoster" placeholder="可留空，或使用附件中的首张图片" /></label>
               <p class="current-video" id="currentVideo" hidden></p>
             </div>
+            <section class="cover-editor" aria-labelledby="coverHeading">
+              <div class="admin-list-heading"><div><p class="eyebrow">Cover · 定格一帧</p><h2 id="coverHeading">作品封面</h2></div><button class="text-button" id="clearCover" type="button">恢复默认封面</button></div>
+              <div class="cover-layout">
+                <div class="cover-preview"><img id="coverPreview" alt="作品封面预览" hidden /><span id="coverPlaceholder">留白，亦是风景<br /><small>默认使用附件中的首张图片</small></span><span class="cover-seal" aria-hidden="true">封</span></div>
+                <div class="cover-controls">
+                  <label><span>上传封面图片</span><input type="file" name="coverFile" accept="image/jpeg,image/png,image/webp" /><small>支持 JPG、PNG、WebP，最大 10 MB；建议使用横向图片。</small></label>
+                  <label><span>或填写封面图片地址</span><input type="url" name="videoPoster" placeholder="https://example.com/cover.jpg" /></label>
+                  <p id="coverStatus" role="status">上传图片或从视频取帧后，可在此预览。</p>
+                </div>
+              </div>
+              <div id="framePicker" class="frame-picker" hidden>
+                <div class="admin-list-heading"><h3>从视频中选取</h3><button class="text-button" id="loadCoverVideo" type="button">载入视频画面</button></div>
+                <p class="frame-hint">先选择本地视频或填写视频直链，再载入画面。拖动进度条，定格喜欢的一帧。</p>
+                <video id="coverVideo" preload="metadata" muted playsinline controls hidden></video>
+                <div class="frame-controls"><label><span>选取时间 <output id="frameTime">00:00</output></span><input id="frameSeek" type="range" min="0" max="0" step="0.01" value="0" disabled /></label><button class="ink-button secondary" id="captureCover" type="button" disabled>用这一帧作封面</button></div>
+              </div>
+            </section>
             <div class="editor-split-fields">
               <label><span>系列 / 合集</span><input type="text" name="seriesName" maxlength="80" placeholder="例如：胡桃进阶课堂" /></label>
               <label><span>集数</span><input type="number" name="episodeNumber" min="1" max="999" /></label>
@@ -189,6 +206,7 @@
     <script defer src="./assets/vendor/katex/auto-render-0.16.22.min.js"></script>
     <script src="./theme.js?v=20"></script>
     <script src="./motion-core.js?v=6"></script>
-    <script src="./admin.js?v=9"></script>
+    <script src="./admin-cover.js?v=1"></script>
+    <script src="./admin.js?v=10"></script>
   </body>
 </html>

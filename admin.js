@@ -47,6 +47,7 @@ const selectedWorks = new Set();
 let autosaveTimer = null;
 let currentVideoUpload = null;
 let lastVideoFile = null;
+let savingWork = false;
 
 function getVideoUploadMode() {
   return window.BLOG_CONFIG?.videoUploadApi ? "r2" : "supabase";
@@ -291,6 +292,7 @@ function selectedContentType() {
 function updateEditorMode() {
   const type = selectedContentType();
   const isVideo = type === "video";
+  window.adminCover.mode(isVideo);
   videoEditorFields.hidden = !isVideo;
   document.querySelector(".video-duration-field").hidden = !isVideo;
   contentFieldLabel.textContent = isVideo ? "视频简介（Markdown）" : "正文（Markdown）";
@@ -434,8 +436,11 @@ function hasEpisodeConflict() {
 }
 
 function resetEditor(type = "article") {
+  if (savingWork) return;
+  clearTimeout(autosaveTimer);
   editingArticle = null;
   articleForm.reset();
+  window.adminCover.reset();
   articleForm.elements.articleId.value = "";
   articleForm.elements.contentType.value = type;
   articleForm.elements.category.value = type === "video" ? "视频" : "随笔";
@@ -465,6 +470,7 @@ function renderExistingAttachments(article) {
   heading.textContent = "已上传附件（勾选后保存将删除）";
   existingAttachments.appendChild(heading);
   attachments.forEach((file, index) => {
+    if (file.role === "cover") return;
     const label = document.createElement("label");
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
@@ -478,6 +484,9 @@ function renderExistingAttachments(article) {
 }
 
 function beginEdit(article) {
+  if (savingWork) return;
+  clearTimeout(autosaveTimer);
+  articleForm.reset();
   editingArticle = article;
   articleForm.elements.articleId.value = article.id;
   articleForm.elements.contentType.value = article.content_type || "article";
@@ -493,6 +502,7 @@ function beginEdit(article) {
     : "";
   articleForm.elements.videoUrl.value = article.video_url || "";
   articleForm.elements.videoPoster.value = article.video_poster || "";
+  window.adminCover.reset(article);
   articleForm.elements.seriesName.value = article.series_name || "";
   articleForm.elements.episodeNumber.value = article.episode_number || "";
   articleForm.elements.durationSeconds.value = article.duration_seconds || "";
@@ -855,6 +865,7 @@ loginForm.addEventListener("submit", async (event) => {
 
 articleForm.addEventListener("submit", async (event) => {
   event.preventDefault();
+  if (savingWork) return;
   const button = articleForm.querySelector(".publish-button");
   const form = new FormData(articleForm);
   const slug = form.get("slug").trim();
@@ -878,21 +889,36 @@ articleForm.addEventListener("submit", async (event) => {
     return;
   }
 
+  let coverSelection;
+  try { coverSelection = window.adminCover.selection(); }
+  catch (error) { setStatus(error.message, true); return; }
+  savingWork = true;
+  articleForm.inert = true;
+  clearTimeout(autosaveTimer);
+  const savedDraftKey = draftKey();
   button.disabled = true;
   setStatus("正在保存作品……");
   let newAttachments = [];
   let uploadedVideo = null;
+  let committed = false;
   try {
     const session = await articleService.getSession();
     if (!session) throw new Error("登录已过期，请重新登录。");
     const files = [...articleForm.elements.attachments.files];
     newAttachments = files.length ? await articleService.uploadFiles(files, session.user.id) : [];
+    let coverAttachment = coverSelection.attachment;
+    if (coverSelection.file) {
+      const uploaded = await articleService.uploadFiles([coverSelection.file], session.user.id);
+      coverAttachment = { ...uploaded[0], role: "cover" };
+      newAttachments.push(coverAttachment);
+    }
     if (selectedVideo) uploadedVideo = await uploadSelectedVideo(selectedVideo, session);
 
     const removedIndexes = new Set(form.getAll("removeAttachment").map(Number));
     const oldAttachments = editingArticle?.attachments || [];
-    const removedAttachments = oldAttachments.filter((_, index) => removedIndexes.has(index));
-    const attachments = oldAttachments.filter((_, index) => !removedIndexes.has(index)).concat(newAttachments);
+    const removedAttachments = oldAttachments.filter((file, index) => removedIndexes.has(index) || (file.role === "cover" && file.path && file.path !== coverAttachment?.path));
+    const attachments = oldAttachments.filter((file, index) => !removedIndexes.has(index) && file.role !== "cover").concat(newAttachments.filter(file => file.role !== "cover"));
+    if (coverAttachment) attachments.unshift(coverAttachment);
     const scheduledAt = form.get("scheduledAt") ? new Date(form.get("scheduledAt")).toISOString() : null;
     const directVideoUrl = form.get("videoUrl").trim();
     const values = {
@@ -907,7 +933,7 @@ articleForm.addEventListener("submit", async (event) => {
       video_url: contentType === "video" ? (uploadedVideo?.url || directVideoUrl || editingArticle?.video_url) : null,
       video_path: contentType === "video" ? (uploadedVideo?.path || editingArticle?.video_path || null) : null,
       video_name: contentType === "video" ? (uploadedVideo?.name || editingArticle?.video_name || null) : null,
-      video_poster: contentType === "video" ? (form.get("videoPoster").trim() || articleService.firstImage({ attachments })?.url || null) : null,
+      video_poster: contentType === "video" ? (coverAttachment?.url || articleService.firstImage({ attachments })?.url || null) : null,
       series_name: form.get("seriesName").trim() || null,
       episode_number: form.get("episodeNumber") ? Number(form.get("episodeNumber")) : null,
       duration_seconds: contentType === "video" && form.get("durationSeconds") ? Number(form.get("durationSeconds")) : null,
@@ -920,22 +946,26 @@ articleForm.addEventListener("submit", async (event) => {
     const article = wasEditing
       ? await articleService.updateArticle(editingArticle.id, values)
       : await articleService.publishArticle({ ...values, author_id: session.user.id });
+    committed = true;
     if (removedAttachments.length) await articleService.removeFiles(removedAttachments).catch(() => {});
     if (uploadedVideo && oldVideoPath && oldVideoPath !== uploadedVideo.path) {
       await articleService.removeVideo({ path: oldVideoPath }).catch(() => {});
     }
+    savingWork = false;
     resetEditor(contentType);
-    localStorage.removeItem(`hutao-editor-draft-${contentType}`);
+    localStorage.removeItem(savedDraftKey);
     await loadAdminArticles();
     setStatus(wasEditing ? "作品修改已保存。" : values.published ? "作品已发布。" : "草稿已保存。");
     if (values.published && (!scheduledAt || new Date(scheduledAt) <= new Date())) {
       window.location.href = articleService.articleUrl(article);
     }
   } catch (error) {
-    if (newAttachments.length) await articleService.removeFiles(newAttachments).catch(() => {});
-    if (uploadedVideo) await articleService.removeVideo(uploadedVideo).catch(() => {});
-    setStatus(`保存失败：${error.message}`, true);
+    if (!committed && newAttachments.length) await articleService.removeFiles(newAttachments).catch(() => {});
+    if (!committed && uploadedVideo) await articleService.removeVideo(uploadedVideo).catch(() => {});
+    setStatus(`${committed ? "作品已保存，但刷新失败" : "保存失败"}：${error.message}`, true);
   } finally {
+    savingWork = false;
+    articleForm.inert = false;
     button.disabled = false;
   }
 });
@@ -1042,7 +1072,12 @@ function saveLocalDraft() {
   const data = {};
   ["contentType", "title", "slug", "excerpt", "category", "tags", "published", "scheduledAt", "videoUrl", "videoPoster", "seriesName", "episodeNumber", "durationSeconds", "content"]
     .forEach((name) => { data[name] = articleForm.elements[name]?.value || ""; });
-  localStorage.setItem(draftKey(), JSON.stringify(data));
+  data.coverData = window.adminCover.draft();
+  try { localStorage.setItem(draftKey(), JSON.stringify(data)); }
+  catch (_) {
+    document.querySelector("#autosaveStatus").textContent = "本地存储空间不足，请及时保存作品（封面尚未备份）";
+    return;
+  }
   document.querySelector("#autosaveStatus").textContent = `已自动保存 ${new Date().toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" })}`;
   document.querySelector("#restoreDraftButton").hidden = false;
 }
@@ -1059,6 +1094,7 @@ document.querySelector("#restoreDraftButton").addEventListener("click", () => {
   Object.entries(draft).forEach(([name, value]) => {
     if (articleForm.elements[name]) articleForm.elements[name].value = value;
   });
+  window.adminCover.restore(draft.coverData);
   updateEditorMode();
   renderMarkdownPreview();
   setStatus("本地草稿已恢复。");
