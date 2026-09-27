@@ -3,6 +3,7 @@
 
   window.HutaoWorksData = {
     categories: ["全部", "H5 与网页作品", "Manim 与动画", "Live2D 与桌宠", "AI 视觉实验", "比赛项目"],
+    categoryLabels: { "H5 与网页作品": "网页", "Manim 与动画": "动画", "Live2D 与桌宠": "桌宠", "AI 视觉实验": "视觉", "比赛项目": "比赛" },
     works: [
       {
         title: "永劫无间征神图鉴",

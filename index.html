@@ -11,13 +11,14 @@
     <link rel="alternate" type="application/rss+xml" title="虎桃不会振刀 RSS" href="./rss.xml" />
     <title>虎桃不会振刀 | 一卷桃花江湖</title>
     <link rel="stylesheet" href="./fonts.css?v=1" />
-    <link rel="stylesheet" href="./styles.css?v=24" />
-    <link rel="stylesheet" href="./hutao-exhibit.css?v=7" />
+    <link rel="stylesheet" href="./styles.css?v=20260927" />
+    <link rel="stylesheet" href="./hutao-exhibit.css?v=20260927" />
     <link rel="stylesheet" href="./motion-core.css?v=6" />
     <link rel="stylesheet" href="./lottie-core.css?v=4" />
-    <link rel="stylesheet" href="./motion-home.css?v=4" />
+    <link rel="stylesheet" href="./motion-home.css?v=20260927" />
     <script defer src="./assets/vendor/lottie-web/lottie_light-5.13.0.min.js"></script>
     <script defer src="./lottie-core.js?v=5"></script>
+    <link rel="stylesheet" href="./ink-system.css?v=2" />
   </head>
   <body class="home-page" data-page="home">
     <div class="paper-noise" aria-hidden="true"></div>
@@ -86,25 +87,25 @@
 
       <section class="section articles-section" id="articles">
         <div class="section-heading reveal">
-          <div><p class="eyebrow">Latest Articles</p><h2>最新文章</h2></div>
-          <p>新写下的两卷文字，<br /><a class="section-heading-link" href="./articles.html">查看全部文章 →</a></p>
+          <div><h2>最新文章</h2></div>
+          <p><a class="section-heading-link" href="./articles.html">查看全部文章 →</a></p>
         </div>
         <div class="article-grid" id="latestArticles" aria-live="polite">
           <article class="article-card featured reveal static-fallback">
             <div class="card-visual peach-mountain" aria-hidden="true"><span class="card-index">新</span><div class="ink-mountain"></div></div>
             <div class="card-content">
-              <div class="article-meta"><span>最新文章</span><time>静态兜底</time></div>
+              <div class="article-meta"><span>最新文章</span><time></time></div>
               <h3>文章正在路上</h3>
-              <p>若网络或 Supabase 暂时不可用，仍可先进入文章页翻阅已发布内容。</p>
+              <p>暂时未能载入新文章，可以前往文章目录重试。</p>
               <a href="./articles.html">查看全部文章 <span>→</span></a>
             </div>
           </article>
           <article class="article-card reveal static-fallback">
             <div class="card-visual moon-lake" aria-hidden="true"><span class="card-index">卷</span><div class="moon"></div></div>
             <div class="card-content">
-              <div class="article-meta"><span>随笔</span><time>备用入口</time></div>
+              <div class="article-meta"><span>随笔</span><time>归档</time></div>
               <h3>去文章页继续阅读</h3>
-              <p>动态数据加载成功后，这里会自动替换为最新两篇文章。</p>
+              <p>游戏随记与生活片刻，都收在文章目录里。</p>
               <a href="./articles.html">展开文章列表 <span>→</span></a>
             </div>
           </article>
@@ -113,47 +114,33 @@
 
       <section class="section home-videos-section" id="videos">
         <div class="section-heading reveal">
-          <div><p class="eyebrow">Latest Videos</p><h2>最新视频</h2></div>
-          <p>新上传的对局与片刻，<br /><a class="section-heading-link" href="./videos.html">查看全部视频 →</a></p>
+          <div><h2>最新视频</h2></div>
+          <p><a class="section-heading-link" href="./videos.html">查看全部视频 →</a></p>
         </div>
         <div class="home-video-grid" id="latestVideos" aria-live="polite">
           <a class="home-video-card reveal static-fallback" href="./videos.html">
             <div class="home-video-visual"><span class="media-play-button" aria-hidden="true"><span class="media-play-button__icon"></span></span></div>
             <div>
-              <small>最新视频 · 静态兜底</small>
+              <small></small>
               <h3>视频正在整理中</h3>
-              <p>动态读取失败时，可以从这里进入视频页查看已发布内容。</p>
+              <p>前往视频目录，查看已发布的影像。</p>
             </div>
           </a>
           <a class="home-video-card reveal static-fallback" href="./videos.html">
             <div class="home-video-visual"><span class="media-play-button" aria-hidden="true"><span class="media-play-button__icon"></span></span></div>
             <div>
-              <small>备用入口</small>
+              <small>归档</small>
               <h3>前往视频列表</h3>
-              <p>Supabase 成功返回后，这里会替换为最新两个视频。</p>
+              <p>对局、创作与值得留下的片刻。</p>
             </div>
           </a>
         </div>
       </section>
 
-      <section class="achievement-section" id="achievements">
-        <div class="achievement-copy reveal">
-          <p class="eyebrow">Jianghu Achievements</p>
-          <h2>江湖成就</h2>
-          <p>每日来桃林留下一枚脚印，连续签到可以解锁新的江湖称号。</p>
-          <button class="ink-button" id="checkinButton" type="button">今日签到</button>
-          <p class="achievement-status" id="achievementStatus" role="status">正在查看你的江湖履历……</p>
-        </div>
-        <div class="achievement-cards reveal" id="achievementCards">
-          <article><strong>初入江湖</strong><span>完成首次签到</span></article>
-          <article><strong>桃林常客</strong><span>连续签到 3 天</span></article>
-          <article><strong>风雨故人</strong><span>累计签到 7 天</span></article>
-        </div>
-      </section>
+
 
       <section class="kurumi-portal reveal" aria-labelledby="kurumiPortalTitle">
         <div class="kurumi-portal-copy">
-          <p class="eyebrow">Kurumi Collection</p>
           <h2 id="kurumiPortalTitle">胡桃绘卷</h2>
           <p>日轮之花，天才阴阳师。她的故事与水墨画卷，已收进一处独立天地。</p>
           <a class="ink-button" href="./kurumi.html"><span>前往角色介绍</span><span aria-hidden="true">→</span></a>
@@ -162,10 +149,10 @@
 
       <section class="section links-section" id="links">
         <div class="section-heading reveal">
-          <div><p class="eyebrow">Useful Links</p><h2>江湖驿站</h2></div>
-          <p>常用入口默认收起，<br />需要时再展开全部。</p>
+          <div><h2>江湖驿站</h2></div>
+          <p>视频、工具与创作入口，按需展开。</p>
         </div>
-        <div class="links-collapsible" id="linksCollapsible">
+        <div class="links-collapsible" id="linksCollapsible" hidden>
         <div class="friend-group reveal">
           <div class="friend-group-heading">
             <div><span>01</span><h3>视频平台</h3></div>
@@ -275,21 +262,34 @@
       <section class="about-section" id="about">
         <div class="ink-cloud cloud-one" aria-hidden="true"></div><div class="ink-cloud cloud-two" aria-hidden="true"></div>
         <div class="portrait-panel reveal">
-          <div class="portrait-frame"><img src="./assets/kurumi-portrait-red-moon.webp" alt="Hu Tao ink portrait" loading="lazy" decoding="async" fetchpriority="low" /></div>
+          <div class="portrait-frame"><img src="./assets/kurumi-portrait-red-moon.webp" alt="胡桃朱月水墨肖像" loading="lazy" decoding="async" fetchpriority="low" /></div>
           <span class="portrait-seal">不振</span>
         </div>
-        <div class="about-copy reveal">
-          <p class="eyebrow">About The Wanderer</p><h2>在下，虎桃不会振刀</h2>
-          <p class="about-lead">一名不太会振刀的胡桃玩家，偶尔行走江湖，常常原地成盒。</p>
+        <div class="about-copy reveal"><h2>在下，虎桃不会振刀</h2>
+          <p class="about-lead">不会振刀，偶尔写代码，也把喜欢的东西做成网页。</p>
           <p>喜欢土御门胡桃，也喜欢春桃笑。这里收藏游戏中的片刻、生活里的微光，以及一些没来得及说完的话。胜负交给下一局，故事留在这一页。</p>
           <div class="traits" aria-label="个人标签"><span>永劫无间</span><span>土御门胡桃</span><span>水墨创作</span></div>
           <blockquote>“刀未必接得住，桃花总能接住。”</blockquote>
         </div>
       </section>
 
+      <details class="achievement-section" id="achievements">
+        <summary>桃林签到 <span>查看我的江湖成就</span></summary>
+        <div class="achievement-copy reveal">
+          <h2>今日到访</h2>
+          <p>每日来桃林留下一枚脚印，连续签到可以解锁新的江湖称号。</p>
+          <button class="ink-button" id="checkinButton" type="button">今日签到</button>
+          <p class="achievement-status" id="achievementStatus" role="status">正在查看你的江湖履历……</p>
+        </div>
+        <div class="achievement-cards reveal" id="achievementCards">
+          <article><strong>初入江湖</strong><span>完成首次签到</span></article>
+          <article><strong>桃林常客</strong><span>连续签到 3 天</span></article>
+          <article><strong>风雨故人</strong><span>累计签到 7 天</span></article>
+        </div>
+      </details>
+
       <section class="message-section" id="message">
         <div class="message-inner reveal">
-          <p class="eyebrow">Leave A Mark</p>
           <h2 class="message-title" aria-label="雁过留声，侠过留墨">
             <span class="message-title-line">雁过留声</span><span class="message-title-separator" aria-hidden="true">，</span><span class="message-title-line">侠过留墨</span>
           </h2>
@@ -347,7 +347,7 @@
     <script defer src="./article-service.js?v=8"></script>
     <script defer src="./theme.js?v=20"></script>
     <script defer src="./motion-core.js?v=6"></script>
-    <script defer src="./script.js?v=17"></script>
-    <script defer src="./motion-home.js?v=3"></script>
+    <script defer src="./script.js?v=20260927"></script>
+    <script defer src="./motion-home.js?v=20260927"></script>
   </body>
 </html>

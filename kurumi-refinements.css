@@ -53,3 +53,24 @@
   }
 }
 
+
+/* Captions live on the paper, never on top of the painting. */
+.kurumi-page .kurumi-profile-copy, .kurumi-page .kurumi-profile-copy h2, .kurumi-page .kurumi-facts dd { color: var(--ink); }
+.kurumi-page .kurumi-profile-copy > p:not(.eyebrow), .kurumi-page .kurumi-facts dt { color: var(--ink-soft); }
+
+.kurumi-page .kurumi-profile-card { border: 0; border-radius: 0; box-shadow: none; background: none; }
+.kurumi-page .source-link { color: var(--cinnabar); background: none; border: 0; border-bottom: 1px solid var(--line); }
+.kurumi-page .kurumi-facts > div { background: none; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; }
+.kurumi-page .kurumi-art-grid { gap: 40px 28px; grid-template-rows: 380px 310px 310px; }
+.kurumi-page .kurumi-art-card { display: flex; flex-direction: column; background: none; border-radius: 0; box-shadow: none; overflow: visible; }
+.kurumi-page .kurumi-art-card .gallery-image-button { flex: 1; min-height: 0; height: auto; overflow: hidden; }
+.kurumi-page .kurumi-art-card figcaption { position: static; flex-shrink: 0; padding: 12px 0; color: var(--ink-soft); background: none; backdrop-filter: none; font: 14px/1.6 var(--serif); opacity: 1; transform: none; border-bottom: 1px solid var(--line); }
+@media(max-width:620px) {
+ .kurumi-page .kurumi-art-grid { display: flex; flex-direction: column; gap: 32px !important; }
+ .kurumi-page .kurumi-art-card { height: auto !important; }
+ .kurumi-page .kurumi-art-card .gallery-image-button { flex: none; aspect-ratio: 4/3; }
+ .kurumi-page .kurumi-art-card.wide .gallery-image-button { aspect-ratio: 16/9; }
+ .kurumi-page .kurumi-art-card.tall .gallery-image-button { aspect-ratio: 3/4; }
+ .kurumi-page .kurumi-art-card:nth-child(even) { margin-right: 32px; }
+ .kurumi-page .kurumi-art-card:nth-child(5) { margin-left: 32px; }
+}

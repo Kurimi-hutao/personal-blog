@@ -98,7 +98,8 @@
       const button = document.createElement("button");
       button.type = "button";
       button.setAttribute("aria-pressed", String(category === active));
-      button.textContent = category;
+      button.textContent = data.categoryLabels?.[category] || category;
+      button.setAttribute("aria-label", category);
       button.classList.toggle("active", category === active);
       button.addEventListener("click", () => {
         active = category;

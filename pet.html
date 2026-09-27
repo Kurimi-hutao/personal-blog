@@ -10,13 +10,14 @@
     <link rel="manifest" href="./manifest.webmanifest" />
     <title>胡桃小屋 | 虎桃不会振刀</title>
     <link rel="stylesheet" href="./fonts.css?v=1" />
-    <link rel="stylesheet" href="./styles.css?v=24" />
+    <link rel="stylesheet" href="./styles.css?v=20260927" />
     <link rel="preload" as="image" href="./assets/hutao-entry-shanshui.webp" fetchpriority="high" />
-    <link rel="stylesheet" href="./pet.css?v=20260925" />
+    <link rel="stylesheet" href="./pet.css?v=20260927" />
     <link rel="stylesheet" href="./motion-core.css?v=6" />
     <link rel="stylesheet" href="./lottie-core.css?v=4" />
     <script defer src="./assets/vendor/lottie-web/lottie_light-5.13.0.min.js"></script>
     <script defer src="./lottie-core.js?v=5"></script>
+    <link rel="stylesheet" href="./ink-system.css?v=2" />
   </head>
   <body class="pet-page pet-entry-active" data-page="pet">
     <div class="pet-entry" id="petEntry" aria-label="正在进入胡桃小屋" aria-live="polite">
@@ -82,14 +83,15 @@
           <div class="hanging-lantern lantern-right"></div>
         </div>
 
-        <aside class="status-card">
+        <details class="status-card">
+          <summary>相伴手记 <span>状态与今日小礼</span></summary>
           <div class="profile-row">
             <span class="profile-avatar">
               <img id="profileAvatarImage" src="./assets/hutao.webp" alt="" />
               <b id="profileAvatarText" aria-hidden="true">季</b>
             </span>
-            <div><small id="profileRelation">亲密伙伴</small><strong><span id="profileName">小桃</span> · Lv.<span id="petLevel">1</span></strong></div>
-            <span class="coin-count">✦ <b id="petCoins">20</b></span>
+            <div><small id="profileRelation">亲密伙伴</small><strong><span id="profileName">小桃</span> · 等级 <span id="petLevel">1</span></strong></div>
+            <span class="coin-count">桃花币 <b id="petCoins">20</b></span>
           </div>
           <div class="xp-track"><i id="petXpBar"></i><span id="petXpText">0 / 100</span></div>
           <div class="stat-list">
@@ -100,7 +102,7 @@
           <button class="daily-gift" id="dailyGift" type="button">
             <span>今日小礼</span><strong>领取 10 枚桃花币</strong>
           </button>
-        </aside>
+        </details>
 
         <div class="live-status" id="modelStatus" role="status">
           <i></i><span>正在唤醒 Live2D…</span>
@@ -132,12 +134,12 @@
             <strong>邀请季沧海来坐坐</strong>
           </button>
           <div class="action-grid">
-            <button type="button" data-action="pet"><span>♡</span><b>摸摸</b><small>心情 +8</small></button>
-            <button type="button" data-action="feed"><span>◇</span><b>投喂</b><small>饱食 +14</small></button>
-            <button type="button" data-action="play"><span>✦</span><b>玩耍</b><small>亲密 +8</small></button>
-            <button type="button" data-action="dance"><span>♪</span><b>跳舞</b><small>心情 +12</small></button>
-            <button type="button" data-action="sleep"><span>☾</span><b>休息</b><small>精力 +16</small></button>
-            <button type="button" data-action="wave"><span>⌁</span><b>招手</b><small>亲密 +5</small></button>
+            <button type="button" data-action="pet"><b>摸摸</b><small>心情 +8</small></button>
+            <button type="button" data-action="feed"><b>投喂</b><small>饱食 +14</small></button>
+            <button type="button" data-action="play"><b>玩耍</b><small>亲密 +8</small></button>
+            <button type="button" data-action="dance"><b>跳舞</b><small>心情 +12</small></button>
+            <button type="button" data-action="sleep"><b>休息</b><small>精力 +16</small></button>
+            <button type="button" data-action="wave"><b>招手</b><small>亲密 +5</small></button>
           </div>
           <div class="switch-row">
             <button id="motionToggle" class="mini-toggle is-on" type="button" aria-pressed="true">动态：开</button>
@@ -150,52 +152,16 @@
         <p class="drag-tip">移动光标，她会看向你 · 按住角色可以拖动</p>
       </section>
 
-      <section class="pet-notes">
-        <article>
-          <span>01</span><div><h2>视线跟随</h2><p>眼球、头部和身体会平滑追随光标，而不是只移动整张图片。</p></div>
-        </article>
-        <article>
-          <span>02</span><div><h2>持续生命感</h2><p>呼吸、眨眼、头发摇摆和身体起伏由本地运行时持续驱动。</p></div>
-        </article>
-        <article>
-          <span>03</span><div><h2>互动回应</h2><p>六种动作都直接控制 Live2D 骨骼参数，并同步保存养成进度。</p></div>
-        </article>
-      </section>
+      <p class="pet-room-note">轻触角色，或按住拖动。互动进度保存在当前浏览器。</p>
 
-      <section class="pet-archive" aria-labelledby="petArchiveTitle">
-        <div class="pet-archive-heading">
-          <p class="pet-kicker">小屋记事</p>
-          <h2 id="petArchiveTitle">小屋卷册</h2>
-          <p>这里先收纳已经接入的角色、台词和小屋记录，后续可以继续扩展家具与事件。</p>
-        </div>
+      <details class="pet-archive">
+        <summary>小屋卷册 <span>角色与互动说明</span></summary>
         <div class="pet-archive-grid">
-          <article>
-            <span>角色图鉴</span>
-            <strong>胡桃、季沧海、张起灵</strong>
-            <p>当前小屋支持三位角色串门，切换时会保留养成状态和互动入口。</p>
-          </article>
-          <article>
-            <span>已解锁台词</span>
-            <strong>六类互动回应</strong>
-            <p>摸摸、投喂、玩耍、跳舞、休息和招手均有角色专属回复。</p>
-          </article>
-          <article>
-            <span>好感等级</span>
-            <strong>经验、等级与桃花币</strong>
-            <p>互动会积累经验；升级奖励桃花币，每日小礼会记录在本地。</p>
-          </article>
-          <article>
-            <span>小屋事件</span>
-            <strong>今日礼物与角色来访</strong>
-            <p>当前记录保存在浏览器本地，后续可以扩展为更完整的事件日志。</p>
-          </article>
-          <article>
-            <span>装饰入口</span>
-            <strong>家具功能预留</strong>
-            <p>暂不伪造家具数据，先保留清晰入口，等待真实素材后接入。</p>
-          </article>
+          <article><h2>今日相伴</h2><p>胡桃、季沧海、张起灵轮流来访。点击「串门」切换角色，进度会保留。</p></article>
+          <article><h2>慢慢熟悉</h2><p>摸摸、投喂、玩耍、跳舞、休息与招手，都有各自的回应。经验、等级与每日小礼收在「相伴手记」里。</p></article>
+          <article><h2>随心歇息</h2><p>可以关闭动态与音效，也可以切换窗外的晨昏。重新访问时，养成记录仍在当前浏览器。</p></article>
         </div>
-      </section>
+      </details>
     </main>
 
     <div class="pet-toast" id="petToast" role="status" aria-live="polite"></div>

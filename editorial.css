@@ -180,7 +180,7 @@
 .article-list-card {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(240px,38%) minmax(0,1fr);
+  grid-template-columns: minmax(0,1fr) 230px;
   gap: 36px;
   padding-bottom: 38px;
   border: 0;
@@ -198,7 +198,10 @@
 }
 .article-list-cover {
   position: relative;
-  min-height: 250px;
+  min-height: 0;
+  grid-column: 2;
+  grid-row: 1;
+  align-self: start;
   overflow: hidden;
   background: var(--paper-deep);
   aspect-ratio: 4/3
@@ -220,7 +223,11 @@
   font: 68px var(--brush);
   background: var(--paper-deep) url('./assets/hutao-ink/PaperTexture.webp') center/460px
 }
+.article-list-card.without-cover { grid-template-columns: 1fr; }
+.article-list-card.without-cover .article-list-cover, .article-list-cover .cover-view-count { display: none; }
 .article-list-copy {
+  grid-column: 1;
+  grid-row: 1;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -496,12 +503,12 @@
   }
   .article-list-card {
     gap: 22px;
-    grid-template-columns: 35% minmax(0,1fr);
+    grid-template-columns: minmax(0,1fr) 160px;
     padding-bottom: 26px
   }
   .article-list-cover {
-    min-height: 210px;
-    aspect-ratio: auto
+    min-height: 0;
+    aspect-ratio: 4/3
   }
   .article-list-copy {
     padding: 0
@@ -543,15 +550,15 @@
     font-size: 54px
   }
   .article-list-card {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0,1fr) 84px;
     gap: 20px
   }
   .article-list-cover {
-    aspect-ratio: 16/9;
+    aspect-ratio: 1;
     min-height: 0
   }
   .article-list-copy h2 {
-    font-size: 27px
+    font-size: 23px
   }
   .article-list-copy .article-tags {
     margin-top: 12px

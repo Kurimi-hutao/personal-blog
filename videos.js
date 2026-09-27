@@ -61,7 +61,7 @@ function createVideoCard(video) {
   const series = video.series_name
     ? ` · ${video.series_name}${video.episode_number ? ` 第 ${video.episode_number} 集` : ""}`
     : "";
-  meta.textContent = `${video.category || "视频"} · ${articleService.formatDate(video.published_at)}${series}`;
+  meta.textContent = `${video.category && video.category !== "视频" ? video.category + " · " : ""}${articleService.formatDate(video.published_at)}${series}`;
   const title = document.createElement("h2");
   title.textContent = video.title || "未题视频";
   const excerpt = document.createElement("p");

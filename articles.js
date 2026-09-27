@@ -53,6 +53,7 @@ function createListCard(article) {
   link.href = articleService.articleUrl(article);
 
   const cover = articleService.firstImage(article);
+  link.classList.toggle("without-cover", !cover);
   const visual = document.createElement("div");
   visual.className = `article-list-cover ${cover ? "" : "placeholder-cover"}`;
   if (cover) {
@@ -88,12 +89,12 @@ function createListCard(article) {
   tags.className = "article-tags";
   (article.tags || []).forEach((tag) => {
     const chip = document.createElement("span");
-    chip.textContent = `# ${tag}`;
+    chip.textContent = tag;
     tags.appendChild(chip);
   });
   const stats = document.createElement("span");
   stats.className = "article-card-stats";
-  stats.textContent = `${article.like_count || 0} 人点赞`;
+  stats.textContent = `${article.view_count || 0} 次阅读 · ${article.like_count || 0} 人点赞`;
 
   copy.append(meta, title, excerpt, tags, stats);
   link.append(visual, copy);
@@ -119,7 +120,7 @@ function renderFilters() {
   tags.forEach((tag) => {
     const button = document.createElement("button");
     button.type = "button";
-    button.textContent = `# ${tag}`;
+    button.textContent = tag;
     button.addEventListener("click", () => {
       activeTag = activeTag === tag ? "" : tag;
       renderArticles();
@@ -155,7 +156,8 @@ function filteredArticles() {
 
 function renderArticleDom(filtered) {
   [...tagFilters.children].forEach((button) => {
-    button.classList.toggle("active", button.textContent === `# ${activeTag}`);
+    button.classList.toggle("active", button.textContent === activeTag);
+    button.setAttribute("aria-pressed", String(button.textContent === activeTag));
   });
   articleContainer.replaceChildren();
   resultCount.textContent = `共找到 ${filtered.length} 篇文章`;
