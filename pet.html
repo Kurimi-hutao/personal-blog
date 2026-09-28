@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="./fonts.css?v=1" />
     <link rel="stylesheet" href="./styles.css?v=20260927" />
     <link rel="preload" as="image" href="./assets/hutao-entry-shanshui.webp" fetchpriority="high" />
-    <link rel="stylesheet" href="./pet.css?v=20260928-2" />
+    <link rel="stylesheet" href="./pet.css?v=20260928-3" />
     <link rel="stylesheet" href="./motion-core.css?v=6" />
     <link rel="stylesheet" href="./lottie-core.css?v=20260928-2" />
     <script defer src="./assets/vendor/lottie-web/lottie_light-5.13.0.min.js"></script>
@@ -74,14 +74,7 @@
       </section>
 
       <section class="hutao-house" id="petRoom" aria-label="胡桃互动小屋">
-        <div class="room-scenery" aria-hidden="true">
-          <div class="moon"></div>
-          <div class="mountain mountain-back"></div>
-          <div class="mountain mountain-front"></div>
-          <div class="window-frame"></div>
-          <div class="hanging-lantern lantern-left"></div>
-          <div class="hanging-lantern lantern-right"></div>
-        </div>
+        <div class="room-scenery" aria-hidden="true"></div>
 
         <details class="status-card">
           <summary>相伴手记 <span>状态与今日小礼</span></summary>
@@ -114,7 +107,6 @@
         </div>
 
         <div class="pet-stage" id="petStage">
-          <div class="stage-glow" aria-hidden="true"></div>
           <div class="pet-shadow" aria-hidden="true"></div>
           <button class="pet-character" id="petCharacter" type="button" aria-label="摸摸胡桃，按住可以拖动">
             <span class="pet-rig" id="petRig">
@@ -126,7 +118,7 @@
 
         <div class="control-card">
           <div class="control-title">
-            <div><small>互动菜单</small><strong>今天想做什么？</strong></div>
+            <div><small>相伴时光</small><strong>与她共度片刻</strong></div>
             <button id="resetPosition" class="text-control" type="button">归位</button>
           </div>
           <button class="visit-control" id="visitToggle" type="button" aria-pressed="false">
@@ -148,7 +140,6 @@
           </div>
         </div>
 
-        <div class="room-floor" aria-hidden="true"></div>
         <p class="drag-tip">移动光标，她会看向你 · 按住角色可以拖动</p>
       </section>
 

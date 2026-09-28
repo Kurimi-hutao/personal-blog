@@ -14,8 +14,6 @@ body { --surface: var(--paper); }
 .ink-button:hover { background: var(--cinnabar); box-shadow: none; }
 .article-list-card, .video-card, .article-state, .work-card, .comment-card { border-radius: 0; }
 .cover-view-count { border: 0; border-radius: 0; backdrop-filter: none; }
-.tag-filter-list button.active { color: var(--paper); background: var(--ink); border-color: transparent; }
-.article-list-copy .article-tags span { border-left: 1px solid var(--line); padding-left: 8px; color: var(--ink-soft); }
 .article-filters .animated-select__menu { box-shadow: none; border: 1px solid var(--line); }
 .media-play-button__icon { border-left-color: currentColor; }
 .media-play-button { box-shadow: none; backdrop-filter: none; border-radius: 0; }
@@ -37,7 +35,7 @@ summary > span { font: 13px/1.8 var(--serif); color: var(--ink-soft); margin-lef
   .section-heading > p { font-size: 12px; }
 }
 
-[data-theme="dark"] .home-video-visual, [data-theme="dark"] .video-card-visual { background-image: none; }
+[data-theme="dark"] .home-video-visual, [data-theme="dark"] .video-card-visual, [data-theme="dark"] .placeholder-cover { background-image: none; }
 
 /* Theme surfaces must follow the same palette as their text. */
 .kurumi-page .kurumi-header { color: var(--ink); text-shadow: none; }
