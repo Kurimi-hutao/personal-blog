@@ -2685,7 +2685,7 @@ body:has(.fortune-dialog[open]) {
 
 .kurumi-page {
   background:
-    linear-gradient(rgba(244, 239, 229, 0.94), rgba(244, 239, 229, 0.94)),
+    linear-gradient(color-mix(in srgb, var(--paper) 96%, transparent), color-mix(in srgb, var(--paper) 96%, transparent)),
     url("./assets/kurumi-mountains.webp") center / cover fixed;
 }
 

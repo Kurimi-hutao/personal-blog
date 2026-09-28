@@ -38,3 +38,15 @@ summary > span { font: 13px/1.8 var(--serif); color: var(--ink-soft); margin-lef
 }
 
 [data-theme="dark"] .home-video-visual, [data-theme="dark"] .video-card-visual { background-image: none; }
+
+/* Theme surfaces must follow the same palette as their text. */
+.kurumi-page .kurumi-header { color: var(--ink); text-shadow: none; }
+.kurumi-page .kurumi-header .site-nav a.active { color: var(--cinnabar); }
+.brand .brand-icon { object-fit: cover; border: 0; padding: 0; border-radius: 50%; background: #fff; box-shadow: none; }
+input::placeholder, textarea::placeholder { color: var(--ink-soft); opacity: 1; }
+[data-theme="dark"] .ink-site-loader__animation:not(.ink-site-loader__fallback) { filter: invert(1); }
+[data-theme="dark"] .ink-site-loader__text { color: var(--ink); }
+[data-theme="dark"] body::before { background: repeating-linear-gradient(90deg, transparent 0 6px, var(--ink-wash) 6px 7px); }
+.friend-logo img { width: 36px; height: 36px; object-fit: contain; display: block; }
+.home-page .friend-logo { width: 48px; height: 48px; padding: 6px; background: #fff; border-radius: 10px; filter: none; flex-shrink: 0; }
+.home-page .friend-card:hover .friend-logo { color: inherit; background: #fff; transform: none; }
