@@ -71,6 +71,9 @@
       navigation.classList.toggle("open", open);
       menuToggle.classList.toggle("open", open);
       menuToggle.setAttribute("aria-expanded", String(open));
+      menuToggle.setAttribute("aria-label", open ? "关闭导航" : "打开导航");
+      const menuLabel = menuToggle.querySelector(".sr-only");
+      if (menuLabel) menuLabel.textContent = open ? "关闭导航" : "打开导航";
       document.documentElement.classList.toggle("mobile-nav-open", open);
       document.body.classList.toggle("mobile-nav-open", open);
       mobileChromeController?.reset();

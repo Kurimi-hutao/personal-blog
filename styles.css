@@ -1968,24 +1968,34 @@ footer {
     width: 44px;
     min-width: 44px;
     min-height: 44px;
-    padding: 11px 8px;
+    height: 44px;
+    padding: 0;
     cursor: pointer;
   }
 
   .menu-toggle span:not(.sr-only) {
+    position: absolute;
+    left: 8px;
+    top: 50%;
     display: block;
-    width: 100%;
+    width: 28px;
     height: 1px;
     background: var(--ink);
+    transform: translateY(calc(-50% - 4px));
+    transform-origin: center;
     transition: transform 0.25s;
   }
 
+  .menu-toggle span:nth-child(2) {
+    transform: translateY(calc(-50% + 4px));
+  }
+
   .menu-toggle.open span:first-child {
-    transform: translateY(4px) rotate(45deg);
+    transform: translateY(-50%) rotate(45deg);
   }
 
   .menu-toggle.open span:nth-child(2) {
-    transform: translateY(-4px) rotate(-45deg);
+    transform: translateY(-50%) rotate(-45deg);
   }
 
 .site-nav {
