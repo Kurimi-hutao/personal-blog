@@ -1,0 +1,170 @@
+[
+  {
+    "file": "index",
+    "width": 1920,
+    "height": 1200,
+    "scrollWidth": 1920,
+    "errors": [],
+    "broken": []
+  },
+  {
+    "file": "articles",
+    "width": 1920,
+    "height": 1200,
+    "scrollWidth": 1920,
+    "errors": [],
+    "broken": []
+  },
+  {
+    "file": "article",
+    "width": 1920,
+    "height": 1200,
+    "scrollWidth": 1920,
+    "errors": [],
+    "broken": []
+  },
+  {
+    "file": "videos",
+    "width": 1920,
+    "height": 1200,
+    "scrollWidth": 1920,
+    "errors": [],
+    "broken": []
+  },
+  {
+    "file": "works",
+    "width": 1920,
+    "height": 1200,
+    "scrollWidth": 1920,
+    "errors": [],
+    "broken": []
+  },
+  {
+    "file": "pet",
+    "width": 1920,
+    "height": 1200,
+    "scrollWidth": 1920,
+    "errors": [],
+    "broken": []
+  },
+  {
+    "file": "index",
+    "width": 390,
+    "height": 844,
+    "scrollWidth": 390,
+    "errors": [],
+    "broken": []
+  },
+  {
+    "file": "articles",
+    "width": 390,
+    "height": 844,
+    "scrollWidth": 390,
+    "errors": [],
+    "broken": []
+  },
+  {
+    "file": "article",
+    "width": 390,
+    "height": 844,
+    "scrollWidth": 390,
+    "errors": [],
+    "broken": []
+  },
+  {
+    "file": "videos",
+    "width": 390,
+    "height": 844,
+    "scrollWidth": 390,
+    "errors": [],
+    "broken": []
+  },
+  {
+    "file": "works",
+    "width": 390,
+    "height": 844,
+    "scrollWidth": 390,
+    "errors": [],
+    "broken": []
+  },
+  {
+    "file": "pet",
+    "width": 390,
+    "height": 844,
+    "scrollWidth": 390,
+    "errors": [],
+    "broken": []
+  },
+  {
+    "file": "index",
+    "width": 768,
+    "height": 1024,
+    "scrollWidth": 768,
+    "errors": [],
+    "broken": []
+  },
+  {
+    "file": "articles",
+    "width": 768,
+    "height": 1024,
+    "scrollWidth": 768,
+    "errors": [],
+    "broken": []
+  },
+  {
+    "file": "article",
+    "width": 768,
+    "height": 1024,
+    "scrollWidth": 768,
+    "errors": [],
+    "broken": []
+  },
+  {
+    "file": "videos",
+    "width": 768,
+    "height": 1024,
+    "scrollWidth": 768,
+    "errors": [],
+    "broken": []
+  },
+  {
+    "file": "works",
+    "width": 768,
+    "height": 1024,
+    "scrollWidth": 768,
+    "errors": [],
+    "broken": []
+  },
+  {
+    "file": "pet",
+    "width": 768,
+    "height": 1024,
+    "scrollWidth": 768,
+    "errors": [],
+    "broken": []
+  },
+  {
+    "file": "kurumi",
+    "width": 1920,
+    "height": 1200,
+    "scrollWidth": 1920,
+    "errors": [],
+    "broken": []
+  },
+  {
+    "file": "kurumi",
+    "width": 390,
+    "height": 844,
+    "scrollWidth": 390,
+    "errors": [],
+    "broken": []
+  },
+  {
+    "file": "kurumi",
+    "width": 768,
+    "height": 1024,
+    "scrollWidth": 768,
+    "errors": [],
+    "broken": []
+  }
+]

@@ -1,0 +1,134 @@
+[
+  {
+    "width": 390,
+    "name": "home anchors links and keyboard",
+    "pass": true
+  },
+  {
+    "width": 390,
+    "name": "articles content filters empty reset",
+    "pass": true
+  },
+  {
+    "width": 390,
+    "name": "article tags and sort preserved",
+    "pass": true
+  },
+  {
+    "width": 390,
+    "name": "mobile navigation and theme",
+    "pass": true
+  },
+  {
+    "width": 390,
+    "name": "article typography toc table code math",
+    "pass": true
+  },
+  {
+    "width": 390,
+    "name": "article bookmark like share comments fixture",
+    "pass": true
+  },
+  {
+    "width": 390,
+    "name": "video covers missing fallback and search",
+    "pass": true
+  },
+  {
+    "width": 390,
+    "name": "works featured and filter empty",
+    "pass": true
+  },
+  {
+    "width": 390,
+    "name": "gallery open close",
+    "pass": true
+  },
+  {
+    "width": 390,
+    "name": "pet live2d actions scene and visitor",
+    "pass": true
+  },
+  {
+    "width": 390,
+    "name": "pet persistence and controls size",
+    "pass": true
+  },
+  {
+    "width": 390,
+    "name": "gallery captions never overlap",
+    "pass": true
+  },
+  {
+    "width": 390,
+    "name": "uncaught errors",
+    "pass": true,
+    "errors": []
+  },
+  {
+    "width": 1920,
+    "name": "home anchors links and keyboard",
+    "pass": true
+  },
+  {
+    "width": 1920,
+    "name": "articles content filters empty reset",
+    "pass": true
+  },
+  {
+    "width": 1920,
+    "name": "article tags and sort preserved",
+    "pass": true
+  },
+  {
+    "width": 1920,
+    "name": "mobile navigation and theme",
+    "pass": true
+  },
+  {
+    "width": 1920,
+    "name": "article typography toc table code math",
+    "pass": true
+  },
+  {
+    "width": 1920,
+    "name": "article bookmark like share comments fixture",
+    "pass": true
+  },
+  {
+    "width": 1920,
+    "name": "video covers missing fallback and search",
+    "pass": true
+  },
+  {
+    "width": 1920,
+    "name": "works featured and filter empty",
+    "pass": true
+  },
+  {
+    "width": 1920,
+    "name": "gallery open close",
+    "pass": true
+  },
+  {
+    "width": 1920,
+    "name": "pet live2d actions scene and visitor",
+    "pass": true
+  },
+  {
+    "width": 1920,
+    "name": "pet persistence and controls size",
+    "pass": true
+  },
+  {
+    "width": 1920,
+    "name": "gallery captions never overlap",
+    "pass": true
+  },
+  {
+    "width": 1920,
+    "name": "uncaught errors",
+    "pass": true,
+    "errors": []
+  }
+]

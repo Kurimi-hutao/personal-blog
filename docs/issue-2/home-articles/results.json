@@ -1,0 +1,110 @@
+[
+  {
+    "width": 1920,
+    "height": 1200,
+    "theme": "light",
+    "count": 5,
+    "cover": {
+      "x": 371,
+      "y": 380.125,
+      "width": 553.65625
+    },
+    "copy": {
+      "x": 924.65625,
+      "y": 380.125
+    },
+    "featuredWidth": 1178,
+    "gridWidth": 1180,
+    "overflow": false,
+    "links": [
+      "./article.html?slug=review-0",
+      "./article.html?slug=review-1",
+      "./article.html?slug=review-2",
+      "./article.html?slug=review-3",
+      "./article.html?slug=review-4"
+    ],
+    "broken": 0,
+    "errors": []
+  },
+  {
+    "width": 1920,
+    "height": 1200,
+    "theme": "dark",
+    "count": 5,
+    "cover": {
+      "x": 371,
+      "y": 380.125,
+      "width": 553.65625
+    },
+    "copy": {
+      "x": 924.65625,
+      "y": 380.125
+    },
+    "featuredWidth": 1178,
+    "gridWidth": 1180,
+    "overflow": false,
+    "links": [
+      "./article.html?slug=review-0",
+      "./article.html?slug=review-1",
+      "./article.html?slug=review-2",
+      "./article.html?slug=review-3",
+      "./article.html?slug=review-4"
+    ],
+    "broken": 0,
+    "errors": []
+  },
+  {
+    "width": 390,
+    "height": 844,
+    "theme": "light",
+    "count": 5,
+    "cover": {
+      "x": 11,
+      "y": 353.40625,
+      "width": 368
+    },
+    "copy": {
+      "x": 11,
+      "y": 535.53125
+    },
+    "featuredWidth": 368,
+    "gridWidth": 370,
+    "overflow": false,
+    "links": [
+      "./article.html?slug=review-0",
+      "./article.html?slug=review-1",
+      "./article.html?slug=review-2",
+      "./article.html?slug=review-3",
+      "./article.html?slug=review-4"
+    ],
+    "broken": 0,
+    "errors": []
+  },
+  {
+    "width": 390,
+    "height": 844,
+    "theme": "dark",
+    "count": 5,
+    "cover": {
+      "x": 11,
+      "y": 353.40625,
+      "width": 368
+    },
+    "copy": {
+      "x": 11,
+      "y": 535.53125
+    },
+    "featuredWidth": 368,
+    "gridWidth": 370,
+    "overflow": false,
+    "links": [
+      "./article.html?slug=review-0",
+      "./article.html?slug=review-1",
+      "./article.html?slug=review-2",
+      "./article.html?slug=review-3",
+      "./article.html?slug=review-4"
+    ],
+    "broken": 0,
+    "errors": []
+  }
+]

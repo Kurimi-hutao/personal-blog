@@ -156,6 +156,7 @@ function filteredArticles() {
 function renderArticleDom(filtered) {
   [...tagFilters.children].forEach((button) => {
     button.classList.toggle("active", button.textContent === `# ${activeTag}`);
+    button.setAttribute("aria-pressed", String(button.textContent === `# ${activeTag}`));
   });
   articleContainer.replaceChildren();
   resultCount.textContent = `共找到 ${filtered.length} 篇文章`;

@@ -72,6 +72,7 @@ function createHomepageArticleCard(article, index) {
     image.src = cover.url;
     image.alt = "";
     image.loading = "lazy";
+    image.addEventListener("error", () => image.remove());
     visual.appendChild(image);
   } else if (index === 0) {
     const mountain = document.createElement("div");
@@ -179,11 +180,11 @@ function createHomepageVideoCard(video) {
     image.src = poster;
     image.alt = "";
     image.loading = "lazy";
+    image.addEventListener("error", () => image.remove());
     visual.appendChild(image);
   }
   const play = document.createElement("span");
   play.className = "media-play-button";
-  play.textContent = "▶";
   play.setAttribute("aria-hidden", "true");
   const playIcon = document.createElement("span");
   playIcon.className = "media-play-button__icon";
@@ -791,6 +792,7 @@ function setupLinksToggle() {
   button.addEventListener("click", () => {
     const open = !section.classList.contains("is-expanded");
     section.classList.toggle("is-expanded", open);
+    document.querySelector("#linksCollapsible").hidden = !open;
     button.setAttribute("aria-expanded", String(open));
     button.textContent = open ? "收起入口" : "展开全部入口";
   });

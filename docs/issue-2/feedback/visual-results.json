@@ -1,0 +1,282 @@
+[
+  {
+    "file": "articles",
+    "width": 1920,
+    "theme": "light",
+    "overflow": false,
+    "broken": [],
+    "brand": "./assets/brand-tigerhat.png",
+    "background": "none",
+    "errors": []
+  },
+  {
+    "file": "kurumi",
+    "width": 1920,
+    "theme": "light",
+    "overflow": false,
+    "broken": [],
+    "brand": "./assets/brand-tigerhat.png",
+    "background": "linear-gradient(color(srgb 0.956863 0.952941 0.929412 / 0.96), color(srgb 0.956863 0.952941 0.929412 / 0.96)), url(\"http://127.0.0.1:8123/assets/kurumi-mountains.webp\")",
+    "errors": []
+  },
+  {
+    "file": "index",
+    "width": 1920,
+    "theme": "light",
+    "overflow": false,
+    "broken": [],
+    "brand": "./assets/brand-tigerhat.png",
+    "background": "none",
+    "errors": []
+  },
+  {
+    "file": "videos",
+    "width": 1920,
+    "theme": "light",
+    "overflow": false,
+    "broken": [],
+    "brand": "./assets/brand-tigerhat.png",
+    "background": "none",
+    "errors": []
+  },
+  {
+    "file": "works",
+    "width": 1920,
+    "theme": "light",
+    "overflow": false,
+    "broken": [],
+    "brand": "./assets/brand-tigerhat.png",
+    "background": "none",
+    "errors": []
+  },
+  {
+    "file": "article",
+    "width": 1920,
+    "theme": "light",
+    "overflow": false,
+    "broken": [],
+    "brand": "./assets/brand-tigerhat.png",
+    "background": "none",
+    "errors": []
+  },
+  {
+    "file": "pet",
+    "width": 1920,
+    "theme": "light",
+    "overflow": false,
+    "broken": [],
+    "brand": "./assets/brand-tigerhat.png",
+    "background": "none",
+    "errors": []
+  },
+  {
+    "file": "articles",
+    "width": 1920,
+    "theme": "dark",
+    "overflow": false,
+    "broken": [],
+    "brand": "./assets/brand-tigerhat.png",
+    "background": "none",
+    "errors": []
+  },
+  {
+    "file": "kurumi",
+    "width": 1920,
+    "theme": "dark",
+    "overflow": false,
+    "broken": [],
+    "brand": "./assets/brand-tigerhat.png",
+    "background": "linear-gradient(color(srgb 0.0705882 0.0901961 0.0823529 / 0.96), color(srgb 0.0705882 0.0901961 0.0823529 / 0.96)), url(\"http://127.0.0.1:8123/assets/kurumi-mountains.webp\")",
+    "errors": []
+  },
+  {
+    "file": "index",
+    "width": 1920,
+    "theme": "dark",
+    "overflow": false,
+    "broken": [],
+    "brand": "./assets/brand-tigerhat.png",
+    "background": "none",
+    "errors": []
+  },
+  {
+    "file": "videos",
+    "width": 1920,
+    "theme": "dark",
+    "overflow": false,
+    "broken": [],
+    "brand": "./assets/brand-tigerhat.png",
+    "background": "none",
+    "errors": []
+  },
+  {
+    "file": "works",
+    "width": 1920,
+    "theme": "dark",
+    "overflow": false,
+    "broken": [],
+    "brand": "./assets/brand-tigerhat.png",
+    "background": "none",
+    "errors": []
+  },
+  {
+    "file": "article",
+    "width": 1920,
+    "theme": "dark",
+    "overflow": false,
+    "broken": [],
+    "brand": "./assets/brand-tigerhat.png",
+    "background": "none",
+    "errors": []
+  },
+  {
+    "file": "pet",
+    "width": 1920,
+    "theme": "dark",
+    "overflow": false,
+    "broken": [],
+    "brand": "./assets/brand-tigerhat.png",
+    "background": "none",
+    "errors": []
+  },
+  {
+    "file": "articles",
+    "width": 390,
+    "theme": "light",
+    "overflow": false,
+    "broken": [],
+    "brand": "./assets/brand-tigerhat.png",
+    "background": "none",
+    "errors": []
+  },
+  {
+    "file": "kurumi",
+    "width": 390,
+    "theme": "light",
+    "overflow": false,
+    "broken": [],
+    "brand": "./assets/brand-tigerhat.png",
+    "background": "linear-gradient(color(srgb 0.956863 0.952941 0.929412 / 0.96), color(srgb 0.956863 0.952941 0.929412 / 0.96)), url(\"http://127.0.0.1:8123/assets/kurumi-mountains.webp\")",
+    "errors": []
+  },
+  {
+    "file": "index",
+    "width": 390,
+    "theme": "light",
+    "overflow": false,
+    "broken": [],
+    "brand": "./assets/brand-tigerhat.png",
+    "background": "none",
+    "errors": []
+  },
+  {
+    "file": "videos",
+    "width": 390,
+    "theme": "light",
+    "overflow": false,
+    "broken": [],
+    "brand": "./assets/brand-tigerhat.png",
+    "background": "none",
+    "errors": []
+  },
+  {
+    "file": "works",
+    "width": 390,
+    "theme": "light",
+    "overflow": false,
+    "broken": [],
+    "brand": "./assets/brand-tigerhat.png",
+    "background": "none",
+    "errors": []
+  },
+  {
+    "file": "article",
+    "width": 390,
+    "theme": "light",
+    "overflow": false,
+    "broken": [],
+    "brand": "./assets/brand-tigerhat.png",
+    "background": "none",
+    "errors": []
+  },
+  {
+    "file": "pet",
+    "width": 390,
+    "theme": "light",
+    "overflow": false,
+    "broken": [],
+    "brand": "./assets/brand-tigerhat.png",
+    "background": "none",
+    "errors": []
+  },
+  {
+    "file": "articles",
+    "width": 390,
+    "theme": "dark",
+    "overflow": false,
+    "broken": [],
+    "brand": "./assets/brand-tigerhat.png",
+    "background": "none",
+    "errors": []
+  },
+  {
+    "file": "kurumi",
+    "width": 390,
+    "theme": "dark",
+    "overflow": false,
+    "broken": [],
+    "brand": "./assets/brand-tigerhat.png",
+    "background": "linear-gradient(color(srgb 0.0705882 0.0901961 0.0823529 / 0.96), color(srgb 0.0705882 0.0901961 0.0823529 / 0.96)), url(\"http://127.0.0.1:8123/assets/kurumi-mountains.webp\")",
+    "errors": []
+  },
+  {
+    "file": "index",
+    "width": 390,
+    "theme": "dark",
+    "overflow": false,
+    "broken": [],
+    "brand": "./assets/brand-tigerhat.png",
+    "background": "none",
+    "errors": []
+  },
+  {
+    "file": "videos",
+    "width": 390,
+    "theme": "dark",
+    "overflow": false,
+    "broken": [],
+    "brand": "./assets/brand-tigerhat.png",
+    "background": "none",
+    "errors": []
+  },
+  {
+    "file": "works",
+    "width": 390,
+    "theme": "dark",
+    "overflow": false,
+    "broken": [],
+    "brand": "./assets/brand-tigerhat.png",
+    "background": "none",
+    "errors": []
+  },
+  {
+    "file": "article",
+    "width": 390,
+    "theme": "dark",
+    "overflow": false,
+    "broken": [],
+    "brand": "./assets/brand-tigerhat.png",
+    "background": "none",
+    "errors": []
+  },
+  {
+    "file": "pet",
+    "width": 390,
+    "theme": "dark",
+    "overflow": false,
+    "broken": [],
+    "brand": "./assets/brand-tigerhat.png",
+    "background": "none",
+    "errors": []
+  }
+]

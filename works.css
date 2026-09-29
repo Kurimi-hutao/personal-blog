@@ -64,17 +64,17 @@
 .works-toolbar button {
   min-height: 44px;
   border: 0;
-  border-bottom: 2px solid transparent;
+  border: 1px solid transparent;
   border-radius: 0;
   background: none;
   color: var(--ink-soft);
-  padding: 8px 2px;
+  padding: 8px 12px;
   font: 14px var(--serif);
   cursor: pointer
 }
 .works-toolbar button.active {
-  color: var(--cinnabar);
-  border-color: var(--cinnabar)
+  color: var(--ink);
+  border-color: var(--line)
 }
 .works-grid {
   display: grid;
@@ -329,4 +329,13 @@
   .work-card,.work-cover img {
     transition: none
   }
+}
+
+/* Secondary projects alternate page width and image proportions like a folio. */
+@media(min-width:841px) {
+ .works-grid { grid-template-columns: repeat(12,minmax(0,1fr)); gap: 64px 40px; align-items: start; }
+ .work-card:not(.work-card-featured):nth-child(even) { grid-column: 1/8; }
+ .work-card:not(.work-card-featured):nth-child(odd) { grid-column: 9/13; margin-top: 100px; }
+ .work-card:not(.work-card-featured):nth-child(odd) .work-cover { aspect-ratio: 4/5; }
+ .work-card-featured { grid-column: 1/-1; grid-template-columns: minmax(0,1.65fr) minmax(0,1fr); }
 }
