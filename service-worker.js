@@ -1,4 +1,4 @@
-const CACHE_NAME = "hutao-blog-v76";
+const CACHE_NAME = "hutao-blog-local-spring-20260929-6";
 
 const APP_SHELL = [
   "./",
@@ -22,6 +22,8 @@ const APP_SHELL = [
   "./motion-core.css",
   "./lottie-core.css",
   "./motion-home.css",
+  "./spring-ink.css",
+  "./page-scenes.css",
   "./works.css",
   "./pet.css",
   "./article-pages.css",

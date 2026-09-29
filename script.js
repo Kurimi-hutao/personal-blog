@@ -503,6 +503,9 @@ function createPiece(options = {}) {
   const piece = document.createElement("span");
   const isPetal = options.type ? options.type === "petal" : Math.random() > 0.28;
   piece.className = `falling-piece ${isPetal ? "petal" : "leaf"}`;
+  if (isPetal) {
+    piece.style.setProperty("--petal-image", `url("./assets/spring-ink/petal-${1 + Math.floor(Math.random() * 8)}.png")`);
+  }
   field.appendChild(piece);
   pieces.add(piece);
 

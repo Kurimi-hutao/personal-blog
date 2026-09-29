@@ -1,8 +1,7 @@
 (function () {
   const storageKey = "hutao-theme";
   const saved = localStorage.getItem(storageKey);
-  const preferredDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-  const theme = saved || (preferredDark ? "dark" : "light");
+  const theme = saved === "dark" ? "dark" : "light";
   document.documentElement.dataset.theme = theme;
 
   const button = document.createElement("button");
@@ -59,7 +58,7 @@
       menuToggle.setAttribute("aria-label", "打开导航");
     }
 
-    const currentPage = document.body.dataset.page;
+    const currentPage = document.body.dataset.navParent || document.body.dataset.page;
     if (currentPage) {
       navigation.querySelectorAll("[data-nav-page]").forEach((link) => {
         link.classList.toggle("active", link.dataset.navPage === currentPage);
@@ -117,8 +116,8 @@
         <a href="./index.html">首页</a>
         <a href="./articles.html">文章</a>
         <a href="./videos.html">视频</a>
+        <a href="./works.html">作品</a>
         <a href="./kurumi.html">胡桃绘卷</a>
-        <a href="./pet.html">桌宠小屋</a>
       </nav>
       <div class="site-search-results" aria-live="polite">
         <p>输入关键词开始搜索，也可以使用上方快捷入口。</p>

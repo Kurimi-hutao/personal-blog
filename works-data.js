@@ -49,14 +49,15 @@
         coverPosition: "50% 18%",
       },
       {
-        title: "Live2D 桌宠小屋",
+        title: "桌宠小屋",
         category: "Live2D 与桌宠",
-        description: "保留本地养成状态的互动桌宠页面，支持角色切换、动作反馈和 Live2D 回退图。",
+        description: "一间可以随时回来坐坐的水墨小屋。与 Live2D 角色互动、切换动作，在日夜景色中留下相伴的时光。",
         tech: ["Live2D", "PixiJS", "JavaScript"],
         date: "2026-06",
         demo: "./pet.html",
+        demoLabel: "进入子站",
         source: "https://github.com/Kurimi-hutao/personal-blog",
-        cover: "./assets/hutao-entry-shanshui.webp",
+        cover: "./assets/pet-room-day.png",
       },
     ],
     logs: [

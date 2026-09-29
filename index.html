@@ -19,6 +19,7 @@
     <script defer src="./assets/vendor/lottie-web/lottie_light-5.13.0.min.js"></script>
     <script defer src="./lottie-core.js?v=5"></script>
     <link rel="stylesheet" href="./ink-system.css?v=20260928-2" />
+    <link rel="stylesheet" href="./spring-ink.css?v=20260929-3" />
   </head>
   <body class="home-page" data-page="home">
     <div class="paper-noise" aria-hidden="true"></div>
@@ -47,7 +48,6 @@
         <a href="./videos.html" data-nav-page="videos">视频</a>
         <a href="./works.html" data-nav-page="works">作品</a>
         <a href="./kurumi.html" data-nav-page="kurumi">胡桃绘卷</a>
-        <a href="./pet.html" data-nav-page="pet">桌宠小屋</a>
         <a href="#links" data-nav-page="links">江湖去处</a>
         <a href="#about" data-nav-page="about">侠客志</a>
         <a href="#message" data-nav-page="message">留墨</a>
@@ -56,22 +56,17 @@
 
     <main>
       <section class="hero" id="home">
-        <picture>
-          <source media="(max-width: 1080px)" srcset="./assets/ink-hero.webp" type="image/webp" />
-          <source srcset="./assets/ink-hero-desktop.webp" type="image/webp" />
-          <img class="hero-art" src="./assets/ink-hero.webp" alt="水墨浪潮与红衣胡桃" width="1600" height="900" fetchpriority="high" />
+        <picture class="spring-day">
+          <source media="(max-width: 840px)" srcset="./assets/spring-ink/mountains-mobile.png" />
+          <img class="hero-art" src="./assets/spring-ink/mountains.png" alt="桃色远山与水墨江湖" width="1672" height="941" fetchpriority="high" />
         </picture>
-        <div class="flowing-landscape" aria-hidden="true">
-          <svg class="landscape-layer landscape-far" viewBox="0 0 1600 520" preserveAspectRatio="none">
-            <path d="M0 420C130 350 210 370 330 280C425 208 500 320 610 250C730 170 810 250 905 195C1020 125 1115 250 1230 205C1360 155 1450 245 1600 150V520H0Z" />
-          </svg>
-          <svg class="landscape-layer landscape-near" viewBox="0 0 1600 520" preserveAspectRatio="none">
-            <path d="M0 445C120 390 205 410 315 335C410 270 515 385 650 310C760 250 835 365 970 290C1090 220 1190 350 1315 275C1420 215 1510 275 1600 235V520H0Z" />
-          </svg>
-          <span class="landscape-mist mist-one"></span>
-          <span class="landscape-mist mist-two"></span>
+        <div class="spring-night" aria-hidden="true"></div>
+        <div class="spring-scene" aria-hidden="true">
+          <img class="spring-mist" src="./assets/spring-ink/mist.png" alt="" width="1672" height="941" />
+          <img class="spring-branch" src="./assets/spring-ink/branch.png" alt="" width="1672" height="941" />
+          <img class="spring-foreground spring-rocks" src="./assets/spring-ink/foreground-rocks.png" alt="" width="1672" height="941" />
+          <img class="spring-foreground spring-grass" src="./assets/spring-ink/foreground-grass.png" alt="" width="1672" height="941" />
         </div>
-        <div class="hero-wash" aria-hidden="true"></div>
         <div class="hero-copy">
           <p class="eyebrow">此间江湖 · 随笔一卷</p>
           <h1><span>虎桃</span><span class="title-small">不会振刀</span></h1>
@@ -308,6 +303,9 @@
       </section>
     </main>
 
+    <div class="spring-closing" aria-hidden="true">
+      <img src="./assets/spring-ink/closing-landscape.png" alt="" width="2172" height="724" loading="lazy" />
+    </div>
     <footer>
       <p>© 2026 虎桃不会振刀</p>
       <span>风来翻卷 · 桃落成诗</span>
@@ -348,9 +346,9 @@
     <script defer src="./assets/vendor/supabase/supabase-2.108.2.js"></script>
     <script defer src="./supabase-config.js"></script>
     <script defer src="./article-service.js?v=8"></script>
-    <script defer src="./theme.js?v=21"></script>
+    <script defer src="./theme.js?v=23"></script>
     <script defer src="./motion-core.js?v=6"></script>
-    <script defer src="./script.js?v=20260927"></script>
+    <script defer src="./script.js?v=20260929-spring"></script>
     <script defer src="./motion-home.js?v=20260927"></script>
   </body>
 </html>

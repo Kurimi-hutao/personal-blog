@@ -91,6 +91,17 @@ function renderArticle(article) {
     body.appendChild(box);
   }
   root.append(header, body);
+  if (article.content_type !== "video") {
+    const ending = document.createElement("img");
+    ending.className = "article-ending-scene";
+    ending.src = "./assets/page-scenes/article-ending.png";
+    ending.alt = "";
+    ending.setAttribute("aria-hidden", "true");
+    ending.width = 1536;
+    ending.height = 1024;
+    ending.loading = "lazy";
+    root.appendChild(ending);
+  }
 
   document.title = `${article.title} | ${article.content_type === "video" ? "视频" : "文章"} | 虎桃不会振刀`;
   setMeta("description", article.excerpt);

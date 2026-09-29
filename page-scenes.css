@@ -1,0 +1,52 @@
+/* Page artwork supplied by the site owner; original PNGs preserved. */
+[data-page="articles"] .scene-banner { --scene-art: url('./assets/page-scenes/articles-writing-desk.png'); }
+[data-page="videos"] .scene-banner { --scene-art: url('./assets/page-scenes/videos-riverside-stage.png'); }
+.works-page .scene-banner { --scene-art: url('./assets/page-scenes/works-maker-study.png'); }
+.kurumi-page .scene-gallery { --scene-art: url('./assets/page-scenes/kurumi-moonlit-background.png'); }
+.scene-banner {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 16px;
+  min-height: 340px;
+  padding: 38px;
+  margin-bottom: 32px;
+  border: 0;
+  background: var(--paper);
+}
+.scene-banner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: var(--scene-art) right center / cover no-repeat;
+  mask-image: linear-gradient(to bottom, #000 85%, transparent);
+}
+.scene-banner > :not(.works-hero-mark) { max-width: 46%; }
+.scene-banner .eyebrow { margin: 0; }
+.scene-banner > p:last-child { margin: 0; max-width: 42%; }
+.scene-banner h1 { margin: 0; }
+.scene-banner .works-hero-mark { display: none; }
+.scene-gallery h2 { font-size: clamp(38px, 5vw, 66px); }
+.scene-gallery::before { background-position: right center; background-size: auto 100%; mask-image: linear-gradient(to right, transparent 48%, #000 67%), linear-gradient(to bottom, #000 85%, transparent); mask-composite: intersect; }
+.article-ending-scene { display: block; width: min(260px, 65%); height: auto; margin: 40px auto 16px; pointer-events: none; }
+.lost-page .article-detail-shell { padding-top: clamp(64px, 10svh, 110px); padding-bottom: 24px; }
+.lost-page .page-title::after { content: none; }
+.lost-scene { display: block; width: 100%; height: auto; margin: 24px auto 0; mask-image: linear-gradient(to bottom, transparent, #000 28%, #000 90%, transparent); }
+html[data-theme="dark"] .scene-banner::before { filter: brightness(.3) saturate(.45); }
+html[data-theme="dark"] .article-ending-scene { filter: brightness(.8) saturate(.65); }
+html[data-theme="dark"] .lost-scene { filter: brightness(.4) saturate(.45); }
+@media (max-width: 700px) {
+  .scene-banner { min-height: 360px; padding: 24px 20px 170px; gap: 14px; justify-content: flex-start; }
+  .scene-banner::before { background-size: auto 190px; background-position: right bottom; mask-image: linear-gradient(to top, transparent, #000 24px, #000 135px, transparent 190px); }
+  .scene-banner > :not(.works-hero-mark), .scene-banner > p:last-child { max-width: 100%; }
+  .scene-banner h1 { font-size: clamp(42px, 10vw, 64px); }
+  .scene-banner .eyebrow { font-size: 11px; letter-spacing: .12em; }
+  .scene-banner > p:last-child { font-size: 14px; }
+  .scene-gallery::before { background-size: auto 260px; }
+  .article-ending-scene { width: 190px; margin-top: 28px; }
+}

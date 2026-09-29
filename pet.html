@@ -19,7 +19,7 @@
     <script defer src="./lottie-core.js?v=5"></script>
     <link rel="stylesheet" href="./ink-system.css?v=20260928-2" />
   </head>
-  <body class="pet-page pet-entry-active" data-page="pet">
+  <body class="pet-page pet-entry-active" data-page="pet" data-nav-parent="works">
     <div class="pet-entry" id="petEntry" aria-label="正在进入胡桃小屋" aria-live="polite">
       <div class="pet-entry-landscape" aria-hidden="true"></div>
       <div class="pet-entry-mist pet-entry-mist-back" aria-hidden="true"></div>
@@ -49,9 +49,8 @@
         <a href="./index.html" data-nav-page="home">卷首</a>
         <a href="./articles.html" data-nav-page="articles">文章</a>
         <a href="./videos.html" data-nav-page="videos">视频</a>
-        <a href="./works.html" data-nav-page="works">作品</a>
+        <a class="active" href="./works.html" data-nav-page="works">作品</a>
         <a href="./kurumi.html" data-nav-page="kurumi">胡桃绘卷</a>
-        <a class="active" href="./pet.html" data-nav-page="pet">桌宠小屋</a>
         <a href="./index.html#links" data-nav-page="links">江湖去处</a>
         <a href="./index.html#about" data-nav-page="about">侠客志</a>
         <a href="./index.html#message" data-nav-page="message">留墨</a>
@@ -61,7 +60,7 @@
     <main class="pet-shell">
       <section class="pet-heading">
         <div>
-          <p class="pet-kicker">一室山月 · 今日相伴</p>
+          <p class="pet-kicker"><a href="./works.html">作品</a> / 桌宠小屋 · 一室山月</p>
           <h1>胡桃小屋</h1>
           <p>摸摸她，送一份点心，或邀她跳一支舞。</p>
         </div>
@@ -160,7 +159,7 @@
     <script src="./assets/vendor/live2dcubismcore.min.js"></script>
     <script src="./assets/vendor/pixi.min.js"></script>
     <script src="./assets/vendor/pixi-live2d-display.min.js"></script>
-    <script src="./theme.js?v=21"></script>
+    <script src="./theme.js?v=23"></script>
     <script src="./pet-rig.js?v=20260615-fullbody"></script>
     <script src="./pet-voices.js?v=2"></script>
     <script src="./pet.js?v=20260630-voices3"></script>
