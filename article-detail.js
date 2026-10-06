@@ -535,6 +535,25 @@ async function loadArticle() {
   try {
     currentArticle = await articleService.getPublished(slug);
     renderArticle(currentArticle);
+    if (currentArticle.local) {
+      const actions = document.querySelector("#articleActions");
+      const likeButton = actions.querySelector("[data-reaction]");
+      const shareButton = document.querySelector("#shareArticle");
+      if (likeButton) likeButton.hidden = true;
+      document.querySelector("#viewCount").textContent = "站内专题";
+      actions.hidden = false;
+      shareButton.addEventListener("click", async () => {
+        const data = { title: currentArticle.title, text: currentArticle.excerpt, url: location.href };
+        try {
+          if (navigator.share) await navigator.share(data);
+          else {
+            await navigator.clipboard.writeText(location.href);
+            shareButton.textContent = "链接已复制";
+          }
+        } catch {}
+      });
+      return;
+    }
     setupComments(currentArticle);
     await Promise.all([loadComments(currentArticle.id), setupArticleExtras(currentArticle)]);
   } catch {
