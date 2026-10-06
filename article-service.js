@@ -11,6 +11,42 @@
       ? window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey)
       : null;
 
+  const localArticles = Array.isArray(window.LOCAL_ARTICLES) ? window.LOCAL_ARTICLES : [];
+
+  function cloneLocalArticle(article) {
+    return {
+      ...article,
+      tags: [...(article.tags || [])],
+      attachments: (article.attachments || []).map((file) => ({ ...file })),
+    };
+  }
+
+  function matchesLocalFilters(article, filters = {}) {
+    if (filters.contentType && article.content_type !== filters.contentType) return false;
+    if (filters.category && article.category !== filters.category) return false;
+    if (filters.tag && !(article.tags || []).includes(filters.tag)) return false;
+    if (filters.search) {
+      const keyword = String(filters.search).trim().toLowerCase();
+      const haystack = [article.title, article.excerpt, article.category, ...(article.tags || [])]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      if (keyword && !haystack.includes(keyword)) return false;
+    }
+    return article.published !== false && !article.deleted_at;
+  }
+
+  function mergeLocalArticles(remote = [], limit, filters = {}) {
+    const remoteSlugs = new Set(remote.map((item) => item.slug));
+    const locals = localArticles
+      .filter((item) => matchesLocalFilters(item, filters) && !remoteSlugs.has(item.slug))
+      .map(cloneLocalArticle);
+    const merged = [...locals, ...remote].sort(
+      (a, b) => new Date(b.published_at || b.created_at || 0) - new Date(a.published_at || a.created_at || 0),
+    );
+    return limit ? merged.slice(0, limit) : merged;
+  }
+
   function requireClient() {
     if (!client) {
       throw new Error("文章服务尚未配置，请先填写 supabase-config.js。");
@@ -125,12 +161,16 @@
     if (filters.tag) query = query.contains("tags", [filters.tag]);
     if (limit) query = query.limit(limit);
     const { data, error } = await query;
-    if (error && isSchemaMismatch(error)) return listPublishedV6(limit, filters);
+    if (error && isSchemaMismatch(error)) {
+      return mergeLocalArticles(await listPublishedV6(limit, filters), limit, filters);
+    }
     if (error) throw error;
-    return data;
+    return mergeLocalArticles(data, limit, filters);
   }
 
   async function getPublished(slug) {
+    const localArticle = localArticles.find((item) => item.slug === slug && matchesLocalFilters(item));
+    if (localArticle) return cloneLocalArticle(localArticle);
     let { data, error } = await requireClient()
       .from("articles")
       .select("*")
