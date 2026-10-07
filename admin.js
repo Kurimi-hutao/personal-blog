@@ -34,6 +34,8 @@ const adminSeriesFilter = document.querySelector("#adminSeriesFilter");
 const adminSortWorks = document.querySelector("#adminSortWorks");
 const selectVisibleWorks = document.querySelector("#selectVisibleWorks");
 const clearSelectedWorks = document.querySelector("#clearSelectedWorks");
+const adminStatusFilter = document.querySelector("#adminStatusFilter");
+const bulkTrashButton = document.querySelector("#bulkTrashButton");
 
 let articles = [];
 let comments = [];
@@ -42,12 +44,13 @@ let editingArticle = null;
 let workFilter = "all";
 let adminMetadata = { categories: new Map(), tags: new Map(), series: new Map() };
 let visibleAdminWorks = [];
-let adminListReady = false;
 const selectedWorks = new Set();
 let autosaveTimer = null;
 let currentVideoUpload = null;
 let lastVideoFile = null;
 let savingWork = false;
+let statusTimer = null;
+let bulkBusy = false;
 
 function getVideoUploadMode() {
   return window.BLOG_CONFIG?.videoUploadApi ? "r2" : "supabase";
@@ -66,17 +69,17 @@ function formatBytes(bytes) {
 
 function validateVideoFile(file) {
   if (!file) return null;
-  if (!["video/mp4", "video/webm", "video/ogg"].includes(file.type)) return "Video must be MP4, WebM, or OGG.";
+  if (!["video/mp4", "video/webm", "video/ogg"].includes(file.type)) return "请选择 MP4、WebM 或 OGG 格式的视频。";
   const maxBytes = getMaxVideoSizeBytes();
-  if (file.size > maxBytes) return `Video must not exceed ${formatBytes(maxBytes)}.`;
+  if (file.size > maxBytes) return `视频大小不能超过 ${formatBytes(maxBytes)}。`;
   return null;
 }
 
 function updateVideoUploadHint() {
   if (!videoUploadHint) return;
   videoUploadHint.textContent = getVideoUploadMode() === "r2"
-    ? "MP4/WebM/OGG, up to 500MB with multipart R2 upload."
-    : "Supabase compatibility upload is active: up to 50MB. Configure Cloudflare R2 for 500MB.";
+    ? `支持 MP4、WebM、OGG，最大 ${formatBytes(getMaxVideoSizeBytes())}，上传时可查看进度。`
+    : "支持 MP4、WebM、OGG，最大 50 MB。";
 }
 
 function renderUploadProgress(detail = {}) {
@@ -86,22 +89,16 @@ function renderUploadProgress(detail = {}) {
   videoUploadName.textContent = detail.file.name;
   videoUploadSize.textContent = formatBytes(detail.file.size);
   const label = {
-    creating: "Creating upload",
-    uploading: "Uploading",
-    retrying: "Retrying",
-    completing: "Completing upload",
-    done: "Upload complete",
-    failed: "Upload failed",
-    canceled: "Canceled",
-    waiting: "Waiting",
-  }[detail.status] || "Waiting";
+    creating: "准备上传", uploading: "正在上传", retrying: "正在重试", completing: "正在完成上传",
+    done: "上传完成", failed: "上传失败", canceled: "已取消", waiting: "等待上传",
+  }[detail.status] || "等待上传";
   videoUploadStatus.textContent = label;
   videoUploadProgress.value = Math.round(detail.percent || 0);
   videoUploadPercent.textContent = `${Math.round(detail.percent || 0)}%`;
   videoUploadBytes.textContent = `${formatBytes(detail.uploadedBytes || 0)} / ${formatBytes(detail.totalBytes || detail.file.size)}`;
-  videoUploadPart.textContent = `Part ${detail.partNumber || 0} / ${detail.totalParts || 0}`;
+  videoUploadPart.textContent = `分片 ${detail.partNumber || 0} / ${detail.totalParts || 0}`;
   videoUploadSpeed.textContent = `${formatBytes(detail.speedBytesPerSecond || 0)}/s`;
-  videoUploadEta.textContent = detail.remainingSeconds ? `ETA ${Math.ceil(detail.remainingSeconds)}s` : "ETA --";
+  videoUploadEta.textContent = detail.remainingSeconds ? `剩余约 ${Math.ceil(detail.remainingSeconds)} 秒` : "剩余时间待估算";
 }
 
 async function uploadSelectedVideo(file, session) {
@@ -157,8 +154,10 @@ async function uploadSelectedVideo(file, session) {
 }
 
 function setStatus(message, isError = false) {
+  clearTimeout(statusTimer);
   statusElement.textContent = message;
   statusElement.classList.toggle("error", isError);
+  if (message && !isError) statusTimer = setTimeout(() => { statusElement.textContent = ""; }, 6000);
 }
 
 function adminDialog({ title, message, input = false, danger = false }) {
@@ -275,6 +274,7 @@ function switchPanel(panelId) {
   });
   document.querySelectorAll("[data-admin-target]").forEach((button) => {
     button.classList.toggle("active", button.dataset.adminTarget === panelId);
+    button.setAttribute("aria-current", button.dataset.adminTarget === panelId ? "page" : "false");
   });
 }
 
@@ -300,12 +300,18 @@ function updateEditorMode() {
     ? "介绍视频内容、录制背景或精彩看点。"
     : "# 标题\n\n支持列表、引用、链接、图片、代码块与 LaTeX 公式。";
   if (!editingArticle) editorTitle.textContent = isVideo ? "新建视频" : "新建文章";
-  articleForm.querySelector(".publish-button").textContent = editingArticle
-    ? "保存修改"
-    : isVideo ? "发布视频" : "发布文章";
+  updatePublishControls();
   updateVideoUploadHint();
   refreshEditorSuggestionPanels();
   updateEpisodeHelper();
+}
+
+function updatePublishControls() {
+  const draft = articleForm.elements.published.value === "false";
+  const scheduled = !draft && articleForm.elements.scheduledAt.value && new Date(articleForm.elements.scheduledAt.value) > new Date();
+  articleForm.querySelector(".publish-button").textContent = draft ? "保存草稿" : scheduled ? "保存定时发布" : editingArticle ? "保存修改" : selectedContentType() === "video" ? "发布视频" : "发布文章";
+  document.querySelector("#publishSummary").textContent = draft ? "仅自己可见，不会公开" : scheduled ? "将在设定时间公开" : "保存后公开显示";
+  window.MotionCore?.createAnimatedSelect?.(articleForm.elements.published)?.refresh();
 }
 
 function ensureSuggestionPanel(input, className) {
@@ -497,8 +503,9 @@ function beginEdit(article) {
   articleForm.elements.category.value = article.category || "随笔";
   articleForm.elements.tags.value = (article.tags || []).join(", ");
   articleForm.elements.published.value = String(article.published);
-  articleForm.elements.scheduledAt.value = article.scheduled_at
-    ? new Date(article.scheduled_at).toISOString().slice(0, 16)
+  const scheduledDate = article.scheduled_at ? new Date(article.scheduled_at) : null;
+  articleForm.elements.scheduledAt.value = scheduledDate
+    ? new Date(scheduledDate.getTime() - scheduledDate.getTimezoneOffset() * 60000).toISOString().slice(0, 16)
     : "";
   articleForm.elements.videoUrl.value = article.video_url || "";
   articleForm.elements.videoPoster.value = article.video_poster || "";
@@ -517,17 +524,32 @@ function beginEdit(article) {
   articleForm.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
+function workStatus(article) {
+  if (article.deleted_at) return "trash";
+  if (!article.published) return "draft";
+  return article.scheduled_at && new Date(article.scheduled_at) > new Date() ? "scheduled" : "published";
+}
+
+function updateSelectionControls() {
+  document.querySelector("#selectedWorkCount").textContent = `已选 ${selectedWorks.size} 项`;
+  clearSelectedWorks.disabled = !selectedWorks.size || bulkBusy;
+  selectVisibleWorks.disabled = bulkBusy || !visibleAdminWorks.some(article => !article.deleted_at && !selectedWorks.has(article.id));
+  bulkTrashButton.disabled = !selectedWorks.size || bulkBusy;
+  bulkTrashButton.textContent = bulkBusy ? "正在移入…" : selectedWorks.size ? `移入回收站（${selectedWorks.size}）` : "移入回收站";
+}
+
 function renderArticleList() {
   const search = (adminWorkSearch?.value || "").trim().toLowerCase();
   const category = adminCategoryFilter?.value || "";
   const series = adminSeriesFilter?.value || "";
   const sort = adminSortWorks?.value || "updated-desc";
+  const status = adminStatusFilter.value;
   const filtered = articles.filter((article) => {
-    if (workFilter === "trash") return Boolean(article.deleted_at);
-    if (article.deleted_at) return false;
-    const typeMatch = workFilter === "all" || (article.content_type || "article") === workFilter;
+    if (Boolean(article.deleted_at) !== (workFilter === "trash")) return false;
+    const typeMatch = workFilter === "all" || workFilter === "trash" || (article.content_type || "article") === workFilter;
     const text = [article.title, article.excerpt, article.category, article.series_name, ...(article.tags || [])].join(" ").toLowerCase();
     return typeMatch &&
+      (!status || workFilter === "trash" || workStatus(article) === status) &&
       (!category || article.category === category) &&
       (!series || article.series_name === series) &&
       (!search || text.includes(search));
@@ -539,34 +561,63 @@ function renderArticleList() {
   };
   filtered.sort(sorters[sort] || sorters["updated-desc"]);
   visibleAdminWorks = filtered;
+  const selectableIds = new Set(filtered.filter(article => !article.deleted_at).map(article => article.id));
+  for (const id of selectedWorks) if (!selectableIds.has(id)) selectedWorks.delete(id);
+  updateSelectionControls();
+  document.querySelector("#adminWorkCount").textContent = `共 ${filtered.length} 个作品${workFilter === "trash" ? " · 可恢复为草稿" : ""}`;
+  document.querySelector(".admin-selection-bar").hidden = workFilter === "trash";
+  adminStatusFilter.disabled = workFilter === "trash";
+  const statusSelect = window.MotionCore?.createAnimatedSelect?.(adminStatusFilter);
+  if (statusSelect) {
+    statusSelect.refresh();
+    statusSelect.trigger.disabled = adminStatusFilter.disabled;
+  }
+  document.querySelectorAll("[data-work-filter]").forEach(button => {
+    const type = button.dataset.workFilter;
+    let count = button.querySelector(".work-filter-count");
+    if (!count) { count = document.createElement("span"); count.className = "work-filter-count"; button.append(count); }
+    count.textContent = articles.filter(article => type === "trash" ? article.deleted_at : !article.deleted_at && (type === "all" || (article.content_type || "article") === type)).length;
+    button.setAttribute("aria-pressed", String(type === workFilter));
+  });
 
   const draw = () => {
   articleList.replaceChildren();
   if (!filtered.length) {
-    articleList.innerHTML = '<p class="article-state">当前分类还没有作品。</p>';
+    articleList.innerHTML = '<p class="article-state">没有符合条件的作品。试试其他关键词，或点击「重置筛选」。</p>';
   } else {
     filtered.forEach((article) => {
       const row = document.createElement("article");
       row.className = "admin-article-row";
       const copy = document.createElement("div");
+      copy.className = "admin-work-copy";
       const select = document.createElement("input");
       select.type = "checkbox";
       select.className = "work-select";
       select.checked = selectedWorks.has(article.id);
+      select.hidden = Boolean(article.deleted_at);
       select.setAttribute("aria-label", `选择《${article.title}》`);
       select.addEventListener("change", () => {
         if (select.checked) selectedWorks.add(article.id);
         else selectedWorks.delete(article.id);
+        updateSelectionControls();
       });
+      const badges = document.createElement("div");
+      badges.className = "work-badges";
+      const typeBadge = document.createElement("span");
+      typeBadge.className = "work-badge";
+      typeBadge.textContent = articleService.contentLabel(article);
+      const statusBadge = document.createElement("span");
+      statusBadge.className = `work-badge ${workStatus(article)}`;
+      statusBadge.textContent = {published:"已发布", draft:"草稿", scheduled:"定时发布", trash:"回收站"}[workStatus(article)];
+      badges.append(typeBadge, statusBadge);
       const title = document.createElement("h3");
       title.textContent = article.title;
       const meta = document.createElement("p");
-      const categoryText = article.category ? ` · ${article.category}` : "";
       const seriesText = article.content_type === "video" && article.series_name
         ? ` · ${article.series_name}${article.episode_number ? ` 第 ${article.episode_number} 集` : ""}`
         : "";
-      meta.textContent = `${articleService.contentLabel(article)} · ${article.published ? "已发布" : "草稿"}${categoryText}${seriesText} · ${articleService.formatDate(article.updated_at)} · ${article.view_count || 0} 次浏览`;
-      copy.append(title, meta);
+      meta.textContent = `${article.category || "未分类"}${seriesText} · ${articleService.formatDate(article.updated_at)}更新 · ${article.view_count || 0} 次浏览`;
+      copy.append(badges, title, meta);
       const actions = document.createElement("div");
       actions.className = "admin-row-actions";
       const viewLink = document.createElement("a");
@@ -577,7 +628,7 @@ function renderArticleList() {
       viewLink.textContent = "查看";
       const editButton = document.createElement("button");
       editButton.type = "button";
-      editButton.className = "text-button";
+      editButton.className = "text-button edit-work";
       editButton.textContent = "编辑";
       editButton.addEventListener("click", () => beginEdit(article));
       const deleteButton = document.createElement("button");
@@ -594,25 +645,27 @@ function renderArticleList() {
         restoreButton.textContent = "恢复";
         restoreButton.addEventListener("click", async () => {
           restoreButton.disabled = true;
-          await articleService.restoreArticle(article.id);
-          await loadAdminArticles();
-          setStatus("作品已从回收站恢复为草稿。");
+          try {
+            await articleService.restoreArticle(article.id);
+            await loadAdminArticles();
+            setStatus("作品已从回收站恢复为草稿。");
+          } catch (error) {
+            setStatus(`恢复失败：${error.message}`, true);
+            restoreButton.disabled = false;
+          }
         });
         actions.append(restoreButton, deleteButton);
       } else {
-        actions.append(viewLink, editButton, deleteButton);
+        actions.append(editButton);
+        if (workStatus(article) === "published") actions.append(viewLink);
+        actions.append(deleteButton);
       }
       row.append(select, copy, actions);
       articleList.appendChild(row);
     });
   }
   };
-  if (adminListReady && window.MotionCore?.animateListUpdate) {
-    window.MotionCore.animateListUpdate(articleList, draw);
-  } else {
-    draw();
-    adminListReady = true;
-  }
+  draw();
   const activeWorks = articles.filter((item) => !item.deleted_at);
   const articleWorks = activeWorks.filter((item) => (item.content_type || "article") === "article");
   const videoWorks = activeWorks.filter((item) => item.content_type === "video");
@@ -955,10 +1008,8 @@ articleForm.addEventListener("submit", async (event) => {
     resetEditor(contentType);
     localStorage.removeItem(savedDraftKey);
     await loadAdminArticles();
-    setStatus(wasEditing ? "作品修改已保存。" : values.published ? "作品已发布。" : "草稿已保存。");
-    if (values.published && (!scheduledAt || new Date(scheduledAt) <= new Date())) {
-      window.location.href = articleService.articleUrl(article);
-    }
+    switchPanel("worksPanel");
+    setStatus(wasEditing ? "作品修改已保存。" : !values.published ? "草稿已保存。" : scheduledAt && new Date(scheduledAt) > new Date() ? "已保存，将在设定时间发布。" : "作品已发布，可在列表中查看。");
   } catch (error) {
     if (!committed && newAttachments.length) await articleService.removeFiles(newAttachments).catch(() => {});
     if (!committed && uploadedVideo) await articleService.removeVideo(uploadedVideo).catch(() => {});
@@ -991,6 +1042,17 @@ adminWorkSearch?.addEventListener("input", () => {
 adminCategoryFilter?.addEventListener("change", renderArticleList);
 adminSeriesFilter?.addEventListener("change", renderArticleList);
 adminSortWorks?.addEventListener("change", renderArticleList);
+adminStatusFilter.addEventListener("change", renderArticleList);
+document.querySelector("#resetWorkFilters").addEventListener("click", () => {
+  clearTimeout(adminWorkSearchTimer);
+  adminWorkSearch.value = "";
+  adminCategoryFilter.value = "";
+  adminSeriesFilter.value = "";
+  adminStatusFilter.value = "";
+  adminSortWorks.value = "updated-desc";
+  window.MotionCore?.setupCustomSelects?.(document.querySelector(".admin-work-tools"));
+  renderArticleList();
+});
 selectVisibleWorks?.addEventListener("click", () => {
   visibleAdminWorks.filter((article) => !article.deleted_at).forEach((article) => selectedWorks.add(article.id));
   renderArticleList();
@@ -1000,18 +1062,38 @@ clearSelectedWorks?.addEventListener("click", () => {
   renderArticleList();
 });
 
-document.querySelector("#bulkTrashButton").addEventListener("click", async () => {
-  const targets = articles.filter((article) => selectedWorks.has(article.id) && !article.deleted_at);
+bulkTrashButton.addEventListener("click", async () => {
+  if (bulkBusy) return;
+  const targets = visibleAdminWorks.filter((article) => selectedWorks.has(article.id) && !article.deleted_at);
   if (!targets.length) {
     setStatus("请先选择要移入回收站的作品。", true);
     return;
   }
   if (!await confirmAction(`将选中的 ${targets.length} 个作品移入回收站吗？`, true)) return;
-  await Promise.all(targets.map((article) => articleService.deleteArticle(article.id)));
-  selectedWorks.clear();
-  await loadAdminArticles();
-  setStatus("选中作品已移入回收站。");
+  bulkBusy = true;
+  updateSelectionControls();
+  try {
+    const results = await Promise.allSettled(targets.map((article) => articleService.deleteArticle(article.id)));
+    results.forEach((result, index) => { if (result.status === "fulfilled") selectedWorks.delete(targets[index].id); });
+    const failed = results.filter(result => result.status === "rejected").length;
+    await loadAdminArticles();
+    setStatus(failed ? `${targets.length - failed} 项已移入回收站，${failed} 项失败，可重试。` : "选中作品已移入回收站。", Boolean(failed));
+  } catch (error) {
+    setStatus(`批量操作后刷新失败：${error.message}`, true);
+  } finally {
+    bulkBusy = false;
+    updateSelectionControls();
+  }
 });
+articleForm.elements.published.addEventListener("change", updatePublishControls);
+articleForm.elements.scheduledAt.addEventListener("input", updatePublishControls);
+document.querySelector("#saveDraftButton").addEventListener("click", () => {
+  if (savingWork) return;
+  articleForm.elements.published.value = "false";
+  articleForm.elements.published.dispatchEvent(new Event("change", {bubbles:true}));
+  articleForm.requestSubmit();
+});
+document.querySelector("#backToWorks").addEventListener("click", () => switchPanel("worksPanel"));
 articleForm.elements.contentType.forEach((radio) => radio.addEventListener("change", updateEditorMode));
 ["category", "seriesName", "tags"].forEach((name) => {
   const input = articleForm.elements[name];

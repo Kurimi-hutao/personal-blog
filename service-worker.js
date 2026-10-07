@@ -1,4 +1,4 @@
-const CACHE_NAME = "hutao-blog-article-filter-20261007-2";
+const CACHE_NAME = "hutao-blog-admin-workbench-20261007-3";
 
 const APP_SHELL = [
   "./",
@@ -11,6 +11,7 @@ const APP_SHELL = [
   "./pet.html",
   "./admin.html",
   "./admin-cover.css",
+  "./admin-workbench.css",
   "./admin-cover.js",
   "./404.html",
   "./manifest.webmanifest",
