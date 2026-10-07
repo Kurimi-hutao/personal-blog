@@ -194,7 +194,7 @@ async function loadArticles() {
   }
 
   try {
-    allArticles = await withTimeout(articleService.listPublished(), "文章服务响应超时");
+    allArticles = await withTimeout(articleService.listPublished(null, { contentType: "article" }), "文章服务响应超时");
     restoreFilterState();
     renderFilters();
     renderArticles({ immediate: true });

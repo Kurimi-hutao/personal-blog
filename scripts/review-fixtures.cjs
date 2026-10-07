@@ -5,7 +5,7 @@ const videos=records.slice(0,4).map((r,i)=>({...r,id:'video-'+i,slug:'video-'+i,
 async function installFixtures(context, { origin = "http://localhost:8000" } = {}){
  let comments=[{id:'comment-review',article_id:'review-0',visitor_name:'本地验收',body:'测试评论，用于确认长文字、回复和按钮排版。'.repeat(4),created_at:'2026-09-20T12:00:00Z',attachments:[],like_count:2}];
  await context.route('**/rest/v1/**',async route=>{const req=route.request(),u=new URL(req.url());let data=[];
- if(u.pathname.endsWith('/articles')){let list=u.searchParams.get('content_type')==='eq.video'?videos:records;const slug=u.searchParams.get('slug');data=slug?[...records,...videos].find(r=>'eq.'+r.slug===slug):list;if(!data)data=null;}
+ if(u.pathname.endsWith('/articles')){const type=u.searchParams.get('content_type');let list=[...records,...videos].filter(r=>!type||'eq.'+r.content_type===type);const slug=u.searchParams.get('slug');data=slug?[...records,...videos].find(r=>'eq.'+r.slug===slug):list;if(!data)data=null;}
  else if(u.pathname.endsWith('/comments')){if(req.method()==='POST'){const c={...JSON.parse(req.postData()),id:'new-review',created_at:new Date().toISOString(),like_count:0};comments.push(c);data=c}else data=comments;}
  else if(u.pathname.includes('toggle_'))data={active:true,count:9};
  else if(u.pathname.includes('/rpc/'))data=129;
