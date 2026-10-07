@@ -1,4 +1,4 @@
-const CACHE_NAME = "hutao-blog-local-spring-20260929-6";
+const CACHE_NAME = "hutao-blog-registration-20261007-1";
 
 const APP_SHELL = [
   "./",
@@ -16,6 +16,9 @@ const APP_SHELL = [
   "./manifest.webmanifest",
   "./fonts.css",
   "./styles.css",
+  "./site-footer.css",
+  "./site-footer.js",
+  "./assets/beian-police.png",
   "./ink-system.css",
   "./assets/brand-tigerhat.png",
   "./hutao-exhibit.css",
