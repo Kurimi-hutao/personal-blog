@@ -1,4 +1,13 @@
 /* Homepage editorial layout. */
+.home-page .card-visual.article-cover > img {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
 .home-page main { display: block; }
 .home-page main > section { content-visibility: visible; contain-intrinsic-size: none; }
 .home-page .about-copy { color: var(--ink); background: none; padding: 0; }
