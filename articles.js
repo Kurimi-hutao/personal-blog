@@ -11,7 +11,12 @@ let activeTag = "";
 let articleFilterTimer = null;
 let filtersReady = false;
 
-function renderArticleState(title, detail) {
+function renderArticleState(title, detail, kind = 'search') {
+  if (window.InkAssets) return InkAssets.state(articleContainer, {
+    kind, title, detail,
+    action: kind === 'error' ? '重新翻阅' : '清除筛选',
+    onAction: kind === 'error' ? loadArticles : () => clearFilters.click(),
+  });
   articleContainer.replaceChildren();
   const state = document.createElement("div");
   state.className = "hutao-state article-state";
@@ -160,6 +165,7 @@ function renderArticleDom(filtered) {
   });
   articleContainer.replaceChildren();
   resultCount.textContent = `共找到 ${filtered.length} 篇文章`;
+  articleContainer.removeAttribute('aria-busy');
   updateFilterUrl();
 
   if (!filtered.length) {
@@ -189,18 +195,19 @@ function scheduleRenderArticles(delay = 150) {
 async function loadArticles() {
   if (!articleService.configured) {
     resultCount.textContent = "文章服务待配置";
-    renderArticleState("文章卷宗暂未开启", "当前文章服务尚未完成配置，页面结构已就绪，不会再停留在读取状态。");
+    renderArticleState("文章卷宗暂未开启", "文章服务暂不可用，请稍后再来。", 'error');
     return;
   }
 
   try {
+    window.InkAssets?.loading(articleContainer, '正在翻阅文章……');
     allArticles = await withTimeout(articleService.listPublished(null, { contentType: "article" }), "文章服务响应超时");
     restoreFilterState();
     renderFilters();
     renderArticles({ immediate: true });
   } catch (error) {
     resultCount.textContent = "读取受阻";
-    renderArticleState("文章读取暂时受阻", error.message || "稍后再试，或检查文章服务配置。");
+    renderArticleState("文章读取暂时受阻", "雾还未散，稍后再试一次。", 'error');
   }
 }
 

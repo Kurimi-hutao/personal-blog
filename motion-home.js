@@ -13,7 +13,7 @@
     window.clearTimeout(openingTimer);
     document.body.classList.remove("motion-home-opening");
     document.body.classList.add("motion-home-ready");
-    sessionStorage.setItem(sessionKey, "true");
+    try { sessionStorage.setItem(sessionKey, "true"); } catch {}
   }
 
   reduceQuery.addEventListener("change", (event) => {
@@ -30,12 +30,8 @@
   }
 
   function setupOpening() {
-    const seen = sessionStorage.getItem(sessionKey) === "true";
-    const duration = reduced ? 0 : seen ? 400 : compact ? 650 : 900;
-    document.body.style.setProperty("--home-open-duration", `${duration}ms`);
-    document.body.classList.add("motion-home-opening");
-
-    openingTimer = window.setTimeout(finishOpening, duration);
+    // The seal introduction owns the entrance; keep the hero immediately usable.
+    finishOpening();
   }
 
   function setupHeroParallax() {

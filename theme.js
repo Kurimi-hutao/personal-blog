@@ -148,7 +148,7 @@
         bookmarks = JSON.parse(localStorage.getItem("hutao-bookmarked-articles") || "[]");
       } catch {}
       if (!bookmarks.length) {
-        searchResults.innerHTML = "<p>输入关键词开始搜索，也可以使用上方快捷入口。</p>";
+        window.InkAssets?.state(searchResults, { title: '翻开一卷江湖', detail: '输入关键词开始搜索，也可以使用上方快捷入口。' });
         return;
       }
       const heading = document.createElement("p");
@@ -169,7 +169,7 @@
       return text.includes(keyword);
     }).slice(0, 8);
       if (!matches.length) {
-      searchResults.innerHTML = `<p>没有找到与“${keyword.replace(/[<>&]/g, "")}”相关的内容。</p>`;
+      window.InkAssets?.state(searchResults, { title: '未寻得合卷内容', detail: `没有找到与“${keyword}”相关的内容，换个关键词试试。` });
       return;
       }
       matches.forEach((work) => {
@@ -225,12 +225,14 @@
       searchInput.focus({ preventScroll: true });
     }, reducedMotionQuery.matches ? 0 : 230);
     if (searchableWorks === null && window.articleService?.configured) {
-      searchResults.innerHTML = "<p>正在整理全站内容……</p>";
+      window.InkAssets?.loading(searchResults, '正在整理全站内容……', 1);
       try {
         searchableWorks = await window.articleService.listPublished();
       } catch {
-        searchableWorks = [];
+        window.InkAssets?.state(searchResults, { kind: 'error', title: '寻卷暂时受阻', detail: '稍后再试一次。', action: '重新读取', onAction: openSearch });
+        return;
       }
+      searchResults.removeAttribute('aria-busy');
       renderSearchResults(searchInput.value);
     }
   }

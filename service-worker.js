@@ -1,6 +1,31 @@
-const CACHE_NAME = "hutao-blog-admin-workbench-20261007-3";
+const CACHE_NAME = "hutao-visual-refresh-20261008-1";
 
 const APP_SHELL = [
+  "./ink-assets.css",
+  "./ink-assets.js",
+  "./assets/visual-refresh/articles-writing-desk-night-mobile.webp",
+  "./assets/visual-refresh/articles-writing-desk-night.webp",
+  "./assets/visual-refresh/empty-comments.webp",
+  "./assets/visual-refresh/empty-search.webp",
+  "./assets/visual-refresh/favicon-16.png",
+  "./assets/visual-refresh/favicon-32.png",
+  "./assets/visual-refresh/favicon-48.png",
+  "./assets/visual-refresh/favicon.ico",
+  "./assets/visual-refresh/home-icon-180.png",
+  "./assets/visual-refresh/home-icon-192.png",
+  "./assets/visual-refresh/home-icon-512.png",
+  "./assets/visual-refresh/icon-bookmark.webp",
+  "./assets/visual-refresh/icon-brush.webp",
+  "./assets/visual-refresh/icon-lantern.webp",
+  "./assets/visual-refresh/icon-scroll.webp",
+  "./assets/visual-refresh/icon-seal.webp",
+  "./assets/visual-refresh/load-error.webp",
+  "./assets/visual-refresh/seal-hutao.webp",
+  "./assets/visual-refresh/videos-riverside-stage-night-mobile.webp",
+  "./assets/visual-refresh/videos-riverside-stage-night.webp",
+  "./assets/visual-refresh/works-maker-study-night-mobile.webp",
+  "./assets/visual-refresh/works-maker-study-night.webp",
+
   "./",
   "./index.html",
   "./articles.html",

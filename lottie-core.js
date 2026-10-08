@@ -87,43 +87,32 @@
   }
 
   async function setupSiteLoader() {
-    if (!document.body || document.querySelector(".ink-site-loader")) return;
+    if (!document.body?.classList.contains('home-page') || isReduced()) return;
+    try {
+      if (sessionStorage.getItem('hutao-seal-intro') === 'seen') return;
+      sessionStorage.setItem('hutao-seal-intro', 'seen');
+    } catch { /* Storage may be unavailable in private browsing. */ }
     const loader = document.createElement("div");
     loader.className = "ink-site-loader";
     loader.setAttribute("aria-hidden", "true");
     loader.innerHTML = [
       '<div class="ink-site-loader__inner">',
-      '<div class="ink-site-loader__animation"></div>',
+      `<div class="ink-site-loader__mark"><span class="ink-site-loader__drop"></span><img src="${asset('./assets/visual-refresh/seal-hutao.webp')}" width="90" height="104" alt=""></div>`,
       '<p class="ink-site-loader__text">墨卷初开</p>',
       "</div>",
     ].join("");
     document.body.prepend(loader);
 
-    const animationNode = loader.querySelector(".ink-site-loader__animation");
-    let animation = null;
-    const animationReady = createAnimation(animationNode, {
-        name: config.inkLoading,
-        loop: true,
-        preserveAspectRatio: "xMidYMid meet",
-      }).then((instance) => { animation = instance; }).catch((error) => {
-      console.warn("[InkLottie] loading animation failed", error);
-      animationNode.classList.add("ink-site-loader__fallback");
-    });
-
-    await Promise.allSettled([
-      wait(isReduced() ? 120 : 680),
-      withTimeout(Promise.allSettled([criticalImagesReady(), fontsReady(), animationReady]), 2400),
-    ]);
-    await wait(isReduced() ? 80 : 120);
+    // A bounded, once-per-session introduction; data loading stays in its own region.
+    await withTimeout(Promise.allSettled([loader.querySelector('img').decode(), wait(560)]), 780);
     loader.classList.add("is-leaving");
     await new Promise((resolve) => {
       const finish = () => {
         window.clearTimeout(timer);
-        animation?.destroy();
         loader.remove();
         resolve();
       };
-      const timer = window.setTimeout(finish, 650);
+      const timer = window.setTimeout(finish, 280);
       loader.addEventListener("transitionend", (event) => {
         if (event.target === loader && event.propertyName === "opacity") finish();
       });

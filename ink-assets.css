@@ -1,0 +1,75 @@
+/* Supplied artwork, October 2026. Shared state components and night scenes. */
+.ink-state {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 300px;
+  padding: 24px 20px 32px;
+  text-align: center;
+  color: var(--ink);
+}
+.ink-state > img { display: block; width: min(240px, 75%); height: 168px; object-fit: contain; }
+.ink-state > strong { font-family: var(--font-serif); font-size: 20px; font-weight: 500; }
+.ink-state > p { max-width: 36em; margin: 0; font-size: 14px; line-height: 1.8; opacity: .74; overflow-wrap: anywhere; }
+.ink-state .text-button { margin: 2px 0 0; font-size: 14px; }
+.site-search-results .ink-state { min-height: 230px; padding: 12px; }
+.site-search-results .ink-state img { height: 110px; width: 180px; }
+html[data-theme="dark"] .ink-state img { filter: brightness(.88) saturate(.8); }
+.ink-icon-label::before { content: ''; display: inline-block; width: 1.2em; height: 1.35em; margin-right: .4em; vertical-align: -.27em; background: var(--ink-label-icon) center / contain no-repeat; }
+.ink-success-stamp { display: inline-block; width: 42px; height: 44px; object-fit: contain; margin-left: 12px; vertical-align: middle; animation: inkStampLand 360ms cubic-bezier(.22,1,.36,1) both; }
+@keyframes inkStampLand { from { opacity: 0; transform: scale(1.5) rotate(-12deg); } to { opacity: 1; transform: scale(1) rotate(-5deg); } }
+.ink-loading { grid-column: 1 / -1; width: 100%; padding: 8px 0 24px; }
+.ink-loading__label { font-size: 14px; color: var(--ink); opacity: .65; margin: 0 0 20px; }
+.ink-loading__cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.ink-loading__card { opacity: .5; animation: inkPaperBreath 1.8s ease-in-out infinite alternate; }
+.ink-loading__card:nth-child(2) { animation-delay: 160ms; }
+.ink-loading__card:nth-child(3) { animation-delay: 320ms; }
+.ink-loading__card :is(i,b,span) { display: block; background: color-mix(in srgb, var(--ink) 10%, var(--paper)); border-radius: 2px; }
+.ink-loading__card i { height: 140px; margin-bottom: 20px; }
+.ink-loading__card b { height: 17px; width: 65%; margin-bottom: 14px; }
+.ink-loading__card span { height: 8px; margin-top: 10px; }
+.ink-loading__card span:last-child { width: 78%; }
+@keyframes inkPaperBreath { to { opacity: .9; } }
+
+html[data-theme="dark"] [data-page="articles"] .scene-banner { --scene-art: url('./assets/visual-refresh/articles-writing-desk-night.webp'); --scene-mobile: url('./assets/visual-refresh/articles-writing-desk-night-mobile.webp'); }
+html[data-theme="dark"] [data-page="videos"] .scene-banner { --scene-art: url('./assets/visual-refresh/videos-riverside-stage-night.webp'); --scene-mobile: url('./assets/visual-refresh/videos-riverside-stage-night-mobile.webp'); }
+html[data-theme="dark"] .works-page .scene-banner { --scene-art: url('./assets/visual-refresh/works-maker-study-night.webp'); --scene-mobile: url('./assets/visual-refresh/works-maker-study-night-mobile.webp'); }
+html[data-theme="dark"] :is([data-page="articles"], [data-page="videos"], .works-page) .scene-banner {
+  color: #eee7dc;
+  background: #202e37;
+  overflow: hidden;
+  border-radius: 3px;
+}
+html[data-theme="dark"] :is([data-page="articles"], [data-page="videos"], .works-page) .scene-banner::before {
+  filter: none;
+  background-image: linear-gradient(90deg, rgba(15,26,33,.2), transparent 65%), var(--scene-art);
+  background-size: cover;
+  background-position: center top;
+  mask-image: none;
+}
+html[data-theme="dark"] :is([data-page="articles"], [data-page="videos"], .works-page) .scene-banner :is(h1,p) { color: #eee7dc; }
+html[data-theme="dark"] :is([data-page="articles"], [data-page="videos"], .works-page) .scene-banner p { opacity: .85; }
+@media (max-width: 700px) {
+  html[data-theme="dark"] :is([data-page="articles"], [data-page="videos"], .works-page) .scene-banner {
+    min-height: 450px;
+    padding: 28px 22px 250px;
+    gap: 10px;
+  }
+  html[data-theme="dark"] :is([data-page="articles"], [data-page="videos"], .works-page) .scene-banner::before {
+    background-image: var(--scene-mobile);
+    background-size: cover;
+    background-position: center bottom;
+    mask-image: none;
+  }
+  .ink-loading__cards { grid-template-columns: 1fr; }
+  .ink-loading__card:not(:first-child) { display: none; }
+  .ink-state { min-height: 260px; padding: 18px 12px 28px; }
+  .ink-state > img { height: 145px; width: 210px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ink-success-stamp, .ink-loading__card { animation: none; }
+}

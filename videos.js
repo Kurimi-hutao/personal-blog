@@ -7,7 +7,12 @@ let videos = [];
 let videoFilterTimer = null;
 let videoFiltersReady = false;
 
-function renderVideoState(title, detail) {
+function renderVideoState(title, detail, kind = 'search') {
+  if (window.InkAssets) return InkAssets.state(videoList, {
+    kind, title, detail,
+    action: kind === 'error' ? '重新翻阅' : '清除筛选',
+    onAction: kind === 'error' ? loadVideos : () => clearVideoFilters.click(),
+  });
   videoList.replaceChildren();
   const state = document.createElement("div");
   state.className = "hutao-state article-state";
@@ -91,6 +96,7 @@ function filteredVideos() {
 }
 
 function renderVideoDom(filtered) {
+  videoList.removeAttribute('aria-busy');
   videoList.replaceChildren();
   if (!filtered.length) {
     renderVideoState("未寻得合卷视频", "换一个关键词或分类再试试，新的影像会在这里归档。");
@@ -116,11 +122,12 @@ function scheduleRenderVideos(delay = 150) {
 
 async function loadVideos() {
   if (!articleService.configured) {
-    renderVideoState("视频卷宗暂未开启", "当前视频服务尚未完成配置，页面结构已就绪，不会再停留在读取状态。");
+    renderVideoState("视频卷宗暂未开启", "视频服务暂不可用，请稍后再来。", 'error');
     return;
   }
 
   try {
+    window.InkAssets?.loading(videoList, '正在整理影像……');
     videos = await withTimeout(articleService.listPublished(null, { contentType: "video" }), "视频服务响应超时");
     videoCategory.querySelectorAll("option:not(:first-child)").forEach((option) => option.remove());
     [...new Set(videos.map((video) => video.category).filter(Boolean))].forEach((category) => {
@@ -133,7 +140,7 @@ async function loadVideos() {
     videoFiltersReady = true;
     renderVideos({ immediate: true });
   } catch (error) {
-    renderVideoState("视频读取暂时受阻", error.message || "稍后再试，或检查视频服务配置。");
+    renderVideoState("视频读取暂时受阻", "雾还未散，稍后再试一次。", 'error');
   }
 }
 

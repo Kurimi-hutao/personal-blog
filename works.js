@@ -83,6 +83,10 @@
     const filtered = active === "全部" ? works : works.filter((work) => work.category === active);
     grid.replaceChildren();
     if (!filtered.length) {
+      if (window.InkAssets) {
+        InkAssets.state(grid, { title: '这一卷尚在创作中', detail: '换个分类，看看其他已经完成的作品。' });
+        return;
+      }
       const state = document.createElement("p");
       state.className = "works-state";
       state.textContent = "这个分类还没有可确认的公开作品，先把卷宗留在这里，等素材齐了再补。";

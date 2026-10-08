@@ -305,7 +305,8 @@ function renderComments(comments) {
   const roots = comments.filter((comment) => !comment.parent_id);
   list.replaceChildren();
   if (!roots.length) {
-    list.innerHTML = '<p class="article-state">还没有评论，来写下第一句吧。</p>';
+    if (window.InkAssets) InkAssets.state(list, { kind: 'comments', title: '此卷尚待落墨', detail: '还没有评论，来写下第一句吧。' });
+    else list.innerHTML = '<p class="article-state">还没有评论，来写下第一句吧。</p>';
     return;
   }
 
@@ -400,7 +401,11 @@ function beginReply(parentId, floor) {
 }
 
 async function loadComments(articleId) {
-  renderComments(await articleService.listComments(articleId));
+  try {
+    renderComments(await articleService.listComments(articleId));
+  } catch {
+    window.InkAssets?.state(document.querySelector('#commentList'), { kind: 'error', title: '评论暂时未能展开', detail: '文章可以继续阅读，评论稍后再试。', action: '重新读取', onAction: () => loadComments(articleId) });
+  }
 }
 
 function setupComments(article) {
@@ -435,6 +440,7 @@ function setupComments(article) {
       form.reset();
       document.querySelector("#replyContext").hidden = true;
       status.textContent = "评论已留下。";
+      window.InkAssets?.stamp(status);
       await loadComments(article.id);
     } catch (error) {
       status.textContent = `评论失败：${error.message}`;
@@ -529,11 +535,14 @@ async function loadArticle() {
   const slug = new URLSearchParams(location.search).get("slug");
   const root = document.querySelector("#articleDetail");
   if (!slug || !articleService.configured) {
-    root.innerHTML = '<p class="article-state">没有找到要展开的文章。</p>';
+    window.InkAssets?.state(root, { title: '没有找到要展开的文章', detail: '回到文章目录，再挑一卷读读。', action: '返回文章目录', onAction: () => { location.href = './articles.html'; } });
     return;
   }
   try {
+    window.InkAssets?.loading(root, '正在展开此卷……', 1);
     currentArticle = await articleService.getPublished(slug);
+    if (!currentArticle) throw new Error('Article not found');
+    root.removeAttribute('aria-busy');
     renderArticle(currentArticle);
     if (currentArticle.local) {
       const actions = document.querySelector("#articleActions");
@@ -555,9 +564,9 @@ async function loadArticle() {
       return;
     }
     setupComments(currentArticle);
-    await Promise.all([loadComments(currentArticle.id), setupArticleExtras(currentArticle)]);
+    await Promise.allSettled([loadComments(currentArticle.id), setupArticleExtras(currentArticle)]);
   } catch {
-    root.innerHTML = '<p class="article-state">文章不存在、尚未发布，或数据库迁移尚未执行。</p>';
+    window.InkAssets?.state(root, { kind: 'error', title: '此卷暂时未能展开', detail: '文章可能尚未发布，或暂时无法连接。', action: '重新翻阅', onAction: loadArticle });
   }
 }
 

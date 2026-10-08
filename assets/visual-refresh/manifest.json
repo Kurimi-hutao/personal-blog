@@ -1,0 +1,122 @@
+[
+  {
+    "file": "seal-hutao.webp",
+    "size": [
+      256,
+      296
+    ],
+    "bytes": 44354
+  },
+  {
+    "file": "empty-search.webp",
+    "size": [
+      600,
+      307
+    ],
+    "bytes": 57224
+  },
+  {
+    "file": "empty-comments.webp",
+    "size": [
+      600,
+      287
+    ],
+    "bytes": 44970
+  },
+  {
+    "file": "load-error.webp",
+    "size": [
+      600,
+      244
+    ],
+    "bytes": 69376
+  },
+  {
+    "file": "icon-brush.webp",
+    "size": [
+      137,
+      160
+    ],
+    "bytes": 5598
+  },
+  {
+    "file": "icon-scroll.webp",
+    "size": [
+      160,
+      94
+    ],
+    "bytes": 6654
+  },
+  {
+    "file": "icon-lantern.webp",
+    "size": [
+      91,
+      160
+    ],
+    "bytes": 6010
+  },
+  {
+    "file": "icon-bookmark.webp",
+    "size": [
+      85,
+      160
+    ],
+    "bytes": 5656
+  },
+  {
+    "file": "icon-seal.webp",
+    "size": [
+      160,
+      160
+    ],
+    "bytes": 17482
+  },
+  {
+    "file": "articles-writing-desk-night.webp",
+    "size": [
+      1920,
+      640
+    ],
+    "bytes": 99980
+  },
+  {
+    "file": "articles-writing-desk-night-mobile.webp",
+    "size": [
+      900,
+      1200
+    ],
+    "bytes": 101814
+  },
+  {
+    "file": "videos-riverside-stage-night.webp",
+    "size": [
+      1920,
+      641
+    ],
+    "bytes": 158784
+  },
+  {
+    "file": "videos-riverside-stage-night-mobile.webp",
+    "size": [
+      900,
+      1200
+    ],
+    "bytes": 120718
+  },
+  {
+    "file": "works-maker-study-night.webp",
+    "size": [
+      1920,
+      640
+    ],
+    "bytes": 127730
+  },
+  {
+    "file": "works-maker-study-night-mobile.webp",
+    "size": [
+      900,
+      1200
+    ],
+    "bytes": 111458
+  }
+]

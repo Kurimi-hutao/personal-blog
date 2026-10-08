@@ -142,10 +142,12 @@ async function loadHomepageArticles() {
   }
 
   try {
+    window.InkAssets?.loading(container, '正在翻阅新文章……', 2);
     const articles = await withTimeout(articleService.listPublished(2, { contentType: "article" }));
+    container.removeAttribute('aria-busy');
     container.replaceChildren();
     if (!articles.length) {
-      container.innerHTML = '<p class="article-state">还没有发布文章，第一卷正在酝酿中。</p>';
+      window.InkAssets?.state(container, { title: '第一卷正在酝酿中', detail: '新的随笔会在这里与你相逢。' });
       return;
     }
     writeCachedWorks("hutao-homepage-articles", articles);
@@ -153,6 +155,7 @@ async function loadHomepageArticles() {
     revealInsertedCards(container);
     setupInkHoverEffects();
   } catch (error) {
+    container.removeAttribute('aria-busy');
     const cached = readCachedWorks("hutao-homepage-articles");
     if (cached.length) {
       container.replaceChildren();
@@ -161,10 +164,7 @@ async function loadHomepageArticles() {
       setupInkHoverEffects();
       return;
     }
-    const note = document.createElement("p");
-    note.className = "article-state";
-    note.textContent = "文章暂时读取失败，已保留备用入口。";
-    container.appendChild(note);
+    window.InkAssets?.state(container, { kind: 'error', title: '新文章暂时未能展开', detail: '雾还未散，稍后再试一次。', action: '重新读取', onAction: loadHomepageArticles });
   }
 }
 
@@ -206,10 +206,12 @@ async function loadHomepageVideos() {
   const container = document.querySelector("#latestVideos");
   if (!container || !articleService.configured) return;
   try {
+    window.InkAssets?.loading(container, '正在整理新影像……', 2);
     const videos = await withTimeout(articleService.listPublished(2, { contentType: "video" }));
+    container.removeAttribute('aria-busy');
     container.replaceChildren();
     if (!videos.length) {
-      container.innerHTML = '<p class="article-state">还没有发布视频，第一段影像正在路上。</p>';
+      window.InkAssets?.state(container, { title: '第一段影像正在路上', detail: '值得留下的片刻，会在这里与你相逢。' });
       return;
     }
     writeCachedWorks("hutao-homepage-videos", videos);
@@ -217,6 +219,7 @@ async function loadHomepageVideos() {
     revealInsertedCards(container);
     setupInkHoverEffects();
   } catch (error) {
+    container.removeAttribute('aria-busy');
     const cached = readCachedWorks("hutao-homepage-videos");
     if (cached.length) {
       container.replaceChildren();
@@ -225,10 +228,7 @@ async function loadHomepageVideos() {
       setupInkHoverEffects();
       return;
     }
-    const note = document.createElement("p");
-    note.className = "article-state";
-    note.textContent = "视频暂时读取失败，已保留备用入口。";
-    container.appendChild(note);
+    window.InkAssets?.state(container, { kind: 'error', title: '新影像暂时未能展开', detail: '雾还未散，稍后再试一次。', action: '重新读取', onAction: loadHomepageVideos });
   }
 }
 
@@ -386,6 +386,7 @@ async function setupAchievements() {
       localStorage.setItem("hutao-achievement-state", JSON.stringify(result));
       renderAchievements(result);
       showFortune();
+      window.InkAssets?.stamp(document.querySelector('.fortune-rank-wrap'));
     } catch (error) {
       document.querySelector("#achievementStatus").textContent = `签到失败：${error.message}`;
       button.disabled = false;
@@ -654,6 +655,10 @@ summonButton.addEventListener("click", summonPetals);
 function renderGuestbook(messages) {
   const list = document.querySelector("#guestbookList");
   list.replaceChildren();
+  if (!messages.length && window.InkAssets) {
+    InkAssets.state(list, { kind: 'comments', title: '纸墨已备，等你留一笔', detail: '这里还没有留言，写下第一句江湖问候吧。' });
+    return;
+  }
   messages.forEach((message) => {
     const item = document.createElement("article");
     const header = document.createElement("div");
@@ -703,6 +708,7 @@ async function loadGuestbook() {
     renderGuestbook(await articleService.listMessages());
   } catch (error) {
     document.querySelector("#formNote").textContent = `留言读取失败：${error.message}`;
+    window.InkAssets?.state(document.querySelector('#guestbookList'), { kind: 'error', title: '留言暂时未能展开', detail: '稍后再试，旧日的墨迹仍在等你。', action: '重新读取', onAction: loadGuestbook });
   }
 }
 
@@ -732,6 +738,7 @@ document.querySelector("#messageForm").addEventListener("submit", async (event) 
       visitor_token: articleService.getVisitorToken(),
     });
     note.textContent = `${name}的墨迹，已留在这卷江湖里。`;
+    window.InkAssets?.stamp(note);
     form.reset();
     await loadGuestbook();
   } catch (error) {
