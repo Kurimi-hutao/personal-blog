@@ -1,4 +1,4 @@
-const CACHE_NAME = "hutao-visual-refresh-20261008-2";
+const CACHE_NAME = "hutao-visual-refresh-20261008-3";
 
 const APP_SHELL = [
   "./ink-assets.css",
