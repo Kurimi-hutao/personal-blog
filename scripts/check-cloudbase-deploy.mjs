@@ -59,6 +59,23 @@ test('large files use signed multipart requests and preserve every byte', async 
   assert.deepEqual(uploaded.map(part => part.length), [1024 * 1024, 1024 * 1024, 17]);
   assert.deepEqual(Buffer.concat(uploaded), bytes);
 });
+test('independent uploads never exceed three concurrent files', async () => {
+  let active = 0, peak = 0, completed = 0;
+  class COS { getObjectUrl(_, callback) { callback(null, { Url: 'https://example.com/file' }); } }
+  await createUploader({
+    COS, credentials: {}, config: {}, toPhysicalKey: (_, key) => key,
+    mime: { lookup: () => 'text/plain' }, read: async () => Buffer.from('test'), report: () => {},
+    request: async () => {
+      active++; peak = Math.max(peak, active);
+      await new Promise(resolve => setTimeout(resolve, 5));
+      active--; completed++;
+      return new Response('');
+    },
+  })({ files: Array.from({ length: 8 }, (_, i) => ({ cloudPath: String(i), localPath: 'unused' })) });
+  assert.equal(peak, 3);
+  assert.equal(active, 0);
+  assert.equal(completed, 8);
+});
 
 const file = (key, md5 = 'a'.repeat(32)) => ({ key, path: key, size: 20, md5 });
 const remote = local => local.map(f => ({ Key: f.key, Size: String(f.size), ETag: `"${f.md5}"` }));

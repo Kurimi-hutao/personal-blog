@@ -2,7 +2,7 @@ import { readFile } from 'node:fs/promises';
 
 export function createUploader({ COS, mime, config, credentials, toPhysicalKey, report = console.log, request = fetch, read = readFile }) {
   return async ({ files }) => {
-    for (const file of files) {
+    async function upload(file) {
       const body = await read(file.localPath);
       const contentType = mime.lookup(file.cloudPath) || 'application/octet-stream';
       async function send(method, data, query, type = contentType) {
@@ -22,7 +22,7 @@ export function createUploader({ COS, mime, config, credentials, toPhysicalKey, 
           }, (error, response) => error ? reject(error) : resolve(response)));
           const response = await request(Url, {
             method, body: data, signal: AbortSignal.timeout(120000), redirect: 'error',
-            headers: { 'content-type': type },
+            headers: { 'content-type': type, connection: 'close' },
           });
           const payload = await response.text();
           if (!response.ok || /<Error>/.test(payload)) {
@@ -40,7 +40,7 @@ export function createUploader({ COS, mime, config, credentials, toPhysicalKey, 
       const chunkSize = 1024 * 1024;
       if (body.length <= chunkSize) {
         await send('PUT', body);
-        continue;
+        return;
       }
       const init = await send('POST', Buffer.alloc(0), { uploads: '' });
       const uploadId = init.payload.match(/<UploadId>([^<]+)<\/UploadId>/)?.[1];
@@ -58,5 +58,12 @@ export function createUploader({ COS, mime, config, credentials, toPhysicalKey, 
         throw error;
       }
     }
+    let next = 0;
+    const workers = Array.from({ length: Math.min(3, files.length) }, async () => {
+      while (next < files.length) await upload(files[next++]);
+    });
+    const results = await Promise.allSettled(workers);
+    const failed = results.find(result => result.status === 'rejected');
+    if (failed) throw failed.reason;
   };
 }

@@ -43,7 +43,7 @@ export async function publish(local, hosting, report = console.log) {
   const plan = partition(local, await hosting.listFiles());
   report(`Unchanged: ${plan.skipped}; assets: ${plan.assets.length}; entries: ${plan.entries.length}`);
   async function upload(files, phase) {
-    // Small groups avoid one huge SDK task, and each PUT uses an isolated connection.
+    // Small groups bound work in flight; the transport limits concurrent files to three.
     for (let start = 0; start < files.length; start += 10) {
       const batch = files.slice(start, start + 10);
       report(`${phase}: ${start + 1}-${start + batch.length}/${files.length}`);
