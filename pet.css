@@ -606,3 +606,49 @@
  .pet-page .pet-entry-skip { left: 20px; bottom: 20px; }
 }
 @media(prefers-reduced-motion:reduce) { .pet-page *, .pet-page *::before, .pet-page *::after { animation: none !important; transition: none !important; } }
+
+/* Keep the daily journal outside the character stage. */
+.pet-page .room-footnote { display:flex; justify-content:space-between; gap:12px; align-items:baseline; margin:14px 0 28px; }
+.pet-page .room-footnote p { margin:0; font-size:12px; line-height:1.8; }
+.pet-page #actionFeedback { color:var(--cinnabar); text-align:right; }
+.pet-page .room-journal { display:grid; grid-template-columns:1fr 1fr; gap:28px; margin-bottom:32px; }
+.pet-page .journal-panel { min-width:0; padding:24px; border:1px solid var(--hud-line); background:var(--hud-paper); border-radius:4px; }
+.pet-page .journal-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:18px; }
+.pet-page .journal-heading p { margin:0 0 6px; color:var(--hud-muted); font:10px/1.4 var(--font-body); letter-spacing:.15em; }
+.pet-page .journal-heading h2 { margin:0; font:26px/1.4 var(--brush); color:var(--hud-ink); }
+.pet-page .journal-heading > span { color:var(--hud-muted); font-size:11px; white-space:nowrap; }
+.pet-page .companion-list,.pet-page .daily-task-list { display:grid; gap:8px; }
+.pet-page .companion-list button,.pet-page .daily-task-list button { display:grid; grid-template-columns:44px minmax(0,1fr) auto; gap:14px; align-items:center; width:100%; min-height:72px; padding:10px 14px; border:1px solid var(--hud-line); border-radius:3px; color:var(--hud-ink); background:transparent; text-align:left; cursor:pointer; transition:background .2s,border-color .2s; }
+.pet-page .companion-list button[aria-pressed="true"] { background:color-mix(in srgb,var(--hud-red) 7%,var(--hud-paper)); border-color:var(--hud-red); }
+.pet-page .companion-list button:hover,.pet-page .daily-task-list button:not(:disabled):hover { background:color-mix(in srgb,var(--hud-red) 10%,var(--hud-paper)); }
+.pet-page .companion-seal { display:grid; place-items:center; width:40px; height:40px; border:1px solid currentColor; border-radius:50%; color:var(--hud-red); font:24px var(--brush); }
+.pet-page [data-character="fireman"] .companion-seal { color:#9a7948; }
+.pet-page [data-character="zhang"] .companion-seal { color:#6d8881; }
+.pet-page .journal-panel b { display:block; font-size:14px; font-weight:500; }
+.pet-page .journal-panel small { display:block; margin-top:4px; color:var(--hud-muted); font-size:11px; line-height:1.6; }
+.pet-page .journal-panel em { font-size:11px; font-style:normal; color:var(--hud-red); }
+.pet-page .journal-caption { margin:-8px 0 16px; font-size:12px; color:var(--hud-muted); line-height:1.6; }
+.pet-page .daily-task-list button { min-height:61px; border-width:0 0 1px; padding:6px 0; }
+.pet-page .daily-task-list svg { width:40px; height:40px; }
+.pet-page .daily-task-list .is-complete { opacity:.65; cursor:default; }
+.pet-page .daily-task-list .is-complete em { color:var(--hud-muted); }
+.pet-page button:focus-visible,.pet-page summary:focus-visible { outline:2px solid var(--hud-red); outline-offset:4px; }
+.pet-page button:disabled:not(.is-complete) { cursor:wait; }
+.pet-page #retryModel { min-width:44px; min-height:44px; color:var(--hud-red); background:none; border:0; cursor:pointer; }
+.pet-page .live-status { max-width:calc(100% - 24px); }
+@media(max-width:760px) {
+ .pet-page .room-journal { grid-template-columns:1fr; gap:16px; }
+ .pet-page .journal-panel { padding:18px; }
+ .pet-page .room-footnote { display:block; margin-bottom:20px; }
+ .pet-page #actionFeedback { text-align:left; min-height:22px; }
+}
+@media(max-width:620px) {
+ .pet-page .hutao-house { height:760px; }
+ .pet-page .pet-stage { left:50%; bottom:230px; height:330px; }
+ .pet-page .action-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:4px; }
+ .pet-page .action-grid button { min-height:68px; border:1px solid var(--hud-line); }
+ .pet-page .action-grid small { font-size:10px; }
+ .pet-page .live-status { white-space:normal; width:max-content; }
+ .pet-page .speech-bubble { top:74px; }
+ .pet-page .control-card { gap:6px; }
+}

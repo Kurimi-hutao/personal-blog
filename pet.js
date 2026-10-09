@@ -3,7 +3,7 @@
 
   const STORAGE_KEY = "hutao-house-state-v3";
   const clamp = (value) => Math.min(100, Math.max(0, value));
-  const today = () => new Date().toISOString().slice(0, 10);
+  const today = () => new Date().toLocaleDateString("sv-SE");
   const $ = (selector) => document.querySelector(selector);
   const $$ = (selector) => [...document.querySelectorAll(selector)];
 
@@ -85,6 +85,7 @@
     motion: true,
     sound: true,
     deepNight: false,
+    daily: { date: "", completed: [] },
   };
 
   let state = loadState();
@@ -95,7 +96,7 @@
   let drag = null;
   let stageOffset = { x: 0, y: 0 };
   let characterKey = "hutao";
-  let modelLoadToken = 0;
+  let modelLoading = false;
   const characterOrder = ["hutao", "fireman", "zhang"];
 
   const characters = {
@@ -297,14 +298,21 @@
 
   function loadState() {
     try {
-      return { ...defaults, ...JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}") };
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+      const result = { ...defaults, ...saved };
+      for (const key of ["hunger", "mood", "energy", "xp"]) result[key] = Number.isFinite(result[key]) ? Math.min(key === "xp" ? 99 : 100, Math.max(0, result[key])) : defaults[key];
+      for (const key of ["coins", "level"]) result[key] = Number.isSafeInteger(result[key]) ? Math.max(key === "level" ? 1 : 0, result[key]) : defaults[key];
+      for (const key of ["sound", "motion"]) result[key] = typeof result[key] === "boolean" ? result[key] : defaults[key];
+      result.deepNight = false;
+      return result;
     } catch (_) {
       return { ...defaults };
     }
   }
 
   function saveState() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+    catch (_) { showToast("浏览器未允许保存，当前进度将在离开后丢失"); }
   }
 
   function updateUI() {
@@ -325,13 +333,47 @@
     gift.querySelector("strong").textContent = claimed ? "今日已领取" : "领取 10 枚桃花币";
     setToggle($("#motionToggle"), state.motion, `动态：${state.motion ? "开" : "关"}`);
     setToggle($("#soundToggle"), state.sound, `音效：${state.sound ? "开" : "关"}`);
-    $("#petRoom").classList.toggle("is-deep-night", state.deepNight);
+    $("#petCondition").textContent = state.energy < 15 ? "有点累了，歇一歇吧" : state.hunger < 30 ? "肚子饿了，来份点心" : state.mood < 40 ? "想和你一起玩" : "状态很好 · 今日小礼";
+    updateDailyTasks();
+  }
+
+  function ensureDaily() {
+    if (state.daily?.date !== today() || !Array.isArray(state.daily?.completed)) state.daily = { date: today(), completed: [] };
+  }
+
+  function updateDailyTasks() {
+    ensureDaily();
+    const tasks = $$("[data-task]");
+    const count = tasks.filter(button => state.daily.completed.includes(button.dataset.task)).length;
+    $("#dailyProgress").textContent = count + " / 3 完成";
+    $("#taskTabCount").textContent = count + " / 3";
+    tasks.forEach(button => {
+      const done = state.daily.completed.includes(button.dataset.task);
+      button.classList.toggle("is-complete", done);
+      button.querySelector("em").textContent = done ? "已完成 ✓" : "去完成";
+      button.disabled = done || busy || modelLoading;
+    });
+  }
+
+  function completeDaily(action) {
+    if (!["pet", "play", "sleep"].includes(action) || state.daily.completed.includes(action)) return false;
+    state.daily.completed.push(action);
+    state.coins += 4;
+    showToast("今日小事完成 · 获得 4 枚桃花币");
+    return true;
+  }
+
+  function refreshAvailability() {
+    $$("[data-action], .companion-list [data-character], #visitToggle, #retryModel").forEach(button => { button.disabled = busy || modelLoading; });
+    updateDailyTasks();
   }
 
   function setToggle(button, active, label) {
     button.classList.toggle("is-on", active);
     button.setAttribute("aria-pressed", String(active));
-    button.textContent = label;
+    button.querySelector(".button-label").textContent = label;
+    const type = button.id === "motionToggle" ? "motion" : "sound";
+    button.querySelector("img").src = `./assets/pet-cottage/ui/03_settings/${type}_${active ? "on" : "off"}.png`;
   }
 
   function addValue(key, amount) {
@@ -438,7 +480,12 @@
   }
 
   function runAction(name, source) {
-    if (busy || !actionData[name]) return;
+    if (busy || modelLoading || !actionData[name]) return;
+    ensureDaily();
+    if (["play", "dance"].includes(name) && state.energy < Math.abs(actionData[name].energy)) {
+      showToast("精力不够啦，先休息一下再来玩");
+      return;
+    }
     unlockVoice({ discardWelcome: true });
     const data = actionData[name];
     if (data.coins && state.coins + data.coins < 0) {
@@ -448,22 +495,25 @@
     }
 
     busy = true;
-    $$("[data-action]").forEach((button) => { button.disabled = true; });
+    refreshAvailability();
     speakCharacter(getVoiceEntry(characterKey, name));
     playSound(data.sound);
     const rect = (source || $("#petCharacter")).getBoundingClientRect();
     makeSparks(rect.left + rect.width / 2, rect.top + rect.height * 0.42, name === "dance" ? 14 : 8);
 
     ["hunger", "mood", "energy", "xp", "coins"].forEach((key) => addValue(key, data[key]));
+    const reward = completeDaily(name);
     saveState();
     updateUI();
+    const feedback = Object.entries(data).filter(([key]) => ["mood", "hunger", "energy", "xp", "coins"].includes(key)).map(([key, value]) => `${({ mood: "心情", hunger: "饱食", energy: "精力", xp: "经验", coins: "桃花币" })[key]} ${value > 0 ? "+" : ""}${value}`).join(" · ");
+    $("#actionFeedback").textContent = reward ? `${feedback} · 今日小事 +4币` : feedback;
 
     let finished = false;
     const finish = () => {
       if (finished) return;
       finished = true;
       busy = false;
-      $$("[data-action]").forEach((button) => { button.disabled = false; });
+      refreshAvailability();
     };
     setTimeout(finish, 3200);
     if (!rig?.play(name, finish)) {
@@ -476,6 +526,7 @@
 
   function setClock() {
     const date = new Date();
+    updateUI();
     $("#petClock").textContent = date.toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" });
     const hour = date.getHours();
     $("#petGreeting").textContent = hour < 6 ? "夜深相伴" : hour < 12 ? "早安相伴" : hour < 18 ? "午后相伴" : "晚间相伴";
@@ -484,7 +535,9 @@
 
   function bindDragging() {
     const character = $("#petCharacter");
+    character.addEventListener("click", event => { if (event.detail === 0) runAction("pet", character); });
     character.addEventListener("pointerdown", (event) => {
+      if (event.button !== 0 || !event.isPrimary) return;
       drag = { id: event.pointerId, startX: event.clientX, startY: event.clientY, originX: stageOffset.x, originY: stageOffset.y, moved: false };
       character.setPointerCapture(event.pointerId);
     });
@@ -493,7 +546,8 @@
       const dx = event.clientX - drag.startX;
       const dy = event.clientY - drag.startY;
       drag.moved ||= Math.abs(dx) + Math.abs(dy) > 7;
-      stageOffset.x = Math.max(-220, Math.min(220, drag.originX + dx));
+      const limit = Math.min(220, $("#petRoom").clientWidth * 0.18);
+      stageOffset.x = Math.max(-limit, Math.min(limit, drag.originX + dx));
       stageOffset.y = Math.max(-115, Math.min(110, drag.originY + dy));
       $("#petStage").style.transform = `translate3d(${stageOffset.x}px, ${stageOffset.y}px, 0)`;
     });
@@ -510,58 +564,75 @@
     const visiting = characterKey !== "hutao";
     const nextKey = characterOrder[(characterOrder.indexOf(characterKey) + 1) % characterOrder.length];
     const nextCharacter = characters[nextKey];
+    $$(".companion-list [data-character]").forEach((button) => {
+      const selected = button.dataset.character === characterKey;
+      button.setAttribute("aria-pressed", String(selected));
+      button.querySelector("em").textContent = selected ? "在小屋" : "邀请";
+    });
     $("#profileName").textContent = character.name;
     $("#profileRelation").textContent = character.relation;
     $("#speakerName").textContent = character.name;
     $("#petCharacter").setAttribute("aria-label", `与${character.name}互动，按住可以拖动`);
     $("#petRoom").classList.toggle("is-visitor", visiting);
-    $("#profileAvatarText").textContent = character.name.slice(0, 1);
+    $("#profileAvatarImage").src = `./assets/pet-cottage/avatars/${characterKey}.png`;
+    $("#petFallback").src = `./assets/pet-cottage/fallbacks/${characterKey}.png`;
+    $("#petFallback").alt = `${character.name}备用立绘`;
     const visitToggle = $("#visitToggle");
     visitToggle.classList.toggle("is-active", visiting);
     visitToggle.setAttribute("aria-pressed", String(visiting));
-    visitToggle.querySelector("span").textContent = nextKey === "hutao" ? "送客" : "串门";
+    visitToggle.querySelector(".visit-label").textContent = nextKey === "hutao" ? "送客" : "串门";
     visitToggle.querySelector("strong").textContent = nextKey === "hutao" ? `请${character.name}下次再来` : `邀请${nextCharacter.name}来坐坐`;
   }
 
   async function loadCharacter(nextKey, initial = false) {
+    if (modelLoading || !characters[nextKey]) return;
+    modelLoading = true;
+    refreshAvailability();
     const status = $("#modelStatus");
-    const token = ++modelLoadToken;
     const character = characters[nextKey];
-    const previousKey = characterKey;
-    characterKey = nextKey;
-    updateCharacterUI();
+    const host = $("#petRig");
+    // Keep the current rig alive until its replacement is ready.
+    const nextHost = document.createElement("span");
+    nextHost.className = "pet-rig";
+    nextHost.style.visibility = "hidden";
+    nextHost.innerHTML = '<span class="pet-canvas"></span>';
+    host.after(nextHost);
+    const candidate = new HutaoRig(nextHost, { modelUrl: character.modelUrl, scale: character.scale, y: character.y });
     $("#petRoom").classList.add("is-switching-character");
     status.classList.remove("is-ready", "is-error");
-    status.querySelector("span").textContent = `正在迎接${character.name}…`;
-    $("#petRig").classList.remove("is-live2d-ready");
-    voiceController.stop();
-    rig?.destroy();
-    rig = null;
+    $("#retryModel").hidden = true;
+    status.querySelector("span").textContent = character.name + "正在登门…";
     try {
-      rig = await new HutaoRig($("#petRig"), {
-        modelUrl: character.modelUrl,
-        scale: character.scale,
-        y: character.y,
-      }).init();
-      if (token !== modelLoadToken) {
-        rig.destroy();
-        return;
-      }
+      await candidate.init();
+      voiceController.stop();
+      rig?.destroy();
+      host.replaceWith(nextHost);
+      nextHost.id = "petRig";
+      nextHost.style.visibility = "";
+      rig = candidate;
+      $("#petRoom").classList.add("has-live2d");
+      characterKey = nextKey;
+      updateCharacterUI();
       rig.setMotion(state.motion);
       status.classList.add("is-ready");
-      status.querySelector("span").textContent = `${character.name}已到 · Live2D 运行中`;
+      status.querySelector("span").textContent = character.name + "已到 · Live2D 运行中";
       pendingWelcomeVoice = null;
       speak(getWelcomeVoice(nextKey), { speaker: character.name, deferAudio: initial && !voiceUnlocked });
     } catch (error) {
-      if (token !== modelLoadToken) return;
-      console.error(`${character.name} Live2D init failed:`, error);
-      characterKey = previousKey;
-      updateCharacterUI();
+      console.warn("[pet-room] Character load failed:", nextKey, error);
+      candidate.destroy();
+      nextHost.remove();
+      if (!rig) { characterKey = nextKey; updateCharacterUI(); }
       status.classList.add("is-error");
-      status.querySelector("span").textContent = `${character.name}暂时未能到访，已留在当前角色`;
-      speakSystemMessage(`${character.name}似乎在路上耽搁了，先继续陪你的是${characters[previousKey].name}。`, { hutaoVoice: false });
+      status.querySelector("span").textContent = character.name + "加载失败" + (rig ? "，当前角色继续相伴" : "，可重试加载");
+      const retry = $("#retryModel");
+      retry.hidden = false;
+      retry.dataset.character = nextKey;
+      showToast("角色未能到访，请重试");
     } finally {
+      modelLoading = false;
       $("#petRoom").classList.remove("is-switching-character");
+      refreshAvailability();
       if (initial) markEntryReady();
     }
   }
@@ -602,23 +673,18 @@
       updateUI();
       if (state.sound) playSound(700);
     });
-    $("#visitToggle").addEventListener("click", async (event) => {
-      if (busy || event.currentTarget.disabled) return;
-      const button = event.currentTarget;
-      const nextKey = characterOrder[(characterOrder.indexOf(characterKey) + 1) % characterOrder.length];
-      const nextCharacter = characters[nextKey];
+    $("#visitToggle").addEventListener("click", () => {
+      if (busy || modelLoading) return;
       unlockVoice({ discardWelcome: true });
-      busy = true;
-      button.disabled = true;
-      try {
-        playSound(nextKey === "fireman" ? 460 : nextKey === "zhang" ? 390 : 620);
-        showToast(nextKey === "hutao" ? `${characters[characterKey].name}告辞离开` : `${nextCharacter.name}正在登门`);
-        await loadCharacter(nextKey);
-      } finally {
-        busy = false;
-        button.disabled = false;
-      }
+      loadCharacter(characterOrder[(characterOrder.indexOf(characterKey) + 1) % characterOrder.length]);
     });
+    $$(".companion-list [data-character]").forEach(button => button.addEventListener("click", () => {
+      if (busy || modelLoading || button.dataset.character === characterKey) return;
+      unlockVoice({ discardWelcome: true });
+      loadCharacter(button.dataset.character);
+    }));
+    $("#retryModel").addEventListener("click", event => loadCharacter(event.currentTarget.dataset.character));
+    $$("[data-task]").forEach(button => button.addEventListener("click", () => runAction(button.dataset.task, button)));
     $("#resetPosition").addEventListener("click", () => {
       unlockVoice({ discardWelcome: true });
       stageOffset = { x: 0, y: 0 };
@@ -632,11 +698,32 @@
     });
   }
 
+  function bindJournalTabs() {
+    const tabs = $$(".journal-tabs [role=tab]");
+    const select = (selected) => tabs.forEach(tab => {
+      const active = tab === selected;
+      tab.setAttribute("aria-selected", String(active));
+      tab.tabIndex = active ? 0 : -1;
+      document.getElementById(tab.getAttribute("aria-controls")).hidden = !active;
+    });
+    tabs.forEach((tab, index) => {
+      tab.addEventListener("click", () => select(tab));
+      tab.addEventListener("keydown", event => {
+        if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+        event.preventDefault();
+        const next = event.key === "Home" ? 0 : event.key === "End" ? tabs.length - 1 : (index + (event.key === "ArrowRight" ? 1 : -1) + tabs.length) % tabs.length;
+        select(tabs[next]); tabs[next].focus();
+      });
+    });
+  }
+
   function init() {
+    updateCharacterUI();
     updateUI();
     setClock();
     setInterval(setClock, 30000);
     bindControls();
+    bindJournalTabs();
     bindDragging();
     window.addEventListener("pointermove", (event) => {
       if (!drag) rig?.trackPointer(event.clientX, event.clientY);

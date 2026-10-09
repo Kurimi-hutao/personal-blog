@@ -1,0 +1,390 @@
+{
+  "project": "Hu Tao Desktop Pet Cottage",
+  "asset_count": 24,
+  "assets": [
+    {
+      "category": "01_interactions",
+      "name": "pet",
+      "label_zh": "摸摸",
+      "file": "png/01_interactions/pet.png",
+      "source_hd": "source_hd/01_interactions/pet.png",
+      "resolution": [
+        512,
+        512
+      ],
+      "source_original_resolution": [
+        1254,
+        1254
+      ],
+      "transparent": true
+    },
+    {
+      "category": "01_interactions",
+      "name": "feed",
+      "label_zh": "投喂",
+      "file": "png/01_interactions/feed.png",
+      "source_hd": "source_hd/01_interactions/feed.png",
+      "resolution": [
+        512,
+        512
+      ],
+      "source_original_resolution": [
+        1254,
+        1254
+      ],
+      "transparent": true
+    },
+    {
+      "category": "01_interactions",
+      "name": "play",
+      "label_zh": "玩耍",
+      "file": "png/01_interactions/play.png",
+      "source_hd": "source_hd/01_interactions/play.png",
+      "resolution": [
+        512,
+        512
+      ],
+      "source_original_resolution": [
+        1254,
+        1254
+      ],
+      "transparent": true
+    },
+    {
+      "category": "01_interactions",
+      "name": "dance",
+      "label_zh": "跳舞",
+      "file": "png/01_interactions/dance.png",
+      "source_hd": "source_hd/01_interactions/dance.png",
+      "resolution": [
+        512,
+        512
+      ],
+      "source_original_resolution": [
+        1254,
+        1254
+      ],
+      "transparent": true
+    },
+    {
+      "category": "01_interactions",
+      "name": "rest",
+      "label_zh": "休息",
+      "file": "png/01_interactions/rest.png",
+      "source_hd": "source_hd/01_interactions/rest.png",
+      "resolution": [
+        512,
+        512
+      ],
+      "source_original_resolution": [
+        1254,
+        1254
+      ],
+      "transparent": true
+    },
+    {
+      "category": "01_interactions",
+      "name": "wave",
+      "label_zh": "招手",
+      "file": "png/01_interactions/wave.png",
+      "source_hd": "source_hd/01_interactions/wave.png",
+      "resolution": [
+        512,
+        512
+      ],
+      "source_original_resolution": [
+        1254,
+        1254
+      ],
+      "transparent": true
+    },
+    {
+      "category": "02_actions",
+      "name": "visit_invite",
+      "label_zh": "串门 / 邀请",
+      "file": "png/02_actions/visit_invite.png",
+      "source_hd": "source_hd/02_actions/visit_invite.png",
+      "resolution": [
+        512,
+        512
+      ],
+      "source_original_resolution": [
+        1254,
+        1254
+      ],
+      "transparent": true
+    },
+    {
+      "category": "02_actions",
+      "name": "return_position",
+      "label_zh": "归位",
+      "file": "png/02_actions/return_position.png",
+      "source_hd": "source_hd/02_actions/return_position.png",
+      "resolution": [
+        512,
+        512
+      ],
+      "source_original_resolution": [
+        1254,
+        1254
+      ],
+      "transparent": true
+    },
+    {
+      "category": "02_actions",
+      "name": "daily_gift",
+      "label_zh": "今日小礼",
+      "file": "png/02_actions/daily_gift.png",
+      "source_hd": "source_hd/02_actions/daily_gift.png",
+      "resolution": [
+        512,
+        512
+      ],
+      "source_original_resolution": [
+        1254,
+        1254
+      ],
+      "transparent": true
+    },
+    {
+      "category": "02_actions",
+      "name": "reload",
+      "label_zh": "重试加载",
+      "file": "png/02_actions/reload.png",
+      "source_hd": "source_hd/02_actions/reload.png",
+      "resolution": [
+        512,
+        512
+      ],
+      "source_original_resolution": [
+        1254,
+        1254
+      ],
+      "transparent": true
+    },
+    {
+      "category": "02_actions",
+      "name": "reenter_scene",
+      "label_zh": "重看入境",
+      "file": "png/02_actions/reenter_scene.png",
+      "source_hd": "source_hd/02_actions/reenter_scene.png",
+      "resolution": [
+        512,
+        512
+      ],
+      "source_original_resolution": [
+        1254,
+        1254
+      ],
+      "transparent": true
+    },
+    {
+      "category": "03_settings",
+      "name": "motion_on",
+      "label_zh": "动态开启",
+      "file": "png/03_settings/motion_on.png",
+      "source_hd": "source_hd/03_settings/motion_on.png",
+      "resolution": [
+        512,
+        512
+      ],
+      "source_original_resolution": [
+        1254,
+        1254
+      ],
+      "transparent": true
+    },
+    {
+      "category": "03_settings",
+      "name": "motion_off",
+      "label_zh": "动态关闭",
+      "file": "png/03_settings/motion_off.png",
+      "source_hd": "source_hd/03_settings/motion_off.png",
+      "resolution": [
+        512,
+        512
+      ],
+      "source_original_resolution": [
+        1254,
+        1254
+      ],
+      "transparent": true
+    },
+    {
+      "category": "03_settings",
+      "name": "sound_on",
+      "label_zh": "声音开启",
+      "file": "png/03_settings/sound_on.png",
+      "source_hd": "source_hd/03_settings/sound_on.png",
+      "resolution": [
+        512,
+        512
+      ],
+      "source_original_resolution": [
+        1254,
+        1254
+      ],
+      "transparent": true
+    },
+    {
+      "category": "03_settings",
+      "name": "sound_off",
+      "label_zh": "声音关闭",
+      "file": "png/03_settings/sound_off.png",
+      "source_hd": "source_hd/03_settings/sound_off.png",
+      "resolution": [
+        512,
+        512
+      ],
+      "source_original_resolution": [
+        1254,
+        1254
+      ],
+      "transparent": true
+    },
+    {
+      "category": "04_scenes",
+      "name": "scene_auto",
+      "label_zh": "日月自动",
+      "file": "png/04_scenes/scene_auto.png",
+      "source_hd": "source_hd/04_scenes/scene_auto.png",
+      "resolution": [
+        512,
+        512
+      ],
+      "source_original_resolution": [
+        1254,
+        1254
+      ],
+      "transparent": true
+    },
+    {
+      "category": "04_scenes",
+      "name": "scene_dawn",
+      "label_zh": "清晨",
+      "file": "png/04_scenes/scene_dawn.png",
+      "source_hd": "source_hd/04_scenes/scene_dawn.png",
+      "resolution": [
+        512,
+        512
+      ],
+      "source_original_resolution": [
+        1254,
+        1254
+      ],
+      "transparent": true
+    },
+    {
+      "category": "04_scenes",
+      "name": "scene_day",
+      "label_zh": "白天",
+      "file": "png/04_scenes/scene_day.png",
+      "source_hd": "source_hd/04_scenes/scene_day.png",
+      "resolution": [
+        512,
+        512
+      ],
+      "source_original_resolution": [
+        1254,
+        1254
+      ],
+      "transparent": true
+    },
+    {
+      "category": "04_scenes",
+      "name": "scene_dusk",
+      "label_zh": "黄昏",
+      "file": "png/04_scenes/scene_dusk.png",
+      "source_hd": "source_hd/04_scenes/scene_dusk.png",
+      "resolution": [
+        512,
+        512
+      ],
+      "source_original_resolution": [
+        1254,
+        1254
+      ],
+      "transparent": true
+    },
+    {
+      "category": "04_scenes",
+      "name": "scene_night",
+      "label_zh": "月夜",
+      "file": "png/04_scenes/scene_night.png",
+      "source_hd": "source_hd/04_scenes/scene_night.png",
+      "resolution": [
+        512,
+        512
+      ],
+      "source_original_resolution": [
+        1254,
+        1254
+      ],
+      "transparent": true
+    },
+    {
+      "category": "05_button_states",
+      "name": "button_default",
+      "label_zh": "按钮默认",
+      "file": "png/05_button_states/button_default.png",
+      "source_hd": "source_hd/05_button_states/button_default.png",
+      "resolution": [
+        768,
+        512
+      ],
+      "source_original_resolution": [
+        1536,
+        1024
+      ],
+      "transparent": true
+    },
+    {
+      "category": "05_button_states",
+      "name": "button_hover",
+      "label_zh": "按钮悬停",
+      "file": "png/05_button_states/button_hover.png",
+      "source_hd": "source_hd/05_button_states/button_hover.png",
+      "resolution": [
+        768,
+        512
+      ],
+      "source_original_resolution": [
+        1536,
+        1024
+      ],
+      "transparent": true
+    },
+    {
+      "category": "05_button_states",
+      "name": "button_pressed",
+      "label_zh": "按钮按下",
+      "file": "png/05_button_states/button_pressed.png",
+      "source_hd": "source_hd/05_button_states/button_pressed.png",
+      "resolution": [
+        768,
+        512
+      ],
+      "source_original_resolution": [
+        1536,
+        1024
+      ],
+      "transparent": true
+    },
+    {
+      "category": "05_button_states",
+      "name": "button_disabled",
+      "label_zh": "按钮禁用",
+      "file": "png/05_button_states/button_disabled.png",
+      "source_hd": "source_hd/05_button_states/button_disabled.png",
+      "resolution": [
+        768,
+        512
+      ],
+      "source_original_resolution": [
+        1536,
+        1024
+      ],
+      "transparent": true
+    }
+  ]
+}

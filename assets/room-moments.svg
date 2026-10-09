@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg">
+<symbol id="flower" viewBox="0 0 48 48"><g fill="#b5786c" fill-opacity=".16" stroke="#9a574b" stroke-width="1.5"><path d="M24 21C12 9 23 2 27 14c10-10 18 1 6 6 15 3 9 16-2 10 1 15-12 15-12 1-11 8-18-4-5-9Z"/><circle cx="24" cy="24" r="4" fill="#c6a36c"/></g><path d="M23 34c-2 6-7 8-11 9" stroke="#768579" fill="none" stroke-width="2"/></symbol>
+<symbol id="kite" viewBox="0 0 48 48"><path d="m24 4 15 17-15 12L9 21Z" fill="#c6a36c" fill-opacity=".18" stroke="#9c7850" stroke-width="1.5"/><path d="M24 4v29M9 21h30M24 33c-9 6 10 5 0 11" stroke="#9c7850" stroke-width="1.5" fill="none"/></symbol>
+<symbol id="tea" viewBox="0 0 48 48"><path d="M9 23h27v7c0 9-27 9-27 0Zm27 1c13-3 10 14 0 9" fill="#768579" fill-opacity=".18" stroke="#657d70" stroke-width="1.5"/><path d="M6 40h34M17 18c-6-6 6-5 0-12m10 12c-6-6 6-5 0-12" stroke="#657d70" stroke-width="1.5" fill="none"/></symbol>
+</svg>

@@ -9,7 +9,7 @@
     constructor(host, options = {}) {
       this.host = host;
       this.options = options;
-      this.canvasHost = host.querySelector("#petCanvas") || host;
+      this.canvasHost = host.querySelector(".pet-canvas") || host;
       this.modelUrl = options.modelUrl || "./assets/models/HutaoSeethrough/seethrough_output.model3.json";
       this.app = null;
       this.model = null;

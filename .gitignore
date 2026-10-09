@@ -8,3 +8,4 @@ blog-source.zip
 
 # Raw browser captures; review-sized comparisons live in docs/issue-2/.
 /screenshots/issue-2/
+_deploy/

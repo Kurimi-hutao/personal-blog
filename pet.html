@@ -10,18 +10,21 @@
     <link rel="stylesheet" href="./fonts.css?v=1" />
     <link rel="stylesheet" href="./styles.css?v=20260928" />
     <link rel="preload" as="image" href="./assets/hutao-entry-shanshui.webp" fetchpriority="high" />
-    <link rel="stylesheet" href="./pet.css?v=20260928-3" />
+    <link rel="stylesheet" href="./pet.css?v=20261009-game-2" />
     <link rel="stylesheet" href="./motion-core.css?v=6" />
     <link rel="stylesheet" href="./lottie-core.css?v=20261008-visual" />
     <script defer src="./assets/vendor/lottie-web/lottie_light-5.13.0.min.js"></script>
     <script defer src="./lottie-core.js?v=20261008-visual"></script>
     <link rel="stylesheet" href="./ink-system.css?v=20260928-2" />
+    <link rel="stylesheet" href="./layout-polish.css?v=20260929-1" />
+    <script defer src="./layout-polish.js?v=20260929-1"></script>
     <link rel="stylesheet" href="./site-footer.css?v=20261007-1" />
     <script defer src="./site-footer.js?v=20261007-1"></script>
       <link rel="icon" href="./assets/visual-refresh/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" sizes="32x32" href="./assets/visual-refresh/favicon-32.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="./assets/visual-refresh/home-icon-180.png" />
     <link rel="stylesheet" href="./ink-assets.css?v=20261008-visual" />
+    <link rel="stylesheet" href="./cottage-ui.css?v=20261009-game-2" />
   </head>
   <body class="pet-page pet-entry-active" data-page="pet" data-nav-parent="works">
     <div class="pet-entry" id="petEntry" aria-label="正在进入胡桃小屋" aria-live="polite">
@@ -73,22 +76,29 @@
           <strong id="petClock">--:--</strong>
           <small id="petDayText">正在整理往生堂的今日事务</small>
         </div>
-        <button class="pet-entry-replay" id="petEntryReplay" type="button">重看入境</button>
+        <button class="pet-entry-replay" id="petEntryReplay" type="button"><img class="utility-icon" src="./assets/pet-cottage/ui/02_actions/reenter_scene.png" alt="" width="32" height="32" /><span class="button-label">重看入境</span></button>
       </section>
 
       <section class="hutao-house" id="petRoom" aria-label="胡桃互动小屋">
         <div class="room-scenery" aria-hidden="true"></div>
-
-        <details class="status-card">
-          <summary>相伴手记 <span>状态与今日小礼</span></summary>
+        <div class="game-topbar" aria-label="角色状态与小屋设置">
           <div class="profile-row">
             <span class="profile-avatar">
-              <img id="profileAvatarImage" src="./assets/hutao.webp" alt="" />
+              <img id="profileAvatarImage" src="./assets/pet-cottage/avatars/hutao.png" alt="" />
               <b id="profileAvatarText" aria-hidden="true">季</b>
             </span>
             <div><small id="profileRelation">亲密伙伴</small><strong><span id="profileName">小桃</span> · 等级 <span id="petLevel">1</span></strong></div>
             <span class="coin-count">桃花币 <b id="petCoins">20</b></span>
           </div>
+          <div class="switch-row">
+            <button id="motionToggle" class="mini-toggle is-on" type="button" aria-pressed="true"><img class="setting-icon" src="./assets/pet-cottage/ui/03_settings/motion_on.png" alt="" width="32" height="32" /><span class="button-label">动态：开</span></button>
+            <button id="soundToggle" class="mini-toggle is-on" type="button" aria-pressed="true"><img class="setting-icon" src="./assets/pet-cottage/ui/03_settings/sound_on.png" alt="" width="32" height="32" /><span class="button-label">音效：开</span></button>
+            <button id="sceneToggle" class="mini-toggle" type="button" aria-pressed="false"><img class="setting-icon" src="./assets/pet-cottage/ui/04_scenes/scene_auto.png" alt="" width="32" height="32" /><span class="button-label">场景：随时间</span></button>
+          </div>
+        </div>
+
+        <details class="status-card">
+          <summary>相伴手记 <span id="petCondition">状态与今日小礼</span></summary>
           <div class="xp-track"><i id="petXpBar"></i><span id="petXpText">0 / 100</span></div>
           <div class="stat-list">
             <div class="stat-row"><span>饱食</span><div><i id="hungerBar"></i></div><b id="hungerValue">80</b></div>
@@ -96,12 +106,12 @@
             <div class="stat-row"><span>精力</span><div><i id="energyBar"></i></div><b id="energyValue">80</b></div>
           </div>
           <button class="daily-gift" id="dailyGift" type="button">
-            <span>今日小礼</span><strong>领取 10 枚桃花币</strong>
+            <img class="gift-icon" src="./assets/pet-cottage/ui/02_actions/daily_gift.png" alt="" width="48" height="48" /><span>今日小礼</span><strong>领取 10 枚桃花币</strong>
           </button>
         </details>
 
         <div class="live-status" id="modelStatus" role="status">
-          <i></i><span>正在唤醒 Live2D…</span>
+          <i></i><span>正在唤醒 Live2D…</span><button id="retryModel" type="button" hidden><img class="utility-icon" src="./assets/pet-cottage/ui/02_actions/reload.png" alt="" width="32" height="32" /><span class="button-label">重试</span></button>
         </div>
 
         <div class="speech-bubble" id="petDialogue" aria-live="polite">
@@ -114,45 +124,63 @@
           <button class="pet-character" id="petCharacter" type="button" aria-label="摸摸胡桃，按住可以拖动">
             <span class="pet-rig" id="petRig">
               <span class="pet-canvas" id="petCanvas"></span>
-              <img class="pet-fallback" src="./assets/hutao.webp" alt="胡桃" />
             </span>
+            <img id="petFallback" class="pet-fallback" src="./assets/pet-cottage/fallbacks/hutao.png" alt="小桃备用立绘" />
           </button>
         </div>
 
         <div class="control-card">
           <div class="control-title">
-            <div><small>相伴时光</small><strong>与她共度片刻</strong></div>
-            <button id="resetPosition" class="text-control" type="button">归位</button>
+            <div><small>相伴时光 · INTERACT</small><strong>今天，想做些什么？</strong></div>
+            <button id="resetPosition" class="text-control" type="button"><img class="utility-icon" src="./assets/pet-cottage/ui/02_actions/return_position.png" alt="" width="32" height="32" /><span class="button-label">归位</span></button>
           </div>
           <button class="visit-control" id="visitToggle" type="button" aria-pressed="false">
-            <span>串门</span>
+            <img class="visit-icon" src="./assets/pet-cottage/ui/02_actions/visit_invite.png" alt="" width="64" height="64" /><span class="visit-label">串门</span>
             <strong>邀请季沧海来坐坐</strong>
           </button>
           <div class="action-grid">
-            <button type="button" data-action="pet"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 13V5a2 2 0 0 1 4 0v6-7a2 2 0 0 1 4 0v8-5a2 2 0 0 1 4 0v8c0 5-3 7-7 7-3 0-5-3-8-7a2 2 0 0 1 3-2l2 2"/></svg><b>摸摸</b><small>心情 +8</small></button>
-            <button type="button" data-action="feed"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h16c0 5-3 8-8 8s-8-3-8-8ZM8 8V4m4 4V3m4 5V4"/></svg><b>投喂</b><small>饱食 +14</small></button>
-            <button type="button" data-action="play"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 9h14l3 9-3 2-4-4H9l-4 4-3-2ZM7 11v4m-2-2h4m7-1h.1m2 2h.1"/></svg><b>玩耍</b><small>亲密 +8</small></button>
-            <button type="button" data-action="dance"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 17V5l11-2v12M9 6l11-2M9 17c0 4-6 4-6 1s6-4 6-1m11-2c0 4-6 4-6 1s6-4 6-1"/></svg><b>跳舞</b><small>心情 +12</small></button>
-            <button type="button" data-action="sleep"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 16A9 9 0 0 1 8 4a9 9 0 1 0 12 12Z"/></svg><b>休息</b><small>精力 +16</small></button>
-            <button type="button" data-action="wave"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 15c3-8 7 8 10 0s5 0 7-4M2 8c3-8 7 8 10 0s5 0 7-4"/></svg><b>招手</b><small>亲密 +5</small></button>
-          </div>
-          <div class="switch-row">
-            <button id="motionToggle" class="mini-toggle is-on" type="button" aria-pressed="true">动态：开</button>
-            <button id="soundToggle" class="mini-toggle is-on" type="button" aria-pressed="true">音效：开</button>
-            <button id="sceneToggle" class="mini-toggle" type="button" aria-pressed="false">夜色：深</button>
+            <button type="button" data-action="pet"><img class="cottage-icon" src="./assets/pet-cottage/ui/01_interactions/pet.png" alt="" width="64" height="64" /><b>摸摸</b><small>心情 +8</small></button>
+            <button type="button" data-action="feed"><img class="cottage-icon" src="./assets/pet-cottage/ui/01_interactions/feed.png" alt="" width="64" height="64" /><b>投喂</b><small>饱食 +14 · 2币</small></button>
+            <button type="button" data-action="play"><img class="cottage-icon" src="./assets/pet-cottage/ui/01_interactions/play.png" alt="" width="64" height="64" /><b>玩耍</b><small>经验 +8 · 精力 −8</small></button>
+            <button type="button" data-action="dance"><img class="cottage-icon" src="./assets/pet-cottage/ui/01_interactions/dance.png" alt="" width="64" height="64" /><b>跳舞</b><small>心情 +12 · 精力 −7</small></button>
+            <button type="button" data-action="sleep"><img class="cottage-icon" src="./assets/pet-cottage/ui/01_interactions/rest.png" alt="" width="64" height="64" /><b>休息</b><small>精力 +16</small></button>
+            <button type="button" data-action="wave"><img class="cottage-icon" src="./assets/pet-cottage/ui/01_interactions/wave.png" alt="" width="64" height="64" /><b>招手</b><small>经验 +5</small></button>
           </div>
         </div>
 
         <p class="drag-tip">移动光标，她会看向你 · 按住角色可以拖动</p>
       </section>
 
-      <p class="pet-room-note">轻触角色，或按住拖动。互动进度保存在当前浏览器。</p>
+      <div class="room-footnote"><p class="pet-room-note">轻触角色，或按住拖动 · 进度保存在当前浏览器</p><p id="actionFeedback" role="status">今日也留一点时间，陪伴彼此。</p></div>
 
+      <section class="room-journal" aria-label="小屋日常">
+        <div class="journal-tabs" role="tablist" aria-label="小屋卷册">
+          <button id="companionsTab" type="button" role="tab" aria-selected="true" aria-controls="companionsPanel">来访伙伴</button>
+          <button id="dailyTab" type="button" role="tab" aria-selected="false" aria-controls="dailyPanel" tabindex="-1">每日小事 <span id="taskTabCount">0 / 3</span></button>
+        </div>
+        <div class="journal-panel" id="companionsPanel" role="tabpanel" aria-labelledby="companionsTab">
+          <div class="journal-heading"><div><p>FRIENDS AT HOME</p><h2>今日谁来作伴</h2></div><span>相伴进度共享</span></div>
+          <div class="companion-list" aria-label="选择小屋角色">
+            <button type="button" data-character="hutao" aria-pressed="true"><img class="companion-portrait" src="./assets/pet-cottage/avatars/hutao.png" alt="" width="56" height="56" loading="lazy" /><span><b>小桃</b><small>一盏茶，等你回家</small></span><em>在小屋</em></button>
+            <button type="button" data-character="fireman" aria-pressed="false"><img class="companion-portrait" src="./assets/pet-cottage/avatars/fireman.png" alt="" width="56" height="56" loading="lazy" /><span><b>季沧海</b><small>把酒言欢，畅快相伴</small></span><em>邀请</em></button>
+            <button type="button" data-character="zhang" aria-pressed="false"><img class="companion-portrait" src="./assets/pet-cottage/avatars/zhang.png" alt="" width="56" height="56" loading="lazy" /><span><b>张起灵</b><small>安静片刻，也很好</small></span><em>邀请</em></button>
+          </div>
+        </div>
+        <div class="journal-panel" id="dailyPanel" role="tabpanel" aria-labelledby="dailyTab" hidden>
+          <div class="journal-heading"><div><p>LITTLE DAILY MOMENTS</p><h2>今日小事</h2></div><span id="dailyProgress">0 / 3 完成</span></div>
+          <p class="journal-caption">做完一件小事，收下 4 枚桃花币。每天重新开始。</p>
+          <div class="daily-task-list">
+            <button type="button" data-task="pet"><img class="task-icon" src="./assets/pet-cottage/ui/01_interactions/pet.png" alt="" width="44" height="44" loading="lazy" /><span><b>摸摸脑袋</b><small>摸摸一次 · +4 桃花币</small></span><em>去完成</em></button>
+            <button type="button" data-task="play"><img class="task-icon" src="./assets/pet-cottage/ui/01_interactions/play.png" alt="" width="44" height="44" loading="lazy" /><span><b>一起玩耍</b><small>玩耍一次 · +4 桃花币</small></span><em>去完成</em></button>
+            <button type="button" data-task="sleep"><img class="task-icon" src="./assets/pet-cottage/ui/01_interactions/rest.png" alt="" width="44" height="44" loading="lazy" /><span><b>歇一歇脚</b><small>休息一次 · +4 桃花币</small></span><em>去完成</em></button>
+          </div>
+        </div>
+      </section>
       <details class="pet-archive">
         <summary>小屋卷册 <span>角色与互动说明</span></summary>
         <div class="pet-archive-grid">
-          <article><h2>今日相伴</h2><p>胡桃、季沧海、张起灵轮流来访。点击「串门」切换角色，进度会保留。</p></article>
-          <article><h2>慢慢熟悉</h2><p>摸摸、投喂、玩耍、跳舞、休息与招手，都有各自的回应。经验、等级与每日小礼收在「相伴手记」里。</p></article>
+          <article><h2>今日相伴</h2><p>胡桃、季沧海、张起灵轮流来访。在「今日谁来作伴」直接邀请，也可以点击「串门」依次切换，养成进度共享。</p></article>
+          <article><h2>慢慢熟悉</h2><p>摸摸、投喂、玩耍、跳舞、休息与招手，都有各自的回应。投喂消耗 2 枚桃花币；玩耍和跳舞消耗精力，休息可以恢复。每日小事和今日小礼都能获得桃花币。</p></article>
           <article><h2>随心歇息</h2><p>可以关闭动态与音效，也可以切换窗外的晨昏。重新访问时，养成记录仍在当前浏览器。</p></article>
         </div>
       </details>
@@ -165,10 +193,10 @@
     <script src="./assets/vendor/pixi-live2d-display.min.js"></script>
     <script src="./ink-assets.js?v=20261008-visual"></script>
     <script src="./theme.js?v=20261008-visual"></script>
-    <script src="./pet-rig.js?v=20260615-fullbody"></script>
-    <script src="./pet-voices.js?v=2"></script>
-    <script src="./pet.js?v=20260630-voices3"></script>
+    <script src="./pet-rig.js?v=20261009-room"></script>
+    <script src="./pet-voices.js?v=20261009-game-2"></script>
+    <script src="./pet.js?v=20261009-game-2"></script>
     <script src="./motion-core.js?v=6"></script>
-    <script src="./motion-pet.js?v=3"></script>
+    <script src="./motion-pet.js?v=20261009-game-2"></script>
   </body>
 </html>

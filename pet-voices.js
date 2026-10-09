@@ -13,7 +13,7 @@
           voice("帽子可不能揉乱啦。", path("hutao", "pet-02")),
         ]),
         feed: Object.freeze([
-          voice("唔，这个味道不错！", null),
+          voice("唔，这个味道不错！", path("hutao", "feed-01")),
           voice("吃饱才有力气工作嘛。", path("hutao", "feed-02")),
         ]),
         play: Object.freeze([

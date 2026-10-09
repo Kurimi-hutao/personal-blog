@@ -1,0 +1,153 @@
+/* Game layout: artwork stays decorative, while each control owns a stable slot. */
+.pet-page { --cottage-plate:url('./assets/pet-cottage/ui/05_button_states/button_default.png'); }
+.pet-page button:hover:not(:disabled) { --cottage-plate:url('./assets/pet-cottage/ui/05_button_states/button_hover.png'); }
+.pet-page button:active:not(:disabled) { --cottage-plate:url('./assets/pet-cottage/ui/05_button_states/button_pressed.png'); }
+.pet-page button:disabled { --cottage-plate:url('./assets/pet-cottage/ui/05_button_states/button_disabled.png'); }
+.pet-page .pet-shell { width:min(1500px,calc(100% - 48px)); padding-top:100px; }
+.pet-page .pet-heading { margin-bottom:18px; }
+.pet-page .pet-heading h1 { font-size:clamp(34px,3.4vw,48px); }
+.pet-page .hutao-house { height:clamp(760px,calc(100svh - 190px),920px); border:5px solid #62503c; border-radius:16px; box-shadow:0 8px 0 #3d312a22,0 22px 50px #30211125; }
+.pet-page .game-topbar { position:absolute; inset:16px 16px auto; z-index:9; display:flex; align-items:center; justify-content:space-between; gap:20px; padding:10px 14px; min-height:80px; color:var(--hud-ink); background:color-mix(in srgb,var(--hud-paper) 96%,transparent); border:1px solid #ac8b64; border-radius:10px; box-shadow:0 3px 12px #2b1d1820; }
+.pet-page .game-topbar .profile-row { display:grid; grid-template-columns:44px minmax(0,1fr) 92px; align-items:center; gap:10px; width:300px; max-width:100%; }
+.pet-page .game-topbar .profile-avatar { width:44px; height:44px; border:2px solid #aa7c52; }
+.pet-page .game-topbar .profile-row strong { font-size:14px; white-space:nowrap; }
+.pet-page .game-topbar .profile-row small { font-size:10px; }
+.pet-page .game-topbar .coin-count { grid-column:3; grid-row:1; display:flex; flex-direction:column; align-items:center; gap:2px; border-left:1px solid var(--hud-line); color:var(--hud-muted); font-size:10px; }
+.pet-page .game-topbar .coin-count b { font-size:20px; color:var(--hud-red); line-height:1.1; font-variant-numeric:tabular-nums; }
+.pet-page .switch-row { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); width:450px; max-width:100%; gap:8px; margin:0; }
+.pet-page #sceneToggle { grid-column:auto; }
+.pet-page .mini-toggle,.pet-page .mini-toggle.is-on { display:grid; grid-template-columns:36px minmax(0,1fr); align-items:center; justify-items:start; justify-content:initial; gap:6px; width:100%; min-width:0; height:50px; min-height:50px; padding:5px 8px; border:1px solid var(--hud-line); border-radius:6px; background:transparent; color:var(--hud-ink); font:11px/20px var(--serif); transform:none; }
+.pet-page .mini-toggle.is-on { background:color-mix(in srgb,var(--hud-red) 7%,transparent); }
+.pet-page .mini-toggle:hover,.pet-page .mini-toggle:active { transform:none; }
+.pet-page .setting-icon { display:block; width:36px; height:36px; max-width:none; object-fit:contain; }
+.pet-page .mini-toggle .button-label { display:block; width:100%; min-width:0; height:20px; text-align:left; white-space:nowrap; }
+.pet-page .status-card { top:112px; left:20px; width:190px; padding:0 14px 10px; border-radius:8px; }
+.pet-page .status-card[open] { width:230px; }
+.pet-page .status-card summary { font-size:20px; }
+.pet-page .status-card summary span { margin-left:0; font-size:10px; }
+.pet-page .speech-bubble { top:122px; left:60%; width:350px; min-height:80px; padding:12px 18px; border-radius:12px 12px 12px 3px; box-shadow:0 4px 20px #24180f20; }
+.pet-page .live-status { top:212px; left:60%; }
+.pet-page .pet-stage { top:170px; bottom:225px; left:60%; width:440px; height:auto; max-width:65%; }
+.pet-page .pet-shadow { bottom:11%; width:28%; height:12px; }
+.pet-page .control-card { inset:auto 16px 16px; display:grid; grid-template-columns:104px minmax(0,1fr); grid-template-rows:44px 136px; align-items:center; gap:10px 24px; padding:12px 18px 14px; border:1px solid #a37950; border-top:3px double #a37950; border-radius:12px; background:color-mix(in srgb,var(--hud-paper) 96%,transparent); box-shadow:0 6px 24px #24180f35; }
+.pet-page .control-title { position:static; grid-column:1/-1; grid-row:1; display:flex; justify-content:space-between; align-items:center; width:100%; height:44px; margin:0; padding-bottom:5px; border-bottom:1px solid var(--hud-line); }
+.pet-page .control-title > div { display:block; }
+.pet-page .control-title small { color:var(--hud-muted); font-size:9px; letter-spacing:.08em; }
+.pet-page .control-title strong { color:var(--hud-ink); font-size:14px; font-weight:500; }
+.pet-page .text-control,.pet-page .pet-entry-replay { display:inline-flex; align-items:center; justify-content:center; gap:5px; min-height:44px; padding:4px 8px; border:0; background:transparent; border-radius:6px; }
+.pet-page .text-control .button-label,.pet-page .pet-entry-replay .button-label { color:var(--hud-ink); font-size:12px; }
+.pet-page .utility-icon { width:32px; height:32px; object-fit:contain; }
+.pet-page .action-grid { grid-column:2; grid-row:2; display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:clamp(12px,1.6vw,24px); min-width:0; width:100%; }
+.pet-page .action-grid button { display:grid; grid-template-rows:64px 34px 30px; justify-items:center; align-items:center; align-content:start; gap:4px; width:100%; min-width:0; min-height:136px; padding:0; border:0; background:none; box-shadow:none; }
+.pet-page .action-grid button:hover { background:none; border:0; transform:translateY(-2px); }
+.pet-page .cottage-icon { display:block; width:64px; height:64px; max-width:100%; object-fit:contain; filter:drop-shadow(0 3px 3px #53311b22); }
+.pet-page .action-grid b,.pet-page .visit-control .visit-label { display:grid; place-items:center; box-sizing:border-box; width:100%; max-width:126px; min-width:0; height:34px; min-height:34px; padding:0 8px; color:#512d20; font:600 14px/1.2 var(--serif); background:var(--cottage-plate) center 52%/100% 205% no-repeat; }
+.pet-page .action-grid small { display:block; box-sizing:border-box; width:100%; min-width:0; max-width:100%; min-height:30px; margin:0; color:var(--hud-muted); white-space:normal; text-wrap:balance; overflow-wrap:anywhere; text-align:center; font:10px/1.4 var(--serif); }
+.pet-page .action-grid button:disabled { opacity:.68; }
+.pet-page .visit-control { position:static; grid-column:1; grid-row:2; display:grid; grid-template-columns:1fr; grid-template-rows:64px 34px 30px; justify-items:center; align-items:center; gap:4px; min-height:136px; width:100%; min-width:0; margin:0; padding:0; border:0; background:none; }
+.pet-page .visit-icon { width:64px; height:64px; object-fit:contain; }
+.pet-page .visit-control strong { min-width:0; width:100%; margin:0; color:var(--hud-muted); font:10px/1.4 var(--serif); text-align:center; overflow-wrap:anywhere; }
+.pet-page #retryModel:not([hidden]) { display:inline-flex; align-items:center; gap:3px; padding:0 4px; }
+.pet-page #retryModel[hidden] { display:none; }
+.pet-page .daily-gift { display:grid; grid-template-columns:48px 1fr; align-items:center; gap:0 8px; text-align:left; }
+.pet-page .gift-icon { grid-row:1/3; width:48px; height:48px; object-fit:contain; }
+.pet-page .daily-gift span { align-self:end; }
+.pet-page .daily-gift strong { align-self:start; }
+.pet-page .room-footnote { margin:18px 4px 22px; }
+.pet-page .room-journal { display:block; padding:0; margin:0 0 24px; border:1px solid #a78d6b88; border-radius:12px; background:var(--hud-paper); overflow:hidden; }
+.pet-page .journal-tabs { display:flex; align-items:stretch; gap:8px; padding:10px 16px 0; border-bottom:1px solid var(--hud-line); }
+.pet-page .journal-tabs button { display:flex; align-items:center; gap:10px; min-height:48px; padding:8px 20px; color:var(--hud-muted); font:15px var(--serif); border:0; border-bottom:3px solid transparent; background:none; cursor:pointer; }
+.pet-page .journal-tabs button[aria-selected=true] { color:var(--hud-red); border-bottom-color:var(--hud-red); background:color-mix(in srgb,var(--hud-red) 5%,transparent); }
+.pet-page #taskTabCount { font:11px var(--serif); font-variant-numeric:tabular-nums; }
+.pet-page .journal-panel { padding:22px 24px; border:0; border-radius:0; background:none; }
+.pet-page .journal-panel[hidden] { display:none; }
+.pet-page .journal-heading { margin-bottom:16px; }
+.pet-page .journal-heading h2 { font-size:24px; }
+.pet-page .journal-heading p { font-size:9px; }
+.pet-page .companion-list { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; }
+.pet-page .companion-list button { grid-template-columns:56px minmax(0,1fr); gap:10px; padding:14px; min-height:104px; border-radius:9px; }
+.pet-page .companion-list em { grid-column:2; margin-top:-8px; }
+.pet-page .companion-portrait { grid-row:1/3; width:56px; height:56px; object-fit:cover; border-radius:50%; border:2px solid #b79b78; background:#faf8f3; }
+.pet-page .companion-list [aria-pressed=true] .companion-portrait { border-color:var(--hud-red); }
+.pet-page .hutao-house.is-visitor .profile-avatar img { display:block; }
+.pet-page .hutao-house.is-visitor .profile-avatar b { display:none; }
+.pet-page .daily-task-list { grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px; }
+.pet-page .daily-task-list button { grid-template-columns:44px minmax(0,1fr); padding:12px; border:1px solid var(--hud-line); border-radius:9px; }
+.pet-page .daily-task-list em { grid-column:2; }
+.pet-page .task-icon { grid-row:1/3; width:44px; height:44px; object-fit:contain; }
+.pet-page .pet-fallback { width:auto; height:88%; max-width:76%; max-height:88%; object-fit:contain; bottom:5%; padding:5px; border:1px solid #bb9a74; border-radius:12px; background:#faf8f3; box-shadow:0 8px 30px #21120d22; animation:none; }
+.pet-page .hutao-house.is-visitor .pet-fallback { display:block; }
+.pet-page .hutao-house.has-live2d .pet-fallback { display:none; }
+@media(max-width:1000px) {
+ .pet-page .game-topbar { display:grid; grid-template-columns:1fr; gap:8px; padding:10px 12px; }
+ .pet-page .game-topbar .profile-row { width:100%; grid-template-columns:40px minmax(0,1fr) 92px; }
+ .pet-page .game-topbar .profile-avatar { width:40px; height:40px; }
+ .pet-page .switch-row { width:100%; }
+ .pet-page .status-card { top:164px; width:170px; }
+ .pet-page .speech-bubble { top:164px; left:63%; width:min(350px,48%); }
+ .pet-page .live-status { top:255px; left:63%; }
+ .pet-page .pet-stage { top:240px; bottom:225px; }
+ .pet-page .hutao-house { min-height:850px; }
+}
+@media(max-width:900px) {
+ .pet-page .hutao-house { height:1020px; }
+ .pet-page .control-card { grid-template-columns:104px minmax(0,1fr); grid-template-rows:44px 284px; gap:10px 24px; }
+ .pet-page .action-grid { grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px 20px; }
+ .pet-page .visit-control { align-self:center; }
+ .pet-page .pet-stage { top:250px; bottom:375px; }
+ .pet-page .companion-list,.pet-page .daily-task-list { gap:10px; }
+ .pet-page .companion-list button { grid-template-columns:48px minmax(0,1fr); padding:10px; }
+ .pet-page .companion-portrait { width:48px; height:48px; }
+ .pet-page .journal-panel small { font-size:10px; }
+}
+@media(max-width:620px) {
+ .pet-page .pet-shell { width:calc(100% - 20px); padding-top:94px; }
+ .pet-page .pet-heading { gap:8px; padding:0 4px; }
+ .pet-page .pet-heading h1 { font-size:36px; }
+ .pet-page .pet-entry-replay { padding:0 3px; }
+ .pet-page .pet-entry-replay .utility-icon { width:26px; height:26px; }
+ .pet-page .pet-entry-replay .button-label { font-size:10px; }
+ .pet-page .hutao-house { height:980px; min-height:980px; border-width:3px; border-radius:12px; }
+ .pet-page .hutao-house[data-time-scene=night] .room-scenery { background-image:url('./assets/pet-cottage/room-night-mobile.png'); background-position:center; }
+ .pet-page .game-topbar { inset:10px 10px auto; padding:8px; gap:8px; }
+ .pet-page .game-topbar .profile-row { grid-template-columns:40px minmax(0,1fr) 72px; gap:8px; }
+ .pet-page .game-topbar .profile-row strong { font-size:12px; }
+ .pet-page .game-topbar .coin-count b { font-size:18px; }
+ .pet-page .switch-row { gap:5px; }
+ .pet-page .mini-toggle,.pet-page .mini-toggle.is-on { grid-template-columns:1fr; grid-template-rows:30px 18px; justify-items:center; gap:0; height:58px; min-height:58px; padding:4px 2px; font-size:10px; line-height:18px; }
+ .pet-page .setting-icon { width:30px; height:30px; }
+ .pet-page .mini-toggle .button-label { text-align:center; width:100%; height:18px; }
+ .pet-page .status-card { top:148px; left:12px; width:156px; padding:0 12px 8px; }
+ .pet-page .status-card[open] { width:225px; }
+ .pet-page .status-card summary { font-size:17px; }
+ .pet-page .status-card summary span { display:none; }
+ .pet-page .speech-bubble { top:208px; left:12px; translate:none; width:calc(100% - 24px); min-height:74px; padding:9px 14px; }
+ .pet-page .live-status { top:290px; left:50%; max-width:calc(100% - 24px); white-space:normal; width:max-content; }
+ .pet-page .pet-stage { top:288px; bottom:auto; left:50%; width:320px; max-width:94%; height:310px; }
+ .pet-page .control-card { inset:auto 10px 12px; grid-template-columns:1fr; grid-template-rows:44px 44px 252px; padding:10px; gap:8px; border-radius:10px; }
+ .pet-page .control-title { grid-column:1; grid-row:1; }
+ .pet-page .control-title strong { font-size:13px; }
+ .pet-page .control-title small { font-size:8px; }
+ .pet-page .text-control { padding:2px 4px; }
+ .pet-page .text-control .utility-icon { width:28px; height:28px; }
+ .pet-page .visit-control { grid-column:1; grid-row:2; grid-template-columns:40px 44px minmax(0,1fr); grid-template-rows:44px; min-height:44px; gap:6px; padding:0; }
+ .pet-page .visit-icon { width:40px; height:40px; }
+ .pet-page .visit-control .visit-label { width:44px; max-width:44px; height:34px; min-height:34px; background:none; color:var(--hud-red); padding:0; font-size:16px; }
+ .pet-page .visit-control strong { text-align:left; font-size:10px; }
+ .pet-page .action-grid { grid-column:1; grid-row:3; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px 12px; }
+ .pet-page .action-grid button { grid-template-rows:54px 30px 30px; gap:3px; min-height:120px; }
+ .pet-page .cottage-icon { width:54px; height:54px; }
+ .pet-page .action-grid b { height:30px; min-height:30px; font-size:13px; padding:0 4px; }
+ .pet-page .action-grid small { min-height:30px; font-size:9px; line-height:1.4; }
+ .pet-page .room-footnote { margin:16px 3px; }
+ .pet-page .journal-tabs { padding:6px 10px 0; gap:4px; }
+ .pet-page .journal-tabs button { padding:8px 14px; font-size:14px; gap:6px; }
+ .pet-page .journal-panel { padding:18px 14px; }
+ .pet-page .companion-list,.pet-page .daily-task-list { grid-template-columns:1fr; gap:10px; }
+ .pet-page .companion-list button { grid-template-columns:48px minmax(0,1fr) auto; min-height:74px; }
+ .pet-page .companion-list em { grid-column:3; margin:0; }
+ .pet-page .companion-portrait { grid-row:1; }
+ .pet-page .daily-task-list button { grid-template-columns:44px minmax(0,1fr) auto; }
+ .pet-page .daily-task-list em { grid-column:3; }
+ .pet-page .task-icon { grid-row:1; }
+}
