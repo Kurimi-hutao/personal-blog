@@ -3,7 +3,7 @@ import { readdir, readFile, appendFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { publish, listAllRemote } from './cloudbase-deploy-lib.mjs';
+import { publish, listAllRemote, multipartEtags } from './cloudbase-deploy-lib.mjs';
 import { createUploader } from './cloudbase-upload.mjs';
 
 for (const name of ['TCB_ENV_ID', 'TCB_SECRET_ID', 'TCB_SECRET_KEY']) {
@@ -32,7 +32,7 @@ async function walk(relative = '') {
     else if (entry.isFile()) {
       const filePath = path.join(root, '_deploy', key);
       const bytes = await readFile(filePath);
-      files.push({ key, path: filePath, size: bytes.length, md5: createHash('md5').update(bytes).digest('hex') });
+      files.push({ key, path: filePath, size: bytes.length, md5: createHash('md5').update(bytes).digest('hex'), multipart: multipartEtags(bytes) });
     } else throw new Error(`Unexpected deployment entry: ${key}`);
   }
 }

@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 
-export function createUploader({ COS, mime, config, credentials, toPhysicalKey, report = console.log }) {
+export function createUploader({ COS, mime, config, credentials, toPhysicalKey, report = console.log, request = fetch }) {
   return async ({ files }) => {
     for (const file of files) {
       const body = await readFile(file.localPath);
@@ -14,12 +14,21 @@ export function createUploader({ COS, mime, config, credentials, toPhysicalKey, 
         });
         report(`PUT ${file.cloudPath} (${body.length} bytes), attempt ${attempt + 1}/4`);
         try {
-          await new Promise((resolve, reject) => cos.putObject({
+          const { Url } = await new Promise((resolve, reject) => cos.getObjectUrl({
             Bucket: config.bucket, Region: config.region,
             Key: toPhysicalKey(config.basePath, file.cloudPath),
-            Body: body, ContentLength: body.length,
-            ContentType: mime.lookup(file.cloudPath) || 'application/octet-stream',
+            Method: 'PUT', Sign: true, Expires: 600,
           }, (error, response) => error ? reject(error) : resolve(response)));
+          const response = await request(Url, {
+            method: 'PUT', body, signal: AbortSignal.timeout(60000), redirect: 'error',
+            headers: { 'content-type': mime.lookup(file.cloudPath) || 'application/octet-stream' },
+          });
+          if (!response.ok) {
+            const payload = await response.text();
+            const code = payload.match(/<Code>([^<]+)<\/Code>/)?.[1] || `HTTP_${response.status}`;
+            throw Object.assign(new Error(code), { code });
+          }
+          await response.arrayBuffer();
           uploaded = true;
           break;
         } catch (error) {

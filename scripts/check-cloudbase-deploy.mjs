@@ -1,26 +1,36 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { matches, partition, publish, listAllRemote } from './cloudbase-deploy-lib.mjs';
+import { matches, partition, publish, listAllRemote, multipartEtags } from './cloudbase-deploy-lib.mjs';
 import { createUploader } from './cloudbase-upload.mjs';
 
 test('upload uses a complete Buffer, explicit timeout, MIME and shared hosting prefix', async () => {
-  let settings, request;
+  let settings, signed, request;
   class COS {
     constructor(options) { settings = options; }
-    putObject(options, callback) { request = options; callback(null, {}); }
+    getObjectUrl(options, callback) { signed = options; callback(null, { Url: 'https://example.com/signed' }); }
   }
   await createUploader({
     COS, credentials: {}, config: { bucket: 'test', region: 'test', basePath: 'site' },
     mime: { lookup: () => 'text/javascript' },
     toPhysicalKey: (prefix, key) => `${prefix}/${key}`, report: () => {},
+    request: async (url, options) => { request = options; return new Response(null, { status: 200 }); },
   })({ files: [{ localPath: new URL('./cloudbase-upload.mjs', import.meta.url), cloudPath: 'app.js' }] });
-  assert(Buffer.isBuffer(request.Body));
-  assert.equal(request.ContentLength, request.Body.length);
-  assert.equal(request.Key, 'site/app.js');
-  assert.equal(request.ContentType, 'text/javascript');
+  assert(Buffer.isBuffer(request.body));
+  assert.equal(signed.Key, 'site/app.js');
+  assert.equal(signed.Method, 'PUT');
+  assert.equal(request.headers['content-type'], 'text/javascript');
+  assert(request.signal instanceof AbortSignal);
   assert.equal(settings.Timeout, 60000);
   assert.equal(settings.Protocol, 'https:');
   assert.equal(settings.KeepAlive, false);
+});
+test('multipart comparisons detect same-size byte changes', () => {
+  const bytes = Buffer.alloc(2 * 1024 * 1024, 1);
+  const a = { key: 'large.gif', size: bytes.length, md5: '', multipart: multipartEtags(bytes) };
+  const stored = { Size: bytes.length, ETag: a.multipart[0] };
+  assert(matches(a, stored));
+  bytes[0] = 2;
+  assert(!matches({ ...a, multipart: multipartEtags(bytes) }, stored));
 });
 
 const file = (key, md5 = 'a'.repeat(32)) => ({ key, path: key, size: 20, md5 });

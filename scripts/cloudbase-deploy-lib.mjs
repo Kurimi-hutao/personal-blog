@@ -14,8 +14,8 @@ export async function listAllRemote(hosting) {
 
 export function matches(local, remote) {
   if (!remote || Number(remote.Size) !== local.size) return false;
-  // Multipart ETags are not MD5s; re-upload them once instead of trusting size alone.
-  return String(remote.ETag).replace(/^"|"$/g, '').toLowerCase() === local.md5;
+  const etag = String(remote.ETag).replace(/^"|"$/g, '').toLowerCase();
+  return etag === local.md5 || Boolean(local.multipart?.includes(etag));
 }
 
 export function partition(local, remote) {
@@ -61,4 +61,19 @@ export async function publish(local, hosting, report = console.log) {
   verify(local, await hosting.listFiles());
   report(`Verified ${local.length} files by size and MD5.`);
   return plan;
+}
+import { createHash } from 'node:crypto';
+
+export function multipartEtags(bytes) {
+  const etags = [];
+  // Common COS slice sizes; comparison still verifies every byte, never size alone.
+  for (const size of [1, 2, 3, 4, 5, 8, 10, 16, 32, 64].map(mib => mib * 1024 * 1024)) {
+    if (size >= bytes.length) continue;
+    const hashes = [];
+    for (let start = 0; start < bytes.length; start += size) {
+      hashes.push(createHash('md5').update(bytes.subarray(start, start + size)).digest());
+    }
+    etags.push(`${createHash('md5').update(Buffer.concat(hashes)).digest('hex')}-${hashes.length}`);
+  }
+  return etags;
 }
