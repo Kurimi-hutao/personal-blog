@@ -32,6 +32,33 @@ test('multipart comparisons detect same-size byte changes', () => {
   bytes[0] = 2;
   assert(!matches({ ...a, multipart: multipartEtags(bytes) }, stored));
 });
+test('large files use signed multipart requests and preserve every byte', async () => {
+  const bytes = Buffer.alloc(2 * 1024 * 1024 + 17, 7);
+  const calls = [], uploaded = [];
+  class COS {
+    getObjectUrl(options, callback) {
+      callback(null, { Url: 'https://example.com/file?' + new URLSearchParams(options.Query) });
+    }
+  }
+  await createUploader({
+    COS, credentials: {}, config: {}, toPhysicalKey: (_, key) => key,
+    mime: { lookup: () => 'image/png' }, read: async () => bytes, report: () => {},
+    request: async (url, options) => {
+      calls.push(options.method);
+      const query = new URL(url).searchParams;
+      if (query.has('uploads')) return new Response('<UploadId>test-upload</UploadId>');
+      if (query.has('partNumber')) {
+        uploaded.push(options.body);
+        return new Response('', { headers: { ETag: '"part"' } });
+      }
+      assert(options.body.toString().includes('<PartNumber>3</PartNumber>'));
+      return new Response('<CompleteMultipartUploadResult/>');
+    },
+  })({ files: [{ cloudPath: 'large.png', localPath: 'unused' }] });
+  assert.deepEqual(calls, ['POST', 'PUT', 'PUT', 'PUT', 'POST']);
+  assert.deepEqual(uploaded.map(part => part.length), [1024 * 1024, 1024 * 1024, 17]);
+  assert.deepEqual(Buffer.concat(uploaded), bytes);
+});
 
 const file = (key, md5 = 'a'.repeat(32)) => ({ key, path: key, size: 20, md5 });
 const remote = local => local.map(f => ({ Key: f.key, Size: String(f.size), ETag: `"${f.md5}"` }));
