@@ -1,3 +1,17 @@
+export async function listAllRemote(hosting) {
+  const files = [];
+  let marker = '';
+  for (;;) {
+    // listFiles() starts at '/', hiding .nojekyll. Explicit pagination includes all keys.
+    const page = await hosting.findFiles({ prefix: '', marker, maxKeys: 1000 });
+    files.push(...(page.Contents || []));
+    if (page.IsTruncated !== true && page.IsTruncated !== 'true') return files;
+    const next = page.NextMarker || page.Contents?.at(-1)?.Key;
+    if (!next || next === marker) throw new Error('CloudBase returned an invalid pagination marker');
+    marker = next;
+  }
+}
+
 export function matches(local, remote) {
   if (!remote || Number(remote.Size) !== local.size) return false;
   // Multipart ETags are not MD5s; re-upload them once instead of trusting size alone.

@@ -1,9 +1,20 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { matches, partition, publish } from './cloudbase-deploy-lib.mjs';
+import { matches, partition, publish, listAllRemote } from './cloudbase-deploy-lib.mjs';
 
 const file = (key, md5 = 'a'.repeat(32)) => ({ key, path: key, size: 20, md5 });
 const remote = local => local.map(f => ({ Key: f.key, Size: String(f.size), ETag: `"${f.md5}"` }));
+test('pagination includes dotfiles and follows every continuation marker', async () => {
+  const markers = [];
+  const files = await listAllRemote({ findFiles: async ({ marker }) => {
+    markers.push(marker);
+    return marker === ''
+      ? { Contents: [{ Key: '.nojekyll' }], IsTruncated: 'true', NextMarker: '.nojekyll' }
+      : { Contents: [{ Key: 'pet.html' }], IsTruncated: false };
+  } });
+  assert.deepEqual(markers, ['', '.nojekyll']);
+  assert.deepEqual(files.map(file => file.Key), ['.nojekyll', 'pet.html']);
+});
 test('skip only identical MD5 and size; reject same-size edits and multipart ETags', () => {
   const a = file('image.png');
   assert(matches(a, remote([a])[0]));

@@ -3,7 +3,7 @@ import { readdir, readFile, appendFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { publish } from './cloudbase-deploy-lib.mjs';
+import { publish, listAllRemote } from './cloudbase-deploy-lib.mjs';
 
 for (const name of ['TCB_ENV_ID', 'TCB_SECRET_ID', 'TCB_SECRET_KEY']) {
   if (!process.env[name]?.trim()) throw new Error(`Missing GitHub Secret: ${name}`);
@@ -31,7 +31,11 @@ async function walk(relative = '') {
   }
 }
 await walk();
-const plan = await publish(files, app.hosting);
+const hosting = app.hosting;
+const plan = await publish(files, {
+  listFiles: () => listAllRemote(hosting),
+  uploadFiles: options => hosting.uploadFiles(options),
+});
 const message = `CloudBase deployed and verified ${files.length} files; skipped ${plan.skipped} unchanged files. Revision: ${process.env.GITHUB_SHA || 'local'}`;
 console.log(message);
 if (process.env.GITHUB_STEP_SUMMARY) await appendFile(process.env.GITHUB_STEP_SUMMARY, message + '\n');
