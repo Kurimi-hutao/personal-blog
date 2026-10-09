@@ -3,8 +3,9 @@ import { readdir, readFile, appendFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { publish, listAllRemote, multipartEtags } from './cloudbase-deploy-lib.mjs';
-import { createUploader } from './cloudbase-upload.mjs';
+import { publish, listAllRemote, matches } from './cloudbase-deploy-lib.mjs';
+import { createUploader, createCRCReader } from './cloudbase-upload.mjs';
+import { crc64Cos as crc64 } from './cloudbase-crc64.mjs';
 
 for (const name of ['TCB_ENV_ID', 'TCB_SECRET_ID', 'TCB_SECRET_KEY']) {
   if (!process.env[name]?.trim()) throw new Error(`Missing GitHub Secret: ${name}`);
@@ -32,7 +33,7 @@ async function walk(relative = '') {
     else if (entry.isFile()) {
       const filePath = path.join(root, '_deploy', key);
       const bytes = await readFile(filePath);
-      files.push({ key, path: filePath, size: bytes.length, md5: createHash('md5').update(bytes).digest('hex'), multipart: multipartEtags(bytes) });
+      files.push({ key, path: filePath, size: bytes.length, md5: createHash('md5').update(bytes).digest('hex') });
     } else throw new Error(`Unexpected deployment entry: ${key}`);
   }
 }
@@ -44,11 +45,32 @@ const config = resolveBucketConfig({
   envId: process.env.TCB_ENV_ID.trim(), bucket: website.Bucket,
   region: website.Regoin || website.Region, externalStorage: website.ExternalStorage,
 });
-const uploadFiles = createUploader({ COS, mime, config, toPhysicalKey, credentials: {
+const credentials = {
   SecretId: process.env.TCB_SECRET_ID.trim(), SecretKey: process.env.TCB_SECRET_KEY.trim(),
-} });
+};
+const uploadFiles = createUploader({ COS, mime, config, toPhysicalKey, credentials });
+const readCRC = createCRCReader({ COS, config, toPhysicalKey, credentials });
+const localByKey = new Map(files.map(file => [file.key, file]));
+async function listVerifiedFiles() {
+  const remote = await listAllRemote(hosting);
+  const candidates = remote.filter(item => {
+    const local = localByKey.get(item.Key);
+    return local && Number(item.Size) === local.size && !matches(local, item);
+  });
+  let next = 0;
+  await Promise.all(Array.from({ length: Math.min(4, candidates.length) }, async () => {
+    while (next < candidates.length) {
+      const item = candidates[next++];
+      const local = localByKey.get(item.Key);
+      if (!local.crc64) local.crc64 = crc64(await readFile(local.path));
+      item.CRC64 = await readCRC(item.Key);
+    }
+  }));
+  console.log(`Checked remote CRC64 for ${candidates.length} non-MD5 objects.`);
+  return remote;
+}
 const plan = await publish(files, {
-  listFiles: () => listAllRemote(hosting),
+  listFiles: listVerifiedFiles,
   uploadFiles,
 });
 const message = `CloudBase deployed and verified ${files.length} files; skipped ${plan.skipped} unchanged files. Revision: ${process.env.GITHUB_SHA || 'local'}`;

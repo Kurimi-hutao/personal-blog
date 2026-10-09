@@ -15,7 +15,7 @@ export async function listAllRemote(hosting) {
 export function matches(local, remote) {
   if (!remote || Number(remote.Size) !== local.size) return false;
   const etag = String(remote.ETag).replace(/^"|"$/g, '').toLowerCase();
-  return etag === local.md5 || Boolean(local.multipart?.includes(etag));
+  return etag === local.md5 || Boolean(local.crc64 && /^\d+$/.test(local.crc64) && remote.CRC64 === local.crc64);
 }
 
 export function partition(local, remote) {
@@ -36,7 +36,7 @@ function isEntry(key) {
 export function verify(local, remote) {
   const byKey = new Map(remote.map(file => [file.Key, file]));
   const failed = local.filter(file => !matches(file, byKey.get(file.key))).map(file => file.key);
-  if (failed.length) throw new Error(`Remote MD5 verification failed: ${failed.join(', ')}`);
+  if (failed.length) throw new Error(`Remote checksum verification failed: ${failed.join(', ')}`);
 }
 
 export async function publish(local, hosting, report = console.log) {
@@ -59,21 +59,6 @@ export async function publish(local, hosting, report = console.log) {
   await verify(local.filter(file => file.key !== 'deployment.json'), await hosting.listFiles());
   await upload(plan.marker, 'Revision');
   verify(local, await hosting.listFiles());
-  report(`Verified ${local.length} files by size and MD5.`);
+  report(`Verified ${local.length} files by size and MD5/CRC64.`);
   return plan;
-}
-import { createHash } from 'node:crypto';
-
-export function multipartEtags(bytes) {
-  const etags = [];
-  // Common COS slice sizes; comparison still verifies every byte, never size alone.
-  for (const size of [1, 2, 3, 4, 5, 8, 10, 16, 32, 64].map(mib => mib * 1024 * 1024)) {
-    if (size >= bytes.length) continue;
-    const hashes = [];
-    for (let start = 0; start < bytes.length; start += size) {
-      hashes.push(createHash('md5').update(bytes.subarray(start, start + size)).digest());
-    }
-    etags.push(`${createHash('md5').update(Buffer.concat(hashes)).digest('hex')}-${hashes.length}`);
-  }
-  return etags;
 }

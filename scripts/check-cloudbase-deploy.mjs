@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { matches, partition, publish, listAllRemote, multipartEtags } from './cloudbase-deploy-lib.mjs';
-import { createUploader } from './cloudbase-upload.mjs';
+import { matches, partition, publish, listAllRemote } from './cloudbase-deploy-lib.mjs';
+import { createUploader, createCRCReader } from './cloudbase-upload.mjs';
+import { crc64Cos } from './cloudbase-crc64.mjs';
 
 test('upload uses a complete Buffer, explicit timeout, MIME and shared hosting prefix', async () => {
   let settings, signed, request;
@@ -24,13 +25,31 @@ test('upload uses a complete Buffer, explicit timeout, MIME and shared hosting p
   assert.equal(settings.Protocol, 'https:');
   assert.equal(settings.KeepAlive, false);
 });
-test('multipart comparisons detect same-size byte changes', () => {
+test('CRC64 comparisons detect same-size byte changes with opaque COS ETags', () => {
   const bytes = Buffer.alloc(2 * 1024 * 1024, 1);
-  const a = { key: 'large.gif', size: bytes.length, md5: '', multipart: multipartEtags(bytes) };
-  const stored = { Size: bytes.length, ETag: a.multipart[0] };
+  const a = { key: 'large.gif', size: bytes.length, md5: '', crc64: crc64Cos(bytes) };
+  const stored = { Size: bytes.length, ETag: 'opaque-etag', CRC64: a.crc64 };
   assert(matches(a, stored));
   bytes[0] = 2;
-  assert(!matches({ ...a, multipart: multipartEtags(bytes) }, stored));
+  assert(!matches({ ...a, crc64: crc64Cos(bytes) }, stored));
+});
+test('COS CRC64 uses Go ECMA parameters and unsigned decimal output', () => {
+  assert.equal(crc64Cos(Buffer.from('123456789')), '11051210869376104954');
+  assert.equal(crc64Cos(Buffer.alloc(0)), '0');
+});
+test('HEAD checksum reader preserves all 64 bits without downloading the object', async () => {
+  let method;
+  class COS { getObjectUrl(options, callback) { method = options.Method; callback(null, { Url: 'https://example.com/file' }); } }
+  const read = createCRCReader({
+    COS, config: {}, credentials: {}, toPhysicalKey: (_, key) => key,
+    request: async (_, options) => {
+      assert.equal(options.method, 'HEAD');
+      assert.equal(options.body, undefined);
+      return new Response(null, { headers: { 'x-cos-hash-crc64ecma': '18446744073709551615' } });
+    },
+  });
+  assert.equal(await read('file'), '18446744073709551615');
+  assert.equal(method, 'HEAD');
 });
 test('large files use signed multipart requests and preserve every byte', async () => {
   const bytes = Buffer.alloc(2 * 1024 * 1024 + 17, 7);

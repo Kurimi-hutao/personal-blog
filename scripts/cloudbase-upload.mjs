@@ -1,5 +1,21 @@
 import { readFile } from 'node:fs/promises';
 
+export function createCRCReader({ COS, config, credentials, toPhysicalKey, request = fetch }) {
+  return async key => {
+    const cos = new COS({ ...credentials, Protocol: 'https:' });
+    const { Url } = await new Promise((resolve, reject) => cos.getObjectUrl({
+      Bucket: config.bucket, Region: config.region, Key: toPhysicalKey(config.basePath, key),
+      Method: 'HEAD', Sign: true, Expires: 600,
+    }, (error, response) => error ? reject(error) : resolve(response)));
+    const response = await request(Url, {
+      method: 'HEAD', signal: AbortSignal.timeout(30000), redirect: 'error', headers: { connection: 'close' },
+    });
+    const value = response.headers.get('x-cos-hash-crc64ecma');
+    if (!response.ok || !/^\d+$/.test(value || '')) throw new Error(`Missing remote CRC64: ${key}, HTTP ${response.status}`);
+    return value;
+  };
+}
+
 export function createUploader({ COS, mime, config, credentials, toPhysicalKey, report = console.log, request = fetch, read = readFile }) {
   return async ({ files }) => {
     async function upload(file) {
