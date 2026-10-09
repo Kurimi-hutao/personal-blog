@@ -24,6 +24,7 @@ jobs:
       TCB_SECRET_ID: ${{ secrets.TCB_SECRET_ID }}
       TCB_SECRET_KEY: ${{ secrets.TCB_SECRET_KEY }}
       COS_SDK_KEEPALIVE: "false"
+      COS_UPLOAD_SERIAL: "true"
 
     steps:
       - name: Checkout repository
@@ -42,31 +43,14 @@ jobs:
         with:
           node-version: "22"
 
-      - name: Install CloudBase CLI
-        run: npm install -g @cloudbase/cli@3.8.5
+      - name: Check deployment ordering and verification
+        run: node --test scripts/check-cloudbase-deploy.mjs
+
+      - name: Install CloudBase SDK
+        run: npm install --prefix .cloudbase-tools --no-save --ignore-scripts @cloudbase/manager-node@5.9.0
 
       - name: Prepare static site
-        id: package
         run: node scripts/prepare-cloudbase.mjs
 
-      - name: Login to CloudBase
-        shell: bash
-        run: |
-          tcb login \
-            --apiKeyId "$TCB_SECRET_ID" \
-            --apiKey "$TCB_SECRET_KEY"
-
       - name: Deploy to CloudBase static hosting
-        shell: bash
-        env:
-          DEPLOY_ENTRIES: ${{ steps.package.outputs.entries }}
-        run: |
-          set -euo pipefail
-          tcb hosting deploy _deploy \
-            -e "$TCB_ENV_ID" \
-            --concurrency 5 \
-            --retry-count 3 \
-            --retry-interval 2000 \
-            --entry "$DEPLOY_ENTRIES" \
-            --verify \
-            --yes
+        run: node scripts/deploy-cloudbase.mjs

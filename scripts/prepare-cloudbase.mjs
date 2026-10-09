@@ -71,8 +71,6 @@ for (const file of files.sort()) {
 }
 const revision = process.env.GITHUB_SHA || 'local-preview';
 await writeFile(path.join(output, 'deployment.json'), JSON.stringify({ revision, files: files.length, bytes }, null, 2) + '\n');
-const entries = [...files.filter(file => file.endsWith('.html')), 'service-worker.js', 'deployment.json'].join(',');
-if (process.env.GITHUB_OUTPUT) await appendFile(process.env.GITHUB_OUTPUT, `entries=${entries}\n`);
 const summary = `CloudBase package: ${files.length + 1} files, ${(bytes / 1024 / 1024).toFixed(1)} MiB; revision ${revision}`;
 console.log(summary);
 if (process.env.GITHUB_STEP_SUMMARY) await appendFile(process.env.GITHUB_STEP_SUMMARY, summary + '\n');
