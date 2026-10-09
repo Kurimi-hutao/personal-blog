@@ -1,6 +1,27 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { matches, partition, publish, listAllRemote } from './cloudbase-deploy-lib.mjs';
+import { createUploader } from './cloudbase-upload.mjs';
+
+test('upload uses a complete Buffer, explicit timeout, MIME and shared hosting prefix', async () => {
+  let settings, request;
+  class COS {
+    constructor(options) { settings = options; }
+    putObject(options, callback) { request = options; callback(null, {}); }
+  }
+  await createUploader({
+    COS, credentials: {}, config: { bucket: 'test', region: 'test', basePath: 'site' },
+    mime: { lookup: () => 'text/javascript' },
+    toPhysicalKey: (prefix, key) => `${prefix}/${key}`, report: () => {},
+  })({ files: [{ localPath: new URL('./cloudbase-upload.mjs', import.meta.url), cloudPath: 'app.js' }] });
+  assert(Buffer.isBuffer(request.Body));
+  assert.equal(request.ContentLength, request.Body.length);
+  assert.equal(request.Key, 'site/app.js');
+  assert.equal(request.ContentType, 'text/javascript');
+  assert.equal(settings.Timeout, 60000);
+  assert.equal(settings.Protocol, 'https:');
+  assert.equal(settings.KeepAlive, false);
+});
 
 const file = (key, md5 = 'a'.repeat(32)) => ({ key, path: key, size: 20, md5 });
 const remote = local => local.map(f => ({ Key: f.key, Size: String(f.size), ETag: `"${f.md5}"` }));
