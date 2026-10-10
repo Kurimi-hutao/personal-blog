@@ -500,11 +500,11 @@
 .pet-page .pet-now strong { font-size: 24px; color: var(--cinnabar); }
 .pet-page .pet-entry-replay,[data-theme="dark"] .pet-page .pet-entry-replay { color: var(--ink); background: none; box-shadow: none; border-radius: 0; min-height: 44px; border-color: var(--line); }
 .pet-page .hutao-house { display: block; height: clamp(680px,72vh,880px); min-height: 0; border: 6px solid #514b40; border-radius: 5px; padding: 0; background: #4a473d; box-shadow: 0 2px 0 #b1a185,0 20px 50px #00000018; isolation: isolate; }
-.pet-page .room-scenery { inset: 0; z-index: -1; background: url('./assets/pet-room-day.png') center 65%/cover; filter: none; }
+.pet-page .room-scenery { inset: 0; z-index: -1; background: url('./assets/pet-room-day.webp') center 65%/cover; filter: none; }
 .pet-page .hutao-house[data-time-scene="dawn"] .room-scenery { filter: brightness(1.03); }
 .pet-page .hutao-house[data-time-scene="day"] .room-scenery { filter: none; }
 .pet-page .hutao-house[data-time-scene="dusk"] .room-scenery { filter: sepia(.12) brightness(.9); }
-.pet-page .hutao-house[data-time-scene="night"] .room-scenery, .pet-page .hutao-house.is-deep-night .room-scenery { background-image: url('./assets/pet-room-night.png'); filter: none; }
+.pet-page .hutao-house[data-time-scene="night"] .room-scenery, .pet-page .hutao-house.is-deep-night .room-scenery { background-image: url('./assets/pet-room-night.webp'); filter: none; }
 .pet-page .room-scenery::before { display: none; }
 .pet-page .room-scenery::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg,#00000020,transparent 30%,transparent 60%,#00000028); pointer-events: none; }
 .pet-page .status-card,.pet-page .control-card,.pet-page .speech-bubble { color: var(--hud-ink); background: var(--hud-paper); border: 1px solid var(--hud-line); border-radius: 3px; backdrop-filter: none; box-shadow: 0 4px 18px #15171022; }
@@ -577,8 +577,8 @@
  .pet-page .pet-now small { display: none; }
  .pet-page .pet-entry-replay { padding: 0; min-height: 44px; border: 0; font-size: 11px; }
  .pet-page .hutao-house { height: 790px; border-width: 3px; }
- .pet-page .room-scenery { background-image: url('./assets/pet-room-mobile.png'); background-position: center; }
- .pet-page .hutao-house[data-time-scene="night"] .room-scenery,.pet-page .hutao-house.is-deep-night .room-scenery { background-image: url('./assets/pet-room-night.png'); background-position: 65% center; }
+ .pet-page .room-scenery { background-image: url('./assets/pet-room-mobile.webp'); background-position: center; }
+ .pet-page .hutao-house[data-time-scene="night"] .room-scenery,.pet-page .hutao-house.is-deep-night .room-scenery { background-image: url('./assets/pet-room-night.webp'); background-position: 65% center; }
  .pet-page .status-card { top: 12px; left: 12px; width: 160px; padding: 0 12px 8px; }
  .pet-page .status-card summary { font-size: 17px; }
  .pet-page .status-card summary span { display: none; }

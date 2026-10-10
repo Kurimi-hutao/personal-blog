@@ -332,6 +332,16 @@
     if (error) throw error;
   }
 
+  function decodeComment(row) {
+    const stored = row.attachments || [];
+    const context = stored.find(file => file.__hutao_comment?.version === 1)?.__hutao_comment;
+    const attachments = stored.filter(file => file.kind !== 'hutao-comment-context').map(file => {
+      const { __hutao_comment, ...attachment } = file;
+      return attachment;
+    });
+    return { ...row, attachments, body: context?.imageOnly ? '' : row.body, reply_to_id: row.reply_to_id || context?.replyToId || null };
+  }
+
   async function listComments(articleId) {
     let { data, error } = await requireClient()
       .from("comments")
@@ -355,7 +365,7 @@
       }
     }
     if (error) throw error;
-    return data;
+    return data.map(decodeComment);
   }
 
   async function listAllComments() {
@@ -364,7 +374,7 @@
       .select("*,articles(title,content_type)")
       .order("created_at", { ascending: false });
     if (error) throw error;
-    return data;
+    return data.map(decodeComment);
   }
 
   async function uploadCommentFiles(files, articleId) {
@@ -390,22 +400,26 @@
   }
 
   async function createComment(comment) {
-    let { data, error } = await requireClient()
+    // Existing installations already have a JSON attachment field. Keep reply
+    // context there so this release requires neither DDL nor historical copies.
+    const { reply_to_id, ...payload } = comment;
+    const attachments = [...(comment.attachments || [])];
+    const imageOnly = !comment.body?.trim() && attachments.length > 0;
+    if (reply_to_id || imageOnly) {
+      const context = { version: 1, replyToId: reply_to_id || null, imageOnly };
+      if (attachments.length) attachments[0] = { ...attachments[0], __hutao_comment: context };
+      else attachments.push({ kind: 'hutao-comment-context', __hutao_comment: context });
+    }
+    payload.attachments = attachments;
+    if (imageOnly) payload.body = '图片评论';
+    const { data, error } = await requireClient()
       .from("comments")
-      .insert(comment)
+      .insert(payload)
       .select()
       .single();
-    if (error && isSchemaMismatch(error)) {
-      const legacy = {
-        article_id: comment.article_id,
-        visitor_name: comment.visitor_name,
-        body: comment.body,
-        attachments: comment.attachments,
-      };
-      ({ data, error } = await requireClient().from("comments").insert(legacy).select().single());
-    }
+    // Never silently downgrade a reply to a new root comment on old schemas.
     if (error) throw error;
-    return data;
+    return decodeComment(data);
   }
 
   async function updateCommentApproval(id, approved) {

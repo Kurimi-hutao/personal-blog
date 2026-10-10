@@ -6,12 +6,12 @@
 .spring-mist { position: absolute; right: -8%; bottom: -18%; width: 90%; height: auto; opacity: .48; animation: springMist 24s ease-in-out infinite alternate; }
 .home-page .hero-copy { background: none !important; border: 0 !important; box-shadow: none !important; }
 .home-page .hero h1 { position: relative; }
-.home-page .hero h1::after { content: ""; display: block; width: 180px; height: 32px; margin-top: 14px; background: url('./assets/spring-ink/brush-1.png') center / 100% 100% no-repeat; opacity: .68; }
+.home-page .hero h1::after { content: ""; display: block; width: 180px; height: 32px; margin-top: 14px; background: url('./assets/spring-ink/brush-1.webp') center / 100% 100% no-repeat; opacity: .68; }
 .home-page .section-heading { position: relative; padding-bottom: 26px; }
-.home-page .section-heading::after { content: ""; position: absolute; bottom: -3px; left: 0; width: min(310px, 65%); height: 34px; background: url('./assets/spring-ink/brush-3.png') center / 100% 100% no-repeat; opacity: .35; pointer-events: none; }
+.home-page .section-heading::after { content: ""; position: absolute; bottom: -3px; left: 0; width: min(310px, 65%); height: 34px; background: url('./assets/spring-ink/brush-3.webp') center / 100% 100% no-repeat; opacity: .35; pointer-events: none; }
 .home-page .falling-piece.petal { width: 36px; height: 36px; border-radius: 0; box-shadow: none; background: var(--petal-image) center / contain no-repeat; pointer-events: none; }
 /* Use individual quadrants of the supplied sheets, keeping the originals intact. */
-.home-page .card-visual:is(.peach-mountain, .moon-lake) { background-image: url('./assets/spring-ink/covers-1.png'); background-size: 202% 202%; background-position: left top; }
+.home-page .card-visual:is(.peach-mountain, .moon-lake) { background-image: url('./assets/spring-ink/covers-1.webp'); background-size: 202% 202%; background-position: left top; }
 .home-page .card-visual.moon-lake { background-position: right top; }
 .home-page .card-visual:is(.peach-mountain, .moon-lake)::before,
 .home-page .card-visual:is(.peach-mountain, .moon-lake)::after,
@@ -38,7 +38,7 @@ html[data-theme="dark"] .home-page .section-heading::after { filter: invert(1); 
 
 /* Second collection: supplied originals, including genuine alpha foregrounds. */
 .home-page .hero-copy { backdrop-filter: none; }
-.spring-night { display: none; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(20,31,43,.66), rgba(20,31,43,.12) 75%), url('./assets/spring-ink/mountains-night.png') right center / cover no-repeat; }
+.spring-night { display: none; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(20,31,43,.66), rgba(20,31,43,.12) 75%), url('./assets/spring-ink/mountains-night.webp') right center / cover no-repeat; }
 .spring-foreground { position: absolute; bottom: -2%; height: auto; pointer-events: none; transform: translate3d(calc(var(--home-parallax-x) * -2), calc(var(--home-parallax-y) * -1), 0); transition: transform 900ms ease-out; }
 .spring-rocks { right: -2%; width: min(64vw, 1050px); }
 .spring-grass { left: -2%; width: min(36vw, 580px); opacity: .72; }
@@ -53,7 +53,7 @@ html[data-theme="dark"] .spring-closing img { filter: brightness(.4) saturate(.4
   .home-page .spring-branch, .home-page .spring-foreground { display: none; }
   .home-page .hero-copy { top: 38%; background: linear-gradient(90deg, rgba(248,245,238,.8), rgba(248,245,238,.45) 75%, transparent) !important; }
   html[data-theme="dark"] .home-page .hero-copy { background: none !important; }
-  .spring-night { background-position: center, 68% center; background-image: linear-gradient(90deg, rgba(20,31,43,.8), rgba(20,31,43,.35)), url('./assets/spring-ink/mountains-night.png'); }
+  .spring-night { background-position: center, 68% center; background-image: linear-gradient(90deg, rgba(20,31,43,.8), rgba(20,31,43,.35)), url('./assets/spring-ink/mountains-night.webp'); }
   .spring-closing img { width: 150%; max-width: none; margin-left: -25%; }
 }
 @media (prefers-reduced-motion: reduce) {

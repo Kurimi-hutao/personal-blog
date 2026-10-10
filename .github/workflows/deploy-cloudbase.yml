@@ -46,6 +46,9 @@ jobs:
       - name: Check deployment ordering and verification
         run: node --test scripts/check-cloudbase-deploy.mjs
 
+      - name: Validate existing comment service without migration
+        run: node scripts/check-comment-service.cjs
+
       - name: Install CloudBase SDK
         run: npm install --prefix .cloudbase-tools --no-save --ignore-scripts @cloudbase/manager-node@5.9.0
 

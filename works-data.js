@@ -57,7 +57,7 @@
         demo: "./pet.html",
         demoLabel: "进入子站",
         source: "https://github.com/Kurimi-hutao/personal-blog",
-        cover: "./assets/pet-room-day.png",
+        cover: "./assets/pet-room-day.webp",
       },
     ],
     logs: [

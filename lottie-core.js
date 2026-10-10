@@ -82,19 +82,25 @@
     );
   }
 
-  function fontsReady() {
-    return document.fonts?.ready?.catch(() => {}) || Promise.resolve();
+  async function fontsReady() {
+    if (!document.fonts) return;
+    // Start the shared brand fonts before taking the FontFaceSet readiness promise.
+    // Layout requests the other subsets actually used by this page.
+    await Promise.allSettled([
+      document.fonts.load('16px "Blog Serif"', '桃'),
+      document.fonts.load('48px "Blog Brush"', '桃'),
+    ]);
+    await document.fonts.ready;
+    await new Promise(resolve => requestAnimationFrame(resolve));
+    await document.fonts.ready;
   }
 
   async function setupSiteLoader() {
-    if (!document.body?.classList.contains('home-page') || isReduced()) return;
-    try {
-      if (sessionStorage.getItem('hutao-seal-intro') === 'seen') return;
-      sessionStorage.setItem('hutao-seal-intro', 'seen');
-    } catch { /* Storage may be unavailable in private browsing. */ }
+    if (!document.body) return;
     const loader = document.createElement("div");
     loader.className = "ink-site-loader";
-    loader.setAttribute("aria-hidden", "true");
+    loader.setAttribute("role", "status");
+    loader.setAttribute("aria-label", "正在加载页面字体");
     loader.innerHTML = [
       '<div class="ink-site-loader__inner">',
       `<div class="ink-site-loader__mark"><span class="ink-site-loader__drop"></span><img src="${asset('./assets/visual-refresh/seal-hutao.webp')}" width="90" height="104" alt=""></div>`,
@@ -102,10 +108,17 @@
       "</div>",
     ].join("");
     document.body.prepend(loader);
+    document.documentElement.classList.add('ink-site-loading');
 
-    // A bounded, once-per-session introduction; data loading stays in its own region.
-    await withTimeout(Promise.allSettled([loader.querySelector('img').decode(), wait(560)]), 780);
+    // Font loading has no visual-intro timeout: keep the seal until the browser
+    // finishes loading (or settles on fallback after an actual font error).
+    await Promise.all([
+      fontsReady(),
+      withTimeout(loader.querySelector('img').decode().catch(() => {}), 780),
+      wait(isReduced() ? 0 : 560),
+    ]);
     loader.classList.add("is-leaving");
+    document.documentElement.classList.remove('ink-site-loading');
     await new Promise((resolve) => {
       const finish = () => {
         window.clearTimeout(timer);

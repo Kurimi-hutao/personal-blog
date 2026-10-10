@@ -2,6 +2,8 @@
   --z-lottie-loader: 11000;
 }
 
+.ink-site-loading { overflow: hidden; }
+
 .ink-site-loader {
   position: fixed;
   inset: 0;
@@ -36,10 +38,10 @@
 }
 
 .ink-site-loader__mark { position: relative; width: 120px; height: 130px; display: grid; place-items: center; }
-.ink-site-loader__mark img { width: 90px; height: 104px; object-fit: contain; animation: sealIntro 280ms 100ms cubic-bezier(.22,1,.36,1) both; }
-.ink-site-loader__drop { position: absolute; width: 12px; height: 12px; border-radius: 45%; background: var(--ink); animation: dropIntro 330ms ease-out both; }
-@keyframes sealIntro { from { opacity: 0; transform: scale(1.2) rotate(-10deg); } to { opacity: 1; transform: scale(1) rotate(-4deg); } }
-@keyframes dropIntro { 0% { opacity: .7; transform: scale(.3); } 65% { opacity: .15; transform: scale(4); } 100% { opacity: 0; transform: scale(6); } }
+.ink-site-loader__mark img { width: 90px; height: 104px; object-fit: contain; animation: sealIntro 1600ms cubic-bezier(.22,1,.36,1) infinite; }
+.ink-site-loader__drop { position: absolute; width: 12px; height: 12px; border-radius: 45%; background: var(--cinnabar); animation: dropIntro 1600ms ease-out infinite; }
+@keyframes sealIntro { 0%, 100% { opacity: .7; transform: translateY(-5px) scale(1.04) rotate(-6deg); } 32%, 65% { opacity: 1; transform: translateY(0) scale(1) rotate(-4deg); } }
+@keyframes dropIntro { 0%, 25% { opacity: 0; transform: scale(.3); } 35% { opacity: .2; } 80%, 100% { opacity: 0; transform: scale(8); } }
 
 .ink-site-loader.is-leaving .ink-site-loader__inner {
   opacity: 0;
@@ -59,7 +61,7 @@
 
 .ink-site-loader__text {
   margin: 0;
-  font-family: var(--font-brush);
+  font-family: system-ui, sans-serif;
   font-size: clamp(1.2rem, 1rem + 0.8vw, 1.75rem);
   line-height: 1.4;
   letter-spacing: 0.12em;

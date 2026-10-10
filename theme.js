@@ -33,7 +33,8 @@
     ]).catch(() => {});
   };
 
-  window.setTimeout(warmUpFonts, 1200);
+  // The loading seal owns font readiness on pages using InkLottie.
+  if (!window.InkLottie) warmUpFonts();
 
   const header = document.querySelector(".site-header");
   const navigation = header?.querySelector("nav");
@@ -118,6 +119,7 @@
         <a href="./videos.html">视频</a>
         <a href="./works.html">作品</a>
         <a href="./kurumi.html">胡桃绘卷</a>
+        <button type="button" data-search-bookmarks aria-pressed="false">我的收藏</button>
       </nav>
       <div class="site-search-results" aria-live="polite">
         <p>输入关键词开始搜索，也可以使用上方快捷入口。</p>
@@ -130,6 +132,21 @@
   let searchableWorks = null;
   let searchClosing = false;
   let searchResultAnimation = null;
+  let bookmarksMode = false;
+  const bookmarksButton = searchDialog.querySelector('[data-search-bookmarks]');
+
+  function showBookmarks() {
+    bookmarksMode = true;
+    bookmarksButton.setAttribute('aria-pressed', 'true');
+    searchInput.placeholder = '搜索已收藏的标题、分类或标签……';
+    renderSearchResults(searchInput.value);
+  }
+  bookmarksButton.addEventListener('click', () => {
+    bookmarksMode = !bookmarksMode;
+    bookmarksButton.setAttribute('aria-pressed', String(bookmarksMode));
+    searchInput.placeholder = bookmarksMode ? '搜索已收藏的标题、分类或标签……' : '搜索文章、视频或标签……';
+    renderSearchResults(searchInput.value);
+  });
   const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
   function workTypeLabel(work) {
@@ -142,6 +159,29 @@
     const keyword = query.trim().toLowerCase();
     const draw = () => {
       searchResults.replaceChildren();
+      if (bookmarksMode) {
+        let bookmarks = [];
+        try { bookmarks = JSON.parse(localStorage.getItem('hutao-bookmarked-articles') || '[]'); } catch {}
+        const matches = bookmarks.filter(item => [item.title, item.category, ...(item.tags || [])].join(' ').toLowerCase().includes(keyword));
+        const caption = document.createElement('p'); caption.className = 'site-search-caption';
+        caption.textContent = `我的收藏 · ${matches.length} / ${bookmarks.length} 篇（当前浏览器）`;
+        searchResults.append(caption);
+        if (!matches.length) {
+          const empty = document.createElement('p'); empty.textContent = keyword ? '没有匹配的收藏，试试其他关键词。' : '还没有收藏，阅读时点击“收藏此卷”即可加入。'; searchResults.append(empty);
+        }
+        matches.forEach(item => {
+          const row = document.createElement('div'); row.className = 'bookmark-row';
+          const link = document.createElement('a'); link.href = `./article.html?slug=${encodeURIComponent(item.slug)}`;
+          const title = document.createElement('strong'); title.textContent = item.title; link.append(title);
+          const remove = document.createElement('button'); remove.type = 'button'; remove.textContent = '移除'; remove.setAttribute('aria-label', `移除收藏：${item.title}`);
+          remove.onclick = () => {
+            try { localStorage.setItem('hutao-bookmarked-articles', JSON.stringify(bookmarks.filter(saved => saved.id !== item.id))); } catch {}
+            window.dispatchEvent(new Event('bookmarkschange')); renderSearchResults(searchInput.value);
+          };
+          row.append(link, remove); searchResults.append(row);
+        });
+        return;
+      }
       if (!keyword) {
       let bookmarks = [];
       try {
@@ -162,6 +202,8 @@
         link.querySelector("strong").textContent = item.title;
         searchResults.appendChild(link);
       });
+      const all = document.createElement('button'); all.type = 'button'; all.className = 'bookmark-all'; all.textContent = `查看全部收藏（${bookmarks.length}）`;
+      all.onclick = showBookmarks; searchResults.append(all);
       return;
       }
       const matches = (searchableWorks || []).filter((work) => {
@@ -219,6 +261,9 @@
     document.documentElement.classList.add("search-dialog-open");
     document.body.classList.add("search-dialog-open");
     searchInput.value = "";
+    bookmarksMode = false;
+    bookmarksButton.setAttribute('aria-pressed', 'false');
+    searchInput.placeholder = '搜索文章、视频或标签……';
     renderSearchResults("");
     window.setTimeout(() => {
       searchDialog.classList.remove("is-opening");

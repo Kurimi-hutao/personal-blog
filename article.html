@@ -13,9 +13,9 @@
     <link rel="stylesheet" href="./styles.css?v=20260928" />
     <link rel="stylesheet" href="./article-pages.css?v=20260925" />
     <link rel="stylesheet" href="./motion-core.css?v=6" />
-    <link rel="stylesheet" href="./lottie-core.css?v=20261008-visual" />
+    <link rel="stylesheet" href="./lottie-core.css?v=20261010-loading-1" />
     <script defer src="./assets/vendor/lottie-web/lottie_light-5.13.0.min.js"></script>
-    <script defer src="./lottie-core.js?v=20261008-visual"></script>
+    <script defer src="./lottie-core.js?v=20261010-loading-1"></script>
       <link rel="stylesheet" href="./editorial.css?v=20260928-2" />
     <link rel="stylesheet" href="./ink-system.css?v=20260928-2" />
     <link rel="stylesheet" href="./page-scenes.css?v=20260929-1" />
@@ -25,6 +25,7 @@
     <link rel="icon" type="image/png" sizes="32x32" href="./assets/visual-refresh/favicon-32.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="./assets/visual-refresh/home-icon-180.png" />
     <link rel="stylesheet" href="./ink-assets.css?v=20261008-visual" />
+    <link rel="stylesheet" href="./site-features.css?v=20261010-p1" />
   </head>
   <body class="inner-page" data-page="articles">
     <div class="reading-progress" id="readingProgress" aria-hidden="true"></div>
@@ -77,16 +78,20 @@
       <section class="comment-section" id="comments" hidden>
         <div class="comment-heading">
           <p class="eyebrow">Comments</p>
-          <h2>卷后留评</h2>
-          <p>所有访客都可以评论，也可以附上一份文件。</p>
+          <h2>卷后留评</h2><span id="commentCount"></span>
+          <p>写句话、发张图，或在楼里接着聊。</p>
         </div>
         <form class="comment-form" id="commentForm">
           <input type="hidden" name="parentId" />
-          <p class="reply-context" id="replyContext" hidden></p>
-          <label><span>江湖名号</span><input type="text" name="visitorName" maxlength="40" required /></label>
-          <label><span>评论</span><textarea name="body" rows="4" maxlength="2000" required></textarea></label>
-          <label><span>文件</span><input type="file" name="attachments" accept="image/png,image/jpeg,image/gif,image/webp,text/plain,application/pdf" multiple /><small>最多 3 个；仅图片、TXT、PDF；单个不超过 5 MB。</small></label>
-          <button class="ink-button" type="submit">留下评论</button>
+          <input type="hidden" name="replyToId" />
+          <div class="reply-context" id="replyContext" hidden><span></span><button type="button" id="cancelReply">取消回复</button></div>
+          <label class="comment-name"><span>昵称</span><input type="text" name="visitorName" maxlength="40" autocomplete="nickname" placeholder="留空使用访客名" /></label>
+          <label class="comment-body-label"><span class="sr-only">评论内容</span><textarea name="body" rows="3" maxlength="2000" placeholder="说点什么，或者直接发张图片……" aria-describedby="commentHelp"></textarea></label>
+          <div id="commentPreviews" class="comment-previews" hidden></div>
+          <input id="commentImageInput" type="file" accept="image/png,image/jpeg,image/gif,image/webp" multiple hidden />
+          <input type="file" name="attachments" accept="image/png,image/jpeg,image/gif,image/webp,text/plain,application/pdf" multiple hidden />
+          <div class="comment-toolbar"><div><button type="button" id="pickCommentImage">＋ 图片</button><button type="button" id="pickCommentFile">附件</button></div><span id="commentLength">0/2000</span><button class="ink-button" type="submit" disabled>发送</button></div>
+          <small id="commentHelp">可粘贴或拖入图片，最多 3 个文件，单个不超过 5 MB。Ctrl / ⌘ + Enter 发送。</small>
           <p class="comment-status" id="commentStatus" role="status"></p>
         </form>
         <div class="comment-list" id="commentList" aria-live="polite"></div>
@@ -95,14 +100,16 @@
     <footer><p>© 2026 虎桃不会振刀</p><a href="./articles.html">返回文章页</a></footer>
     <script src="./assets/vendor/supabase/supabase-2.108.2.js"></script>
     <script src="./supabase-config.js"></script>
-    <script src="./article-service.js?v=20261008-remote"></script>
+    <script src="./article-service.js?v=20261010-p1"></script>
     <script src="./markdown.js?v=20260925"></script>
     <script defer src="./assets/vendor/katex/katex-0.16.22.min.js"></script>
     <script defer src="./assets/vendor/katex/auto-render-0.16.22.min.js"></script>
     <script src="./assets/vendor/gsap/gsap-3.13.0.min.js"></script>
     <script src="./ink-assets.js?v=20261008-visual"></script>
-    <script src="./theme.js?v=20261008-visual"></script>
-    <script src="./article-detail.js?v=20261008-remote"></script>
+    <script src="./theme.js?v=20261010-p1"></script>
+    <script src="./article-reading.js?v=20261010-p1"></script>
+    <script src="./article-comments.js?v=20261010-p1"></script>
+    <script src="./article-detail.js?v=20261010-p1"></script>
     <script src="./motion-core.js?v=6"></script>
   </body>
 </html>

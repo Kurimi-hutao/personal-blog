@@ -1,5 +1,4 @@
 let currentArticle = null;
-let currentComments = [];
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 function setMeta(name, content, property = false) {
@@ -112,6 +111,7 @@ function renderArticle(article) {
   if (cover) setMeta("og:image", cover.url, true);
   createToc(body);
   setupReadingTools(article);
+  window.ArticleReading.setupResume(article);
 }
 
 function setupReadingTools(article) {
@@ -143,6 +143,7 @@ function setupReadingTools(article) {
 
   applyScale();
   renderBookmark();
+  window.addEventListener('bookmarkschange', renderBookmark);
   tools.hidden = false;
   document.querySelector("#decreaseFont").addEventListener("click", () => {
     scale = Math.max(0.9, Number((scale - 0.1).toFixed(1)));
@@ -156,7 +157,7 @@ function setupReadingTools(article) {
     const items = getBookmarks();
     const index = items.findIndex((item) => item.id === article.id);
     if (index >= 0) items.splice(index, 1);
-    else items.unshift({ id: article.id, slug: article.slug, title: article.title, savedAt: Date.now() });
+    else items.unshift({ id: article.id, slug: article.slug, title: article.title, category: article.category, tags: article.tags || [], savedAt: Date.now() });
     localStorage.setItem(bookmarkKey, JSON.stringify(items.slice(0, 50)));
     renderBookmark();
   });
@@ -255,34 +256,7 @@ function createLikeInkEffect(button) {
   }
 }
 
-function createToc(body) {
-  const toc = document.querySelector("#articleToc");
-  const headings = [...body.querySelectorAll("h1, h2, h3")];
-  if (headings.length < 2) return;
-  toc.innerHTML = "<strong>此卷目录</strong>";
-  const list = document.createElement("ol");
-  headings.forEach((heading) => {
-    const item = document.createElement("li");
-    item.className = `toc-level-${heading.tagName.slice(1)}`;
-    const link = document.createElement("a");
-    link.href = `#${heading.id}`;
-    link.textContent = heading.textContent;
-    item.appendChild(link);
-    list.appendChild(item);
-  });
-  toc.appendChild(list);
-  body.before(toc);
-  toc.hidden = false;
-  const links = [...list.querySelectorAll("a")];
-  const observer = new IntersectionObserver((entries) => {
-    const visible = entries
-      .filter((entry) => entry.isIntersecting)
-      .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
-    if (!visible) return;
-    links.forEach((link) => link.classList.toggle("active", link.hash === `#${visible.target.id}`));
-  }, { rootMargin: "-18% 0px -68% 0px", threshold: 0 });
-  headings.forEach((heading) => observer.observe(heading));
-}
+function createToc(body) { window.ArticleReading.setupToc(body); }
 
 function createAttachmentLink(file) {
   const link = document.createElement("a");
@@ -293,163 +267,8 @@ function createAttachmentLink(file) {
   return link;
 }
 
-function commentFloorMap(comments) {
-  const roots = comments.filter((comment) => !comment.parent_id);
-  return new Map(roots.map((comment, index) => [comment.id, index + 1]));
-}
-
-function renderComments(comments) {
-  currentComments = comments;
-  const list = document.querySelector("#commentList");
-  const floors = commentFloorMap(comments);
-  const roots = comments.filter((comment) => !comment.parent_id);
-  list.replaceChildren();
-  if (!roots.length) {
-    if (window.InkAssets) InkAssets.state(list, { kind: 'comments', title: '此卷尚待落墨', detail: '还没有评论，来写下第一句吧。' });
-    else list.innerHTML = '<p class="article-state">还没有评论，来写下第一句吧。</p>';
-    return;
-  }
-
-  roots.forEach((comment) => {
-    const item = createCommentItem(comment, floors.get(comment.id), false);
-    const replies = comments.filter((reply) => reply.parent_id === comment.id);
-    if (replies.length) {
-      const replyList = document.createElement("div");
-      replyList.className = "comment-replies";
-      replies.forEach((reply) => replyList.appendChild(createCommentItem(reply, floors.get(comment.id), true)));
-      item.appendChild(replyList);
-    }
-    list.appendChild(item);
-  });
-}
-
-function createCommentItem(comment, floor, isReply) {
-  const item = document.createElement("article");
-  item.className = `comment-item${isReply ? " comment-reply" : ""}`;
-  const header = document.createElement("header");
-  const name = document.createElement("strong");
-  name.textContent = comment.visitor_name;
-  if (comment.is_owner) {
-    const badge = document.createElement("small");
-    badge.className = "owner-comment-badge";
-    badge.textContent = "站长";
-    name.appendChild(badge);
-  }
-  const meta = document.createElement("span");
-  const time = document.createElement("time");
-  time.dateTime = comment.created_at;
-  time.textContent = articleService.formatDate(comment.created_at);
-  meta.textContent = isReply ? `回复 ${floor} 楼 · ` : `${floor} 楼 · `;
-  meta.appendChild(time);
-  if (comment.pinned) {
-    const pinned = document.createElement("b");
-    pinned.className = "pinned-comment-badge";
-    pinned.textContent = "置顶";
-    meta.append(" · ", pinned);
-  }
-  header.append(name, meta);
-  const body = document.createElement("p");
-  body.textContent = comment.body;
-  const reply = document.createElement("button");
-  reply.type = "button";
-  reply.className = "comment-reply-button";
-  reply.textContent = "回复";
-  reply.addEventListener("click", () => beginReply(isReply ? comment.parent_id : comment.id, floor));
-  const actions = document.createElement("div");
-  actions.className = "comment-item-actions";
-  const like = document.createElement("button");
-  like.type = "button";
-  like.className = "comment-reply-button comment-like-button";
-  like.textContent = `赞 ${comment.like_count || 0}`;
-  like.classList.toggle("active", articleService.hasCommentReaction(comment.id));
-  like.addEventListener("click", async () => {
-    like.disabled = true;
-    try {
-      const result = await articleService.toggleCommentReaction(comment.id);
-      like.textContent = `赞 ${result.count}`;
-      like.classList.toggle("active", result.active);
-    } catch {
-      like.title = "请先执行最新的 Supabase 数据库迁移";
-    } finally {
-      like.disabled = false;
-    }
-  });
-  actions.append(reply, like);
-  item.append(header, body);
-  if (comment.attachments?.length) {
-    const files = document.createElement("div");
-    files.className = "comment-files";
-    comment.attachments.forEach((file) => files.appendChild(createAttachmentLink(file)));
-    item.appendChild(files);
-  }
-  item.appendChild(actions);
-  return item;
-}
-
-function beginReply(parentId, floor) {
-  const form = document.querySelector("#commentForm");
-  form.elements.parentId.value = parentId;
-  const context = document.querySelector("#replyContext");
-  context.hidden = false;
-  context.textContent = `正在回复 ${floor} 楼，点击此处取消。`;
-  context.onclick = () => {
-    form.elements.parentId.value = "";
-    context.hidden = true;
-  };
-  form.elements.body.focus();
-  form.scrollIntoView({ behavior: "smooth", block: "center" });
-}
-
-async function loadComments(articleId) {
-  try {
-    renderComments(await articleService.listComments(articleId));
-  } catch {
-    window.InkAssets?.state(document.querySelector('#commentList'), { kind: 'error', title: '评论暂时未能展开', detail: '文章可以继续阅读，评论稍后再试。', action: '重新读取', onAction: () => loadComments(articleId) });
-  }
-}
-
-function setupComments(article) {
-  const section = document.querySelector("#comments");
-  const form = document.querySelector("#commentForm");
-  const status = document.querySelector("#commentStatus");
-  const allowedTypes = new Set(["image/png", "image/jpeg", "image/gif", "image/webp", "text/plain", "application/pdf"]);
-  section.hidden = false;
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    const button = form.querySelector("button[type=submit]");
-    const values = new FormData(form);
-    const files = [...form.elements.attachments.files];
-    if (files.length > 3 || files.some((file) => file.size > 5 * 1024 * 1024 || !allowedTypes.has(file.type))) {
-      status.textContent = "附件须为图片、TXT 或 PDF；最多 3 个，单个不超过 5 MB。";
-      status.classList.add("error");
-      return;
-    }
-    button.disabled = true;
-    status.classList.remove("error");
-    status.textContent = "正在留下评论……";
-    try {
-      const attachments = files.length ? await articleService.uploadCommentFiles(files, article.id) : [];
-      await articleService.createComment({
-        article_id: article.id,
-        parent_id: values.get("parentId") || null,
-        visitor_name: values.get("visitorName").trim(),
-        visitor_token: articleService.getVisitorToken(),
-        body: values.get("body").trim(),
-        attachments,
-      });
-      form.reset();
-      document.querySelector("#replyContext").hidden = true;
-      status.textContent = "评论已留下。";
-      window.InkAssets?.stamp(status);
-      await loadComments(article.id);
-    } catch (error) {
-      status.textContent = `评论失败：${error.message}`;
-      status.classList.add("error");
-    } finally {
-      button.disabled = false;
-    }
-  });
-}
+function setupComments(article) { window.ArticleComments.setup(article); }
+async function loadComments() { await window.ArticleComments.load(); }
 
 async function setupArticleExtras(article) {
   const actions = document.querySelector("#articleActions");
@@ -525,11 +344,6 @@ function neighborLink(article, label) {
   link.append(small, strong);
   return link;
 }
-
-window.addEventListener("scroll", () => {
-  const max = document.documentElement.scrollHeight - innerHeight;
-  document.querySelector("#readingProgress").style.transform = `scaleX(${max > 0 ? scrollY / max : 0})`;
-}, { passive: true });
 
 async function loadArticle() {
   const slug = new URLSearchParams(location.search).get("slug");

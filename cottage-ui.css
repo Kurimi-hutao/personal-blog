@@ -108,7 +108,7 @@
  .pet-page .pet-entry-replay .utility-icon { width:26px; height:26px; }
  .pet-page .pet-entry-replay .button-label { font-size:10px; }
  .pet-page .hutao-house { height:980px; min-height:980px; border-width:3px; border-radius:12px; }
- .pet-page .hutao-house[data-time-scene=night] .room-scenery { background-image:url('./assets/pet-cottage/room-night-mobile.png'); background-position:center; }
+ .pet-page .hutao-house[data-time-scene=night] .room-scenery { background-image:url('./assets/pet-cottage/room-night-mobile.webp'); background-position:center; }
  .pet-page .game-topbar { inset:10px 10px auto; padding:8px; gap:8px; }
  .pet-page .game-topbar .profile-row { grid-template-columns:40px minmax(0,1fr) 72px; gap:8px; }
  .pet-page .game-topbar .profile-row strong { font-size:12px; }
