@@ -76,3 +76,19 @@ const plan = await publish(files, {
 const message = `CloudBase deployed and verified ${files.length} files; skipped ${plan.skipped} unchanged files. Revision: ${process.env.GITHUB_SHA || 'local'}`;
 console.log(message);
 if (process.env.GITHUB_STEP_SUMMARY) await appendFile(process.env.GITHUB_STEP_SUMMARY, message + '\n');
+
+// Check the public gateway separately from COS object verification. Gateway caches
+// can lag behind a successful upload, so report their state without re-uploading.
+for (const [label, domain] of [['hosting', website.CdnDomain], ['custom', 'joestarzhang.cn']]) {
+  if (!domain) continue;
+  try {
+    const origin = /^https?:\/\//.test(domain) ? domain : `https://${domain}`;
+    const response = await fetch(new URL('/article-service.js', origin), {
+      signal: AbortSignal.timeout(15000), headers: { 'cache-control': 'no-cache' },
+    });
+    const current = response.ok && (await response.text()).includes('__hutao_comment');
+    console.log(`Public ${label} comment service: HTTP ${response.status}, current=${current}`);
+  } catch (error) {
+    console.log(`Public ${label} comment service: check unavailable (${error.name})`);
+  }
+}
