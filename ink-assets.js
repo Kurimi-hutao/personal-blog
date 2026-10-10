@@ -9,7 +9,9 @@
     const node = document.createElement('div');
     node.className = `ink-state ink-state--${kind}`;
     const image = document.createElement('img');
-    image.src = url(({ search: 'empty-search', comments: 'empty-comments', error: 'load-error' }[kind] || 'empty-search') + '.webp');
+    image.src = kind === 'comments'
+      ? new URL('./assets/comment-ui/comment-empty.webp', document.baseURI).href
+      : url(({ search: 'empty-search', error: 'load-error' }[kind] || 'empty-search') + '.webp');
     image.alt = '';
     image.width = 240;
     image.height = 168;

@@ -1,4 +1,4 @@
-const CACHE_NAME = "hutao-features-20261010-2";
+const CACHE_NAME = "hutao-comments-20261010-3";
 // Install only the offline fallback. Artwork, fonts and page modules are cached
 // on demand, so a home visit never downloads the pet room or other pages.
 const APP_SHELL = ["./offline.html"];

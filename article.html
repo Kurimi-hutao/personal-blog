@@ -26,6 +26,7 @@
     <link rel="apple-touch-icon" sizes="180x180" href="./assets/visual-refresh/home-icon-180.png" />
     <link rel="stylesheet" href="./ink-assets.css?v=20261008-visual" />
     <link rel="stylesheet" href="./site-features.css?v=20261010-p1" />
+    <link rel="stylesheet" href="./comment-ui.css?v=20261010-2" />
   </head>
   <body class="inner-page" data-page="articles">
     <div class="reading-progress" id="readingProgress" aria-hidden="true"></div>
@@ -86,11 +87,11 @@
           <input type="hidden" name="replyToId" />
           <div class="reply-context" id="replyContext" hidden><span></span><button type="button" id="cancelReply">取消回复</button></div>
           <label class="comment-name"><span>昵称</span><input type="text" name="visitorName" maxlength="40" autocomplete="nickname" placeholder="留空使用访客名" /></label>
-          <label class="comment-body-label"><span class="sr-only">评论内容</span><textarea name="body" rows="3" maxlength="2000" placeholder="说点什么，或者直接发张图片……" aria-describedby="commentHelp"></textarea></label>
+          <label class="comment-body-label"><span class="sr-only">评论内容</span><textarea name="body" rows="3" maxlength="2000" placeholder="写下你的想法……" aria-describedby="commentHelp"></textarea></label>
           <div id="commentPreviews" class="comment-previews" hidden></div>
           <input id="commentImageInput" type="file" accept="image/png,image/jpeg,image/gif,image/webp" multiple hidden />
           <input type="file" name="attachments" accept="image/png,image/jpeg,image/gif,image/webp,text/plain,application/pdf" multiple hidden />
-          <div class="comment-toolbar"><div><button type="button" id="pickCommentImage">＋ 图片</button><button type="button" id="pickCommentFile">附件</button></div><span id="commentLength">0/2000</span><button class="ink-button" type="submit" disabled>发送</button></div>
+          <div class="comment-toolbar"><div><button type="button" id="pickCommentImage">图片</button><button type="button" id="pickCommentFile">附件</button></div><span id="commentLength">0/2000</span><button class="ink-button" type="submit" disabled>发送</button></div>
           <small id="commentHelp">可粘贴或拖入图片，最多 3 个文件，单个不超过 5 MB。Ctrl / ⌘ + Enter 发送。</small>
           <p class="comment-status" id="commentStatus" role="status"></p>
         </form>
@@ -105,10 +106,10 @@
     <script defer src="./assets/vendor/katex/katex-0.16.22.min.js"></script>
     <script defer src="./assets/vendor/katex/auto-render-0.16.22.min.js"></script>
     <script src="./assets/vendor/gsap/gsap-3.13.0.min.js"></script>
-    <script src="./ink-assets.js?v=20261008-visual"></script>
+    <script src="./ink-assets.js?v=20261010-comments-1"></script>
     <script src="./theme.js?v=20261010-p1"></script>
     <script src="./article-reading.js?v=20261010-p1"></script>
-    <script src="./article-comments.js?v=20261010-p1"></script>
+    <script src="./article-comments.js?v=20261010-comments-1"></script>
     <script src="./article-detail.js?v=20261010-p1"></script>
     <script src="./motion-core.js?v=6"></script>
   </body>

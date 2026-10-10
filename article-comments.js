@@ -152,7 +152,10 @@
     const floors = new Map(roots.map((c,i) => [c.id, i+1]));
     const ordered = [...roots].sort((a,b) => Number(Boolean(b.pinned)) - Number(Boolean(a.pinned)) || byDate(a,b));
     document.querySelector('#commentCount').textContent = `${comments.length} 条评论 · ${roots.length} 楼`;
-    if (!roots.length) { const empty = document.createElement('p'); empty.className = 'comment-empty'; empty.textContent = '还没有评论，写句话或发张图吧。'; list.append(empty); }
+    if (!roots.length) {
+      if (window.InkAssets) InkAssets.state(list, { kind: 'comments', title: '此卷尚待落墨', detail: '还没有评论，写句话或发张图吧。' });
+      else { const empty = document.createElement('p'); empty.className = 'comment-empty'; empty.textContent = '还没有评论，写句话或发张图吧。'; list.append(empty); }
+    }
     ordered.forEach(root => {
       const node = item(root, floors.get(root.id), false);
       const replies = comments.filter(c => c.parent_id === root.id).sort(byDate);
@@ -177,7 +180,7 @@
       if (parent && !comments.some(c => c.id === parent && !c.parent_id)) { setReply(null); feedback('原回复楼层已不可用，草稿保留为新评论。'); }
     } catch {
       const list = document.querySelector('#commentList'); list.replaceChildren();
-      const retry = document.createElement('button'); retry.type = 'button'; retry.className = 'comment-more'; retry.textContent = '评论读取失败，点击重试'; retry.onclick = load; list.append(retry);
+      const retry = document.createElement('button'); retry.type = 'button'; retry.className = 'comment-more comment-retry'; retry.textContent = '评论读取失败，点击重试'; retry.onclick = load; list.append(retry);
     }
   }
   async function send(event) {
