@@ -85,6 +85,25 @@ try {
     Filters: [{ Name: 'Domain', Values: ['joestarzhang.cn'] }],
   });
   for (const domain of routing.Domains || []) {
+    // The custom domain was bound to the old manual-upload directory. This
+    // workflow publishes at the hosting root; reconcile only that known route.
+    const oldRoot = (domain.Routes || []).find(route => route.Path === '/' &&
+      route.UpstreamResourceType === 'STATIC_STORE' && route.Enable &&
+      route.PathRewrite?.Prefix === '/personal-blog' && !route.PathRewrite?.StaticStorePrefix);
+    if (domain.Domain === 'joestarzhang.cn' && domain.AccessType === 'DIRECT' && oldRoot) {
+      const { Path, UpstreamResourceType, UpstreamResourceName, EnableSafeDomain,
+        EnableAuth, EnablePathTransmission, QPSPolicy, Extension, Enable } = oldRoot;
+      await app.env.modifyHttpServiceRoute({
+        EnvId: process.env.TCB_ENV_ID.trim(),
+        Domain: { Domain: domain.Domain, Routes: [{
+          Path, UpstreamResourceType, UpstreamResourceName, EnableSafeDomain,
+          EnableAuth, EnablePathTransmission, QPSPolicy, Extension, Enable,
+          PathRewrite: { ...oldRoot.PathRewrite, Prefix: '/' },
+        }] },
+      });
+      oldRoot.PathRewrite.Prefix = '/';
+      console.log('Public custom root route updated to verified hosting root.');
+    }
     console.log('Public custom routing:', JSON.stringify({
       domain: domain.Domain, access: domain.AccessType, status: domain.Status,
       routes: (domain.Routes || []).map(route => ({
