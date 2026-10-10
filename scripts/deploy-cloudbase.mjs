@@ -79,6 +79,30 @@ if (process.env.GITHUB_STEP_SUMMARY) await appendFile(process.env.GITHUB_STEP_SU
 
 // Check the public gateway separately from COS object verification. Gateway caches
 // can lag behind a successful upload, so report their state without re-uploading.
+try {
+  const routing = await app.env.describeHttpServiceRoute({
+    EnvId: process.env.TCB_ENV_ID.trim(),
+    Filters: [{ Name: 'Domain', Values: ['joestarzhang.cn'] }],
+  });
+  for (const domain of routing.Domains || []) {
+    console.log('Public custom routing:', JSON.stringify({
+      domain: domain.Domain, access: domain.AccessType, status: domain.Status,
+      routes: (domain.Routes || []).map(route => ({
+        path: route.Path, type: route.UpstreamResourceType,
+        rewrite: route.PathRewrite, enabled: route.Enable,
+      })),
+    }));
+    if (['CDN', 'EO'].includes(domain.AccessType)) {
+      const task = await app.env.purgeHttpServiceCache({
+        EnvId: process.env.TCB_ENV_ID.trim(), Domain: domain.Domain,
+        CacheType: domain.AccessType, PurgeType: 'PURGE_HOST', Targets: [domain.Domain],
+      });
+      console.log(`Public custom cache refresh submitted: ${task.TaskId}`);
+    }
+  }
+} catch (error) {
+  console.log(`Public custom routing check unavailable (${error.code || error.name})`);
+}
 for (const [label, domain] of [['hosting', website.CdnDomain], ['custom', 'joestarzhang.cn']]) {
   if (!domain) continue;
   try {
