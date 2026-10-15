@@ -34,7 +34,7 @@ const out = path.resolve('outputs/blog-refinements'); fs.mkdirSync(out, { recurs
           assert.equal(await page.locator('[data-search-bookmarks]').getAttribute('aria-pressed'), 'true');
           await page.locator('[data-search-close]').click();
           await page.waitForFunction(() => !document.querySelector('.site-search-dialog').open);
-          await page.locator('.site-search-trigger').click();
+          if (!(await page.locator('.site-search-trigger').isVisible())) await page.locator('.reading-more:visible, .menu-toggle:visible').first().click();await page.locator('.site-search-trigger').click();
           await page.locator('.site-search-field input').fill('图鉴');
           await page.waitForFunction(() => document.querySelector('.site-search-results').textContent.includes('永劫无间征神图鉴'));
           assert.equal(await page.locator('.site-search-results a').first().getAttribute('href'), './zhengshen-atlas/');
@@ -87,7 +87,7 @@ const out = path.resolve('outputs/blog-refinements'); fs.mkdirSync(out, { recurs
     assert.equal(await page.evaluate(() => document.fonts.status), 'loading');
     await page.waitForLoadState('networkidle');
     await page.route('**/rest/v1/articles*', route => route.abort());
-    await page.locator('.site-search-trigger').click();
+    if (!(await page.locator('.site-search-trigger').isVisible())) await page.locator('.reading-more:visible, .menu-toggle:visible').first().click();await page.locator('.site-search-trigger').click();
     await page.locator('.site-search-field input').fill('桌宠');
     await page.waitForFunction(() => document.querySelector('.site-search-results').textContent.includes('桌宠小屋'));
     await page.waitForFunction(() => document.querySelector('.search-status').textContent.includes('暂时无法读取'));

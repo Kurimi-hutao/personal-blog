@@ -21,7 +21,7 @@ function renderArticle(article) {
     <h1></h1>
     <div class="article-detail-meta">
       <time datetime="${article.published_at}">${articleService.formatDate(article.published_at)}</time>
-      <span></span>
+      <span class="article-tags"></span>
     </div>
     <p class="article-detail-excerpt"></p>`;
   header.querySelector(".eyebrow").textContent = article.category || "Jianghu Notes";
@@ -30,6 +30,7 @@ function renderArticle(article) {
     .map((tag) => `#${tag}`)
     .join(" ");
   const readingMeta = document.createElement("span");
+  readingMeta.className = "reading-duration";
   const plainText = (article.content || article.excerpt || "").replace(/[#*_>`~\[\]()!-]/g, " ");
   const characterCount = plainText.replace(/\s/g, "").length;
   readingMeta.textContent = article.content_type === "video"

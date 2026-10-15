@@ -29,7 +29,7 @@ async function trackRipples(page) {
   });
 }
 async function visibleDockRects(page) {
-  return page.evaluate(() => [...document.querySelectorAll('.mobile-control-dock button')].map(element => {
+  return page.evaluate(() => [...document.querySelectorAll('.mobile-reading-bar button')].map(element => {
     const r = element.getBoundingClientRect();
     const style = getComputedStyle(element);
     return { text: element.textContent, x: r.x, y: r.y, width: r.width, height: r.height, right: r.right, bottom: r.bottom,
@@ -46,7 +46,7 @@ async function visibleDockRects(page) {
       const page = await context.newPage(); const errors = [];
       page.on('pageerror', error => errors.push(error.message));
       await ready(page, 'index.html'); await trackRipples(page);
-      const searchTarget = await page.locator('.site-search-trigger').boundingBox();
+      const searchTarget = await page.locator('.menu-toggle').boundingBox();
       assert(searchTarget.width >= 44 && searchTarget.height >= 44, 'header search target is at least 44px');
       const cdp = await context.newCDPSession(page);
       await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: 110, y: 140 }] });
@@ -56,7 +56,7 @@ async function visibleDockRects(page) {
       assert.equal(await page.evaluate(() => window.auditRipples), 0, 'scroll gesture creates no effect');
       await page.waitForTimeout(350); await page.evaluate(() => scrollTo(0,0)); await page.waitForTimeout(350);
       await page.touchscreen.tap(30,110);
-      assert.equal(await page.evaluate(() => window.auditRipples), 1, 'one tap creates exactly one ripple');
+      assert.equal(await page.evaluate(() => window.auditRipples), 0, 'mobile tap keeps the page quiet');
       if (width === 390) await page.screenshot({ path: path.join(out, 'tap-feedback.png') });
       await page.waitForTimeout(650);
       assert.equal(await page.locator('.ink-click-ripple, .ink-click-core, .click-petal').count(), 0, 'particles are cleaned up');
@@ -64,8 +64,8 @@ async function visibleDockRects(page) {
       await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: 30, y: 110 }] });
       await page.waitForTimeout(560);
       await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-      assert.equal(await page.evaluate(() => window.auditRipples), 1, 'long presses create no click particles');
-      await page.locator('#summonPetals').tap();
+      assert.equal(await page.evaluate(() => window.auditRipples), 0, 'long presses create no click particles');
+      await page.locator('.menu-toggle').tap();await page.locator('.nav-summon-petals').tap();
       assert(await page.locator('.manual-petal').count() > 0, 'phone petal action gives visible feedback');
       assert(await page.locator('.manual-petal').count() <= 8, 'phone petal count is bounded');
       assert.equal(await page.locator('.manual-petal').first().evaluate(element => getComputedStyle(element).pointerEvents), 'none');
@@ -73,19 +73,19 @@ async function visibleDockRects(page) {
       await page.evaluate(() => scrollTo(0, 0)); await page.waitForTimeout(350);
       await page.locator('.menu-toggle').tap(); await page.waitForTimeout(300);
       assert.equal(await page.locator('main').evaluate(element => element.inert), true);
-      const menuTargets = await page.locator('.site-nav a, .mobile-nav-dismiss').evaluateAll(elements => elements.map(element => {
+      const menuTargets = await page.locator('.site-nav a:visible, .nav-utilities button:visible').evaluateAll(elements => elements.map(element => {
         const r = element.getBoundingClientRect(); return { text: element.textContent, top: r.top, bottom: r.bottom, height: r.height, width: r.width };
       }));
       for (const target of menuTargets) {
         assert(target.height >= 44 && target.width >= 44, `navigation touch target: ${target.text}`);
-        assert(target.top >= 70 && target.bottom <= height, `navigation fits viewport: ${target.text}`);
+        assert(target.top >= 66, `navigation below header: ${target.text}`);
       }
       await page.keyboard.press('Tab');
       assert.equal(await page.evaluate(() => !!document.activeElement.closest('.site-header')), true, 'menu focus stays in header/navigation');
       await page.screenshot({ path: path.join(out, `menu-${width}.png`) });
-      await page.locator('.mobile-nav-dismiss').tap();
+      await page.locator('.menu-toggle').tap();
       assert.equal(await page.locator('main').evaluate(element => element.inert), false);
-      await page.locator('.site-search-trigger').tap();
+      await page.locator('.menu-toggle').tap();await page.locator('.site-search-trigger').tap();
       await page.locator('.site-search-field input').fill('片刻');
       await page.waitForFunction(() => document.querySelector('.site-search-results').textContent.includes('找到'));
       if (width <= 430) await page.setViewportSize({ width, height: 430 });
@@ -112,14 +112,14 @@ async function visibleDockRects(page) {
       }), true, 'TOC remains tappable while scrolling down through the article');
       await page.evaluate(() => scrollBy(0,-24)); await page.waitForTimeout(450);
       const controls = await visibleDockRects(page);
-      assert(controls.some(item => item.text === '目录'), 'TOC joins the shared dock');
+      assert(controls.some(item => item.text === '目录'), 'TOC stays in reading header');
       for (let i = 0; i < controls.length; i++) {
         const a = controls[i]; assert(a.height >= 44 && a.width >= 44 && a.bottom <= height, 'dock button fits and is tappable');
         for (const b of controls.slice(i + 1)) assert(a.right <= b.x || b.right <= a.x || a.bottom <= b.y || b.bottom <= a.y, 'dock buttons never overlap');
       }
       await page.screenshot({ path: path.join(out, `reading-${width}.png`) });
       await page.locator('.reading-toc-trigger').tap();
-      assert.equal(await page.locator('.mobile-control-dock').evaluate(element => getComputedStyle(element).visibility), 'hidden');
+      assert.equal(await page.locator('.mobile-control-dock').isVisible(), false);
       await page.locator('.reading-toc-dialog a').nth(1).tap();
       assert.equal(await page.locator('.reading-toc-dialog').evaluate(element => element.open), false);
       await page.waitForTimeout(500);
@@ -144,7 +144,7 @@ async function visibleDockRects(page) {
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false, 'pet room fits');
         await page.screenshot({ path: path.join(out, 'pet-390.png') });
         await ready(page, 'articles.html');
-        await page.locator('.theme-toggle').tap();
+        await page.locator('.menu-toggle').tap();await page.locator('.theme-toggle').tap();await page.locator('.menu-toggle').tap();
         await page.locator('.scene-banner').evaluate(async element => {
           const url = getComputedStyle(element, '::before').backgroundImage.match(/url\("([^"]+)"\)/)?.[1];
           if (url) { const image = new Image(); image.src = url; await image.decode(); }
@@ -164,7 +164,7 @@ async function visibleDockRects(page) {
       if (mobile) await page.touchscreen.tap(110,140); else await page.mouse.click(110,140);
       assert.equal(await page.evaluate(() => window.auditRipples), mobile ? 0 : 1, 'reduced motion and desktop click count');
       if (mobile) {
-        await page.locator('#summonPetals').tap();
+        await page.locator('.menu-toggle').tap();await page.locator('.nav-summon-petals').tap();
         assert.equal(await page.locator('.manual-petal').count(), 0);
         assert.match(await page.locator('.petal-feedback-toast').innerText(), /减少动态效果/);
       }

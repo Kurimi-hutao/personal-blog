@@ -153,7 +153,7 @@
   }
 
   function createClickEffect(x, y, source) {
-    if (state.reduced || state.hidden) return;
+    if (state.reduced || state.hidden || matchMedia('(max-width:1080px), (pointer:coarse)').matches) return;
     if (typeof x !== "number" || typeof y !== "number") return;
     const target = source instanceof Element ? source : null;
     if (target?.closest("dialog, .animated-select, .animated-select__panel, .click-petal, .falling-piece, input, textarea, select, option, video, audio, iframe, canvas, [contenteditable='true'], :disabled, [aria-disabled='true']")) return;

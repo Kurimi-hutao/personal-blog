@@ -65,10 +65,22 @@
 
   if (header && navigation) {
     const menuHeading = document.createElement('div'); menuHeading.className = 'mobile-nav-heading';
-    menuHeading.innerHTML = '<small>此间江湖 · 随心翻阅</small><strong>想去哪里逛逛？</strong>';
+    menuHeading.innerHTML = '<small>此间目录</small>';
     navigation.prepend(menuHeading);
     const menuDismiss = document.createElement('button'); menuDismiss.type = 'button'; menuDismiss.className = 'mobile-nav-dismiss';
     menuDismiss.textContent = '收起导航 ×'; navigation.append(menuDismiss);
+    const primary = document.createElement('div'); primary.className = 'nav-primary';
+    const secondary = document.createElement('div'); secondary.className = 'nav-secondary';
+    const mainPages = ['articles', 'works', 'videos'];
+    mainPages.forEach((page, i) => {
+      const link = navigation.querySelector(`[data-nav-page="${page}"]`);
+      if (!link) return;
+      link.dataset.index = `0${i + 1}`;
+      link.dataset.description = ['随笔与记录', '所做与所爱', '流动的片刻'][i];
+      primary.append(link);
+    });
+    navigation.querySelectorAll(':scope > a').forEach(link => secondary.append(link));
+    navigation.append(primary, secondary);
     const inertBeforeMenu = new Map();
     navigation.classList.add("site-nav");
     if (!navigation.id) navigation.id = "siteNav";
@@ -105,7 +117,7 @@
       document.documentElement.classList.toggle("mobile-nav-open", open);
       document.body.classList.toggle("mobile-nav-open", open);
       if (open) {
-        document.querySelectorAll('main, body > footer, .mobile-control-dock, .reading-toc-trigger, .site-header .brand').forEach(element => {
+        document.querySelectorAll('main, body > footer, .mobile-control-dock, .reading-toc-trigger, .mobile-reading-bar, .site-header .brand').forEach(element => {
           if (!inertBeforeMenu.has(element)) inertBeforeMenu.set(element, element.inert);
           element.inert = true;
         });
@@ -125,10 +137,10 @@
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape" && navigation.classList.contains("open")) setMenuOpen(false);
       if (event.key === 'Tab' && navigation.classList.contains('open')) {
-        const targets = [menuToggle, header.querySelector('.site-search-trigger'), ...navigation.querySelectorAll('a, button')].filter(Boolean);
+        const targets = [menuToggle, header.querySelector('.site-search-trigger'), ...navigation.querySelectorAll('a, button')].filter((element, i, all) => element && all.indexOf(element) === i && element.getClientRects().length && !element.inert);
         const current = targets.indexOf(document.activeElement);
         const next = (current + (event.shiftKey ? -1 : 1) + targets.length) % targets.length;
-        event.preventDefault(); targets[next].focus({ preventScroll: true });
+        event.preventDefault(); targets[next].focus({ preventScroll: true }); targets[next].scrollIntoView({ block: 'nearest' });
       }
     });
     window.addEventListener("resize", () => {
@@ -260,6 +272,7 @@
       link.append(title, progress); list.append(link);
       if (list.children.length === 3) break;
     }
+    list.closest('.reading-return')?.classList.toggle('has-reading-history', Boolean(list.children.length));
     if (!list.children.length) {
       const link = document.createElement('a'); link.href = './articles.html';
       link.textContent = '翻开一篇文章，下次回来可从这里接着读 →'; list.append(link);
@@ -676,6 +689,26 @@
     backToTop,
   });
   setupFloatingControls();
+  if (navigation) {
+    const utilities = document.createElement('div'); utilities.className = 'nav-utilities';
+    const savedButton = document.createElement('button'); savedButton.type = 'button'; savedButton.textContent = '收藏';
+    savedButton.onclick = () => { closeMobileNavigation(); void openSearch(); showBookmarks(); };
+    utilities.append(savedButton);
+    const petals = document.querySelector('#summonPetals');
+    if (petals) {
+      const summon = document.createElement('button'); summon.type = 'button'; summon.textContent = '唤桃花'; summon.className = 'nav-summon-petals';
+      summon.onclick = () => { closeMobileNavigation(); petals.click(); }; utilities.append(summon);
+    }
+    navigation.append(utilities);
+    const layout = matchMedia('(max-width:1080px)');
+    const placeUtilities = () => {
+      if (layout.matches) utilities.prepend(searchButton, button);
+      else { header.insertBefore(searchButton, menuToggle); document.querySelector('.mobile-control-dock')?.append(button); }
+    };
+    layout.addEventListener('change', placeUtilities); placeUtilities();
+    const topLink = document.createElement('button'); topLink.type = 'button'; topLink.className = 'mobile-scroll-top'; topLink.textContent = '回到卷首 ↑';
+    topLink.onclick = () => backToTop.click(); document.querySelector('body > footer')?.append(topLink);
+  }
 
   // Keep dialogs inside the visual viewport when a phone keyboard is open.
   let viewportFrame = 0;

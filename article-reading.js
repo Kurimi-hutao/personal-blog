@@ -5,6 +5,13 @@
   function write(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); } catch {} }
 
   function setupToc(body) {
+    let bar = document.querySelector('.mobile-reading-bar');
+    if (!bar) {
+      bar = document.createElement('div'); bar.className = 'mobile-reading-bar';
+      bar.innerHTML = '<a href="./articles.html">← 返回文章</a><div class="mobile-reading-actions"><button type="button" class="reading-more">更多</button></div>';
+      bar.querySelector('button').onclick = () => document.querySelector('.menu-toggle')?.click();
+      document.body.append(bar); document.body.classList.add('has-mobile-reading-bar');
+    }
     const toc = document.querySelector('#articleToc');
     const headings = [...body.querySelectorAll('h1,h2,h3')];
     if (headings.length < 2) return;
@@ -31,9 +38,15 @@
     dialog.className = 'reading-toc-dialog'; dialog.setAttribute('aria-label', '此卷目录');
     dialog.innerHTML = '<header><strong>此卷目录</strong><button type="button" aria-label="关闭目录">×</button></header>';
     dialog.append(list.cloneNode(true));
-    (document.querySelector('.mobile-control-dock') || document.body).append(button);
+    const mobile = matchMedia('(max-width:900px)');
+    let inReading = true;
+    const placeToc = () => {
+      const parent = mobile.matches ? bar.querySelector('.mobile-reading-actions') : (document.querySelector('.mobile-control-dock') || document.body);
+      parent.prepend(button); button.hidden = mobile.matches ? false : !inReading;
+    };
+    mobile.addEventListener('change', placeToc); placeToc();
     document.body.append(dialog);
-    const readingObserver = new IntersectionObserver(entries => { button.hidden = !entries[0].isIntersecting; });
+    const readingObserver = new IntersectionObserver(entries => { inReading = entries[0].isIntersecting; button.hidden = mobile.matches ? false : !inReading; });
     readingObserver.observe(body);
     button.onclick = () => {
       dialog.showModal();
