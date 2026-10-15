@@ -74,6 +74,10 @@
     headings.forEach(heading => observer.observe(heading));
   }
 
+  function readingInset() {
+    const bar = document.querySelector('.mobile-reading-bar');
+    return bar && getComputedStyle(bar).display !== 'none' ? bar.getBoundingClientRect().height + 24 : 96;
+  }
   function setupResume(article) {
     if (article.content_type === 'video') return;
     const body = document.querySelector('#articleDetail .article-body');
@@ -81,7 +85,7 @@
     const positions = read(key, {});
     const saved = positions[article.id];
     let interacted = false, timer;
-    const ratio = () => Math.max(0, Math.min(1, (96 - body.getBoundingClientRect().top) / Math.max(1, body.offsetHeight - innerHeight + 96)));
+    const ratio = () => { const inset = readingInset(); return Math.max(0, Math.min(1, (inset - body.getBoundingClientRect().top) / Math.max(1, body.offsetHeight - innerHeight + inset))); };
     function save() {
       if (!interacted || document.documentElement.classList.contains('ink-site-loading')) return;
       const value = ratio();
@@ -100,7 +104,8 @@
       resume.onclick = async () => {
         await (window.InkLottie?.loaded || document.fonts?.ready);
         notice.remove(); interacted = true;
-        const top = scrollY + body.getBoundingClientRect().top - 96 + saved.ratio * Math.max(1, body.offsetHeight - innerHeight + 96);
+        const inset = readingInset();
+        const top = scrollY + body.getBoundingClientRect().top - inset + saved.ratio * Math.max(1, body.offsetHeight - innerHeight + inset);
         scrollTo({ top, behavior: motion() });
       };
       reset.onclick = () => { delete positions[article.id]; write(key, positions); notice.remove(); };
