@@ -23,6 +23,8 @@ let windActive = false;
 let windStrength = 0;
 let ownerSession = null;
 const pieces = new Set();
+const manualPetals = new Set();
+let petalNoticeTimer;
 const pointer = { x: -1000, y: -1000 };
 let lastCursorTrailAt = 0;
 let lastTrailPoint = null;
@@ -593,6 +595,28 @@ function burstPiece(piece) {
 }
 
 function summonPetals() {
+  if (document.hidden) return;
+  if (reducedMotion || compactMotion || lowPowerDevice || !hasGsap) {
+    showPetalNotice(reducedMotion ? '桃花已送达 · 已按你的偏好减少动态效果' : '桃花来了');
+    if (reducedMotion) return;
+    manualPetals.forEach(node => { node.getAnimations().forEach(animation => animation.cancel()); node.remove(); });
+    manualPetals.clear();
+    const count = lowPowerDevice ? 5 : 8;
+    for (let i = 0; i < count; i++) {
+      const petal = document.createElement('span'); petal.className = 'manual-petal'; petal.setAttribute('aria-hidden', 'true');
+      petal.style.backgroundImage = `url('./assets/spring-ink/petal-${1 + i % 8}.webp')`;
+      document.body.append(petal); manualPetals.add(petal);
+      const x = random(innerWidth * .12, innerWidth * .88), drift = random(-36, 36);
+      const animation = petal.animate([
+        { transform: `translate3d(${x}px,70px,0) rotate(0deg)`, opacity: 0 },
+        { opacity: .72, offset: .16 },
+        { transform: `translate3d(${x + drift}px,${Math.min(innerHeight - 96, 580)}px,0) rotate(${random(90,220)}deg)`, opacity: 0 },
+      ], { duration: 1800 + i * 80, delay: i * 65, easing: 'ease-out', fill: 'both' });
+      const remove = () => { petal.remove(); manualPetals.delete(petal); };
+      animation.finished.then(remove, remove);
+    }
+    return;
+  }
   for (let i = 0; i < 18; i += 1) {
     window.setTimeout(
       () =>
@@ -607,10 +631,19 @@ function summonPetals() {
   }
 }
 
+function showPetalNotice(message) {
+  let notice = document.querySelector('.petal-feedback-toast');
+  if (!notice) { notice = document.createElement('span'); notice.className = 'petal-feedback-toast'; notice.setAttribute('role', 'status'); document.body.append(notice); }
+  notice.textContent = message; notice.hidden = false;
+  clearTimeout(petalNoticeTimer); petalNoticeTimer = setTimeout(() => { notice.hidden = true; }, 2200);
+}
+
 function setWind(active) {
   windActive = active;
   windStrength = active ? 170 : 0;
   windToggle.setAttribute("aria-pressed", String(active));
+  windToggle.setAttribute('aria-label', active ? '停止桃花风' : '开启桃花风');
+  windToggle.title = active ? '停止桃花风' : '开启桃花风';
   windLabel.textContent = active ? "风起" : "风止";
 
   if (hasGsap && !reducedMotion) {
@@ -648,6 +681,7 @@ window.addEventListener("pointermove", (event) => {
 });
 
 window.addEventListener("pointerdown", (event) => {
+  if (window.MotionCore?.ready) return;
   if (event.button !== 0) return;
   createClickEffect(event.clientX, event.clientY, event.target);
 });
@@ -660,7 +694,14 @@ window.addEventListener(
   { passive: true },
 );
 
-windToggle.addEventListener("click", () => setWind(!windActive));
+if (compactMotion || lowPowerDevice || !hasGsap) {
+  windToggle.classList.add('wind-toggle--summon'); windToggle.removeAttribute('aria-pressed');
+  windToggle.setAttribute('aria-label', '唤一场桃花'); windToggle.title = '唤一场桃花'; windLabel.textContent = '桃花';
+}
+windToggle.addEventListener("click", () => {
+  if (compactMotion || lowPowerDevice || !hasGsap) summonPetals();
+  else setWind(!windActive);
+});
 summonButton.addEventListener("click", summonPetals);
 
 function renderGuestbook(messages) {
@@ -922,6 +963,10 @@ function applyHomeMotionPreference() {
   reducedMotion = homeMotionQuery.matches;
   document.documentElement.classList.toggle("cursor-ready", !reducedMotion && finePointer && !lowPowerDevice);
   ambientMotions.forEach((motion) => motion.paused(reducedMotion || document.hidden));
+  if (reducedMotion || document.hidden) {
+    manualPetals.forEach(node => { node.getAnimations().forEach(animation => animation.cancel()); node.remove(); });
+    manualPetals.clear();
+  }
   if (!reducedMotion || !hasGsap) return;
   pieces.forEach((piece) => { gsap.killTweensOf(piece); piece.remove(); });
   pieces.clear();

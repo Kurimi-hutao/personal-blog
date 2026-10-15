@@ -30,10 +30,15 @@
     const dialog = document.createElement('dialog');
     dialog.className = 'reading-toc-dialog'; dialog.setAttribute('aria-label', '此卷目录');
     dialog.innerHTML = '<header><strong>此卷目录</strong><button type="button" aria-label="关闭目录">×</button></header>';
-    dialog.append(list.cloneNode(true)); document.body.append(button, dialog);
+    dialog.append(list.cloneNode(true));
+    (document.querySelector('.mobile-control-dock') || document.body).append(button);
+    document.body.append(dialog);
     const readingObserver = new IntersectionObserver(entries => { button.hidden = !entries[0].isIntersecting; });
     readingObserver.observe(body);
-    button.onclick = () => dialog.showModal();
+    button.onclick = () => {
+      dialog.showModal();
+      dialog.querySelector('a.active')?.scrollIntoView({ block: 'nearest' });
+    };
     dialog.querySelector('button').onclick = () => dialog.close();
     dialog.addEventListener('click', event => {
       if (event.target === dialog) dialog.close();

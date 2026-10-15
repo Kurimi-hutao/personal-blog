@@ -153,9 +153,11 @@
   }
 
   function createClickEffect(x, y, source) {
+    if (state.reduced || state.hidden) return;
     if (typeof x !== "number" || typeof y !== "number") return;
     const target = source instanceof Element ? source : null;
-    if (target?.closest(".click-petal, .falling-piece, input, textarea, select, option, video, audio, iframe, canvas, [contenteditable='true']")) return;
+    if (target?.closest("dialog, .animated-select, .animated-select__panel, .click-petal, .falling-piece, input, textarea, select, option, video, audio, iframe, canvas, [contenteditable='true'], :disabled, [aria-disabled='true']")) return;
+    if (document.querySelectorAll('.ink-click-ripple').length >= 4) return;
 
     const interactive = Boolean(target?.closest("button, a, summary, [role='button'], .ink-button, .text-button, .seal-button"));
     const duration = state.reduced ? 180 : interactive ? 340 : state.coarse ? 360 : 430;
@@ -193,17 +195,31 @@
     }
 
     const nodes = Array.from(root.children);
+    nodes.forEach(node => node.setAttribute('aria-hidden', 'true'));
     document.body.appendChild(root);
     window.setTimeout(() => nodes.forEach((node) => node.remove()), duration + 80);
   }
 
   function setupClickFeedback() {
+    let touch = null;
     window.addEventListener("pointerdown", (event) => {
-      if (event.button !== 0) return;
-      createClickEffect(event.clientX, event.clientY, event.target);
+      if (event.button !== 0 || !event.isPrimary) { touch = null; return; }
+      if (event.pointerType === 'mouse') createClickEffect(event.clientX, event.clientY, event.target);
+      else touch = { id: event.pointerId, x: event.clientX, y: event.clientY, target: event.target, at: performance.now() };
     }, { passive: true });
+    window.addEventListener('pointermove', event => {
+      if (touch?.id === event.pointerId && Math.hypot(event.clientX - touch.x, event.clientY - touch.y) > 10) touch = null;
+    }, { passive: true });
+    window.addEventListener('pointerup', event => {
+      const tap = touch; touch = null;
+      if (!tap || tap.id !== event.pointerId || performance.now() - tap.at > 500) return;
+      if (Math.hypot(event.clientX - tap.x, event.clientY - tap.y) > 10 || !window.getSelection()?.isCollapsed) return;
+      createClickEffect(event.clientX, event.clientY, tap.target);
+    }, { passive: true });
+    window.addEventListener('pointercancel', () => { touch = null; }, { passive: true });
 
     document.addEventListener("pointerdown", (event) => {
+      if (state.reduced || !event.isPrimary || event.button !== 0) return;
       const target = event.target.closest?.("button, a, [role='button'], [role='option'], summary");
       if (!target || target.matches(":disabled, [aria-disabled='true']")) return;
       target.classList.add("motion-pressing");
@@ -218,6 +234,7 @@
     };
     document.addEventListener("pointerup", release, { passive: true });
     document.addEventListener("pointercancel", release, { passive: true });
+    window.addEventListener('blur', release);
     document.addEventListener("keyup", (event) => {
       if (event.key === "Enter" || event.key === " ") release();
     });

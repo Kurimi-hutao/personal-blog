@@ -38,6 +38,8 @@ node scripts/import-next-generation.mjs "原项目路径/dist"
 
 首页可直接进入收藏并继续最近三篇未读完的文章。全站搜索覆盖文章、视频及站内作品，支持类型筛选与展开全部结果；打开作品等页面的搜索时按需加载内容服务。列表读取失败时显示 14 天内保存的公开内容及缓存日期，并提供重试。字体仅为书法标题下载，正文使用系统字体；更新头像后运行 `python scripts/optimize-blog-assets.py` 重新生成资源。验证与变更说明见 `docs/blog-refinements-20261015.md`。
 
+手机导航支持双列入口与底部收起，阅读目录与页面工具合并为横向工具栏；搜索根据键盘占用后的可用视口调整，结果独立滚动。点击特效区分轻点、拖动和长按；手机主动召唤桃花使用限量轻动效，减少动态效果模式提供静态提示。验证说明见 `docs/mobile-motion-20261015.md`。
+
 文章正文支持 Markdown 与 KaTeX 数学公式。行内公式使用 `$E = mc^2$`，块级公式使用 `$$...$$`。
 
 `anon key` 可以公开在前端；真正的文章管理权限由 `supabase-schema.sql` 中的 RLS 策略限制为唯一站长。评论附件仅在前端允许图片、TXT 和 PDF，单个不超过 5 MB；生产环境还应在 Supabase Storage 中配置相同的 MIME 限制。不要把 `service_role key` 写入本项目。

@@ -61,8 +61,15 @@
   const navigation = header?.querySelector("nav");
   let menuToggle = header?.querySelector(".menu-toggle");
   let mobileChromeController = null;
+  let closeMobileNavigation = () => {};
 
   if (header && navigation) {
+    const menuHeading = document.createElement('div'); menuHeading.className = 'mobile-nav-heading';
+    menuHeading.innerHTML = '<small>此间江湖 · 随心翻阅</small><strong>想去哪里逛逛？</strong>';
+    navigation.prepend(menuHeading);
+    const menuDismiss = document.createElement('button'); menuDismiss.type = 'button'; menuDismiss.className = 'mobile-nav-dismiss';
+    menuDismiss.textContent = '收起导航 ×'; navigation.append(menuDismiss);
+    const inertBeforeMenu = new Map();
     navigation.classList.add("site-nav");
     if (!navigation.id) navigation.id = "siteNav";
 
@@ -97,15 +104,32 @@
       if (menuLabel) menuLabel.textContent = open ? "关闭导航" : "打开导航";
       document.documentElement.classList.toggle("mobile-nav-open", open);
       document.body.classList.toggle("mobile-nav-open", open);
+      if (open) {
+        document.querySelectorAll('main, body > footer, .mobile-control-dock, .reading-toc-trigger, .site-header .brand').forEach(element => {
+          if (!inertBeforeMenu.has(element)) inertBeforeMenu.set(element, element.inert);
+          element.inert = true;
+        });
+      } else {
+        inertBeforeMenu.forEach((inert, element) => { element.inert = inert; });
+        inertBeforeMenu.clear();
+      }
       mobileChromeController?.reset();
     };
+    closeMobileNavigation = () => setMenuOpen(false);
+    menuDismiss.onclick = () => { setMenuOpen(false); menuToggle.focus({ preventScroll: true }); };
 
     menuToggle.addEventListener("click", () => setMenuOpen(!navigation.classList.contains("open")));
     navigation.addEventListener("click", (event) => {
-      if (event.target.closest("a")) setMenuOpen(false);
+      if (event.target.closest("a") || event.target === navigation) setMenuOpen(false);
     });
     document.addEventListener("keydown", (event) => {
       if (event.key === "Escape" && navigation.classList.contains("open")) setMenuOpen(false);
+      if (event.key === 'Tab' && navigation.classList.contains('open')) {
+        const targets = [menuToggle, header.querySelector('.site-search-trigger'), ...navigation.querySelectorAll('a, button')].filter(Boolean);
+        const current = targets.indexOf(document.activeElement);
+        const next = (current + (event.shiftKey ? -1 : 1) + targets.length) % targets.length;
+        event.preventDefault(); targets[next].focus({ preventScroll: true });
+      }
     });
     window.addEventListener("resize", () => {
       if (window.innerWidth > 1080 && navigation.classList.contains("open")) setMenuOpen(false);
@@ -367,6 +391,7 @@
 
   async function openSearch() {
     if (searchClosing) return;
+    closeMobileNavigation();
     mobileChromeController?.forceVisible();
     if (!searchDialog.open) searchDialog.showModal();
     searchDialog.classList.remove("is-closing");
@@ -651,6 +676,27 @@
     backToTop,
   });
   setupFloatingControls();
+
+  // Keep dialogs inside the visual viewport when a phone keyboard is open.
+  let viewportFrame = 0;
+  const updateVisualViewport = () => {
+    viewportFrame = 0;
+    const viewport = window.visualViewport;
+    const height = viewport?.height || innerHeight;
+    document.documentElement.style.setProperty('--visual-viewport-height', `${height}px`);
+    document.documentElement.style.setProperty('--visual-viewport-top', `${viewport?.offsetTop || 0}px`);
+    const typing = /INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName || '');
+    document.body.classList.toggle('mobile-keyboard-open', typing && (height < innerHeight * .8 || height < 520));
+  };
+  const requestViewportUpdate = () => {
+    if (!viewportFrame) viewportFrame = requestAnimationFrame(updateVisualViewport);
+  };
+  window.visualViewport?.addEventListener('resize', requestViewportUpdate, { passive: true });
+  window.visualViewport?.addEventListener('scroll', requestViewportUpdate, { passive: true });
+  window.addEventListener('resize', requestViewportUpdate, { passive: true });
+  document.addEventListener('focusin', requestViewportUpdate);
+  document.addEventListener('focusout', requestViewportUpdate);
+  updateVisualViewport();
 
   if (finePointer && !document.querySelector(".ink-cursor")) {
     const cursor = document.createElement("div");

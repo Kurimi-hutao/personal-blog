@@ -331,8 +331,8 @@
 }
 
 @keyframes inkClickRipple {
-  from { opacity: 0.42; transform: translate3d(var(--click-x), var(--click-y), 0) scale(0.32); filter: blur(0); }
-  to { opacity: 0; transform: translate3d(var(--click-x), var(--click-y), 0) scale(1); filter: blur(1px); }
+  from { opacity: 0.42; transform: translate3d(var(--click-x), var(--click-y), 0) scale(0.32); }
+  to { opacity: 0; transform: translate3d(var(--click-x), var(--click-y), 0) scale(1); }
 }
 
 @keyframes inkClickCore {
