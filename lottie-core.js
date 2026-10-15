@@ -87,7 +87,6 @@
     // Start the shared brand fonts before taking the FontFaceSet readiness promise.
     // Layout requests the other subsets actually used by this page.
     await Promise.allSettled([
-      document.fonts.load('16px "Blog Serif"', '桃'),
       document.fonts.load('48px "Blog Brush"', '桃'),
     ]);
     await document.fonts.ready;
@@ -110,10 +109,9 @@
     document.body.prepend(loader);
     document.documentElement.classList.add('ink-site-loading');
 
-    // Font loading has no visual-intro timeout: keep the seal until the browser
-    // finishes loading (or settles on fallback after an actual font error).
+    // Show readable fallback text after a short budget, even on slow font requests.
     await Promise.all([
-      fontsReady(),
+      withTimeout(fontsReady().catch(() => {}), 900),
       withTimeout(loader.querySelector('img').decode().catch(() => {}), 780),
       wait(isReduced() ? 0 : 560),
     ]);

@@ -169,7 +169,8 @@ function renderArticleDom(filtered) {
   updateFilterUrl();
 
   if (!filtered.length) {
-    renderArticleState("未寻得合卷文章", "换一个关键词、分类或标签再试试，江湖册页还在继续整理。");
+    if (!allArticles.length) renderArticleState("第一卷正在酝酿中", "这里还没有发布的文章，新的随笔会在这里归档。", 'empty');
+    else renderArticleState("未寻得合卷文章", "换一个关键词、分类或标签再试试，江湖册页还在继续整理。");
     return;
   }
   filtered.forEach((article) => articleContainer.appendChild(createListCard(article)));
@@ -200,14 +201,23 @@ async function loadArticles() {
   }
 
   try {
+    window.ContentCache?.clearNotice(articleContainer);
     window.InkAssets?.loading(articleContainer, '正在翻阅文章……');
     allArticles = await withTimeout(articleService.listPublished(null, { contentType: "article" }), "文章服务响应超时");
+    window.ContentCache?.write('articles', allArticles);
     restoreFilterState();
     renderFilters();
     renderArticles({ immediate: true });
   } catch (error) {
+    const cached = window.ContentCache?.read('articles');
+    if (cached) {
+      allArticles = cached.items;
+      renderFilters(); restoreFilterState(); renderArticles({ immediate: true });
+      window.ContentCache.notice(articleContainer, loadArticles, cached.savedAt);
+      return;
+    }
     resultCount.textContent = "读取受阻";
-    renderArticleState("文章读取暂时受阻", "雾还未散，稍后再试一次。", 'error');
+    renderArticleState("文章读取暂时受阻", "连接暂时不可用，请重新读取。这不代表文章卷宗为空。", 'error');
   }
 }
 

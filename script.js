@@ -39,16 +39,17 @@ function withTimeout(promise, ms = 7000) {
 }
 
 function readCachedWorks(key) {
+  const current = window.ContentCache?.read(key);
+  if (current) return current.items;
   try {
     const cached = JSON.parse(localStorage.getItem(key) || "null");
-    if (Array.isArray(cached?.items)) return cached.items;
-  } catch {
-    localStorage.removeItem(key);
-  }
+    if (Array.isArray(cached?.items) && Date.now() - cached.savedAt < 14 * 86400000) return cached.items;
+  } catch {}
   return [];
 }
 
 function writeCachedWorks(key, items) {
+  if (window.ContentCache) { window.ContentCache.write(key, items); return; }
   try {
     localStorage.setItem(key, JSON.stringify({ savedAt: Date.now(), items }));
   } catch {}
@@ -142,6 +143,7 @@ async function loadHomepageArticles() {
   }
 
   try {
+    window.ContentCache?.clearNotice(container);
     window.InkAssets?.loading(container, '正在翻阅新文章……', 2);
     const articles = await withTimeout(articleService.listPublished(2, { contentType: "article" }));
     container.removeAttribute('aria-busy');
@@ -160,11 +162,12 @@ async function loadHomepageArticles() {
     if (cached.length) {
       container.replaceChildren();
       cached.slice(0, 2).forEach((article, index) => container.appendChild(createHomepageArticleCard(article, index)));
+      showHomeCacheNotice(container, 'hutao-homepage-articles', loadHomepageArticles);
       revealInsertedCards(container);
       setupInkHoverEffects();
       return;
     }
-    window.InkAssets?.state(container, { kind: 'error', title: '新文章暂时未能展开', detail: '雾还未散，稍后再试一次。', action: '重新读取', onAction: loadHomepageArticles });
+    window.InkAssets?.state(container, { kind: 'error', title: '新文章暂时未能展开', detail: '连接暂时不可用，重新读取即可再试一次。', action: '重新读取', onAction: loadHomepageArticles });
   }
 }
 
@@ -206,6 +209,7 @@ async function loadHomepageVideos() {
   const container = document.querySelector("#latestVideos");
   if (!container || !articleService.configured) return;
   try {
+    window.ContentCache?.clearNotice(container);
     window.InkAssets?.loading(container, '正在整理新影像……', 2);
     const videos = await withTimeout(articleService.listPublished(2, { contentType: "video" }));
     container.removeAttribute('aria-busy');
@@ -224,12 +228,19 @@ async function loadHomepageVideos() {
     if (cached.length) {
       container.replaceChildren();
       cached.slice(0, 2).forEach((video) => container.appendChild(createHomepageVideoCard(video)));
+      showHomeCacheNotice(container, 'hutao-homepage-videos', loadHomepageVideos);
       revealInsertedCards(container);
       setupInkHoverEffects();
       return;
     }
-    window.InkAssets?.state(container, { kind: 'error', title: '新影像暂时未能展开', detail: '雾还未散，稍后再试一次。', action: '重新读取', onAction: loadHomepageVideos });
+    window.InkAssets?.state(container, { kind: 'error', title: '新影像暂时未能展开', detail: '连接暂时不可用，重新读取即可再试一次。', action: '重新读取', onAction: loadHomepageVideos });
   }
+}
+
+function showHomeCacheNotice(container, key, retry) {
+  let entry = window.ContentCache?.read(key);
+  if (!entry) { try { entry = JSON.parse(localStorage.getItem(key)); } catch {} }
+  if (entry?.savedAt) window.ContentCache?.notice(container, retry, entry.savedAt);
 }
 
 function renderAchievements(result) {

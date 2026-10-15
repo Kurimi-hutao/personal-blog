@@ -75,6 +75,20 @@
     }
 
     copy.append(category, title, description, tech, actions);
+    if (work.goal) {
+      const notes = document.createElement('details'); notes.className = 'work-notes';
+      const summary = document.createElement('summary'); summary.textContent = '创作目标与实现思路 ＋';
+      notes.append(summary);
+      for (const [label, text] of [
+        ['创作目标', work.goal], ['作品亮点', (work.highlights || []).join(' · ')], ['实现思路', work.approach],
+      ]) {
+        if (!text) continue;
+        const paragraph = document.createElement('p');
+        const heading = document.createElement('strong'); heading.textContent = label + '：';
+        paragraph.append(heading, document.createTextNode(text)); notes.append(paragraph);
+      }
+      copy.append(notes);
+    }
     card.append(cover, copy);
     return card;
   }

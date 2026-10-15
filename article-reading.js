@@ -69,7 +69,7 @@
       const value = ratio();
       const items = read(key, {});
       if (value > .98) delete items[article.id];
-      else if (value > .03) items[article.id] = { ratio: value, title: article.title, updatedAt: Date.now() };
+      else if (value > .03) items[article.id] = { ratio: value, title: article.title, slug: article.slug, updatedAt: Date.now() };
       else delete items[article.id];
       write(key, Object.fromEntries(Object.entries(items).sort((a,b) => b[1].updatedAt - a[1].updatedAt).slice(0,100)));
     }

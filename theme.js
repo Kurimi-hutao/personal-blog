@@ -1,4 +1,26 @@
 (function () {
+  const scriptBase = new URL('.', document.currentScript.src);
+  const searchModules = new Map();
+  function loadSearchModule(path) {
+    if (!searchModules.has(path)) {
+      searchModules.set(path, new Promise((resolve, reject) => {
+        const script = document.createElement('script'); script.src = new URL(path, scriptBase).href;
+        script.onload = resolve;
+        script.onerror = () => { searchModules.delete(path); script.remove(); reject(new Error('搜索模块未能加载')); };
+        document.head.append(script);
+      }));
+    }
+    return searchModules.get(path);
+  }
+  async function searchPublishedContent() {
+    if (!window.articleService) {
+      if (!window.supabase) await loadSearchModule('./assets/vendor/supabase/supabase-2.108.2.js');
+      if (!window.BLOG_CONFIG) await loadSearchModule('./supabase-config.js');
+      await loadSearchModule('./article-service.js?v=20261010-p1');
+    }
+    if (!window.articleService?.configured) throw new Error('内容服务暂不可用');
+    return window.articleService.listPublished();
+  }
   const storageKey = "hutao-theme";
   const saved = localStorage.getItem(storageKey);
   const theme = saved === "dark" ? "dark" : "light";
@@ -28,7 +50,6 @@
   const warmUpFonts = () => {
     if (!document.fonts?.load) return;
     Promise.allSettled([
-      document.fonts.load('16px "Blog Serif"', "桃"),
       document.fonts.load('48px "Blog Brush"', "桃"),
     ]).catch(() => {});
   };
@@ -110,7 +131,7 @@
       </header>
       <label class="site-search-field">
         <span aria-hidden="true">⌕</span>
-        <input type="search" placeholder="搜索文章、视频或标签……" autocomplete="off" />
+        <input type="search" placeholder="搜索文章、视频、作品或标签……" autocomplete="off" />
         <kbd>ESC</kbd>
       </label>
       <nav class="site-quick-links" aria-label="快捷入口">
@@ -121,6 +142,13 @@
         <a href="./kurumi.html">胡桃绘卷</a>
         <button type="button" data-search-bookmarks aria-pressed="false">我的收藏</button>
       </nav>
+      <div class="search-type-filters" role="group" aria-label="搜索内容类型">
+        <button type="button" data-search-type="all" aria-pressed="true">全部</button>
+        <button type="button" data-search-type="article" aria-pressed="false">文章</button>
+        <button type="button" data-search-type="video" aria-pressed="false">视频</button>
+        <button type="button" data-search-type="work" aria-pressed="false">作品</button>
+      </div>
+      <div class="search-status" role="status" hidden></div>
       <div class="site-search-results" aria-live="polite">
         <p>输入关键词开始搜索，也可以使用上方快捷入口。</p>
       </div>
@@ -130,6 +158,50 @@
   const searchInput = searchDialog.querySelector("input");
   const searchResults = searchDialog.querySelector(".site-search-results");
   let searchableWorks = null;
+  let searchType = 'all';
+  let searchLimit = 8;
+  let searchPending = false;
+  const searchStatus = searchDialog.querySelector('.search-status');
+  const typeFilters = searchDialog.querySelector('.search-type-filters');
+  typeFilters.addEventListener('click', event => {
+    const button = event.target.closest('[data-search-type]');
+    if (!button) return;
+    searchType = button.dataset.searchType; searchLimit = 8;
+    typeFilters.querySelectorAll('button').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+    renderSearchResults(searchInput.value);
+  });
+  function localWorks() {
+    return (window.HutaoWorksData?.works || []).map(work => ({ ...work, content_type: 'work', excerpt: work.description, tags: work.tech, searchUrl: work.demo }));
+  }
+  function updateSearchStatus(text, retry = false) {
+    searchStatus.replaceChildren(); searchStatus.hidden = !text;
+    const copy = document.createElement('span'); copy.textContent = text; searchStatus.append(copy);
+    if (retry) {
+      const button = document.createElement('button'); button.type = 'button'; button.textContent = '重新读取';
+      button.onclick = () => loadSearchContent(); searchStatus.append(button);
+    }
+  }
+  async function loadSearchContent() {
+    if (searchPending) return;
+    searchPending = true;
+    updateSearchStatus('正在更新文章与视频，作品可以先行搜索……');
+    let timer;
+    try {
+      searchableWorks = await Promise.race([
+        searchPublishedContent(),
+        new Promise((_, reject) => { timer = setTimeout(() => reject(new Error('timeout')), 7000); }),
+      ]);
+      window.ContentCache?.write('search', searchableWorks);
+      updateSearchStatus('');
+    } catch {
+      const cached = window.ContentCache?.read('search');
+      searchableWorks = cached?.items || null;
+      updateSearchStatus(cached ? '连接暂时受阻，文章与视频显示上次保存的内容。' : '文章与视频暂时无法读取，仍可搜索站内作品。', true);
+    } finally {
+      clearTimeout(timer); searchPending = false;
+      if (searchDialog.open) renderSearchResults(searchInput.value);
+    }
+  }
   let searchClosing = false;
   let searchResultAnimation = null;
   let bookmarksMode = false;
@@ -141,16 +213,47 @@
     searchInput.placeholder = '搜索已收藏的标题、分类或标签……';
     renderSearchResults(searchInput.value);
   }
+  document.querySelector('#homeBookmarks')?.addEventListener('click', () => {
+    void openSearch(); showBookmarks();
+  });
+  function renderReadingReturn() {
+    const list = document.querySelector('#readingReturnList');
+    if (!list) return;
+    list.replaceChildren();
+    let positions = {}, bookmarks = [];
+    try { positions = JSON.parse(localStorage.getItem('hutao-reading-positions') || '{}'); } catch {}
+    try { bookmarks = JSON.parse(localStorage.getItem('hutao-bookmarked-articles') || '[]'); } catch {}
+    const known = [...bookmarks, ...(window.ContentCache?.read('search')?.items || []), ...(window.ContentCache?.read('articles')?.items || [])];
+    const entries = Object.entries(positions).filter(([, item]) => item && item.ratio > .03 && item.ratio < .98)
+      .sort((a, b) => b[1].updatedAt - a[1].updatedAt);
+    for (const [id, item] of entries) {
+      const slug = item.slug || known.find(work => work.id === id)?.slug;
+      if (!slug) continue;
+      const link = document.createElement('a');
+      link.href = `./article.html?slug=${encodeURIComponent(slug)}`;
+      const title = document.createElement('strong'); title.textContent = item.title || '继续阅读';
+      const progress = document.createElement('span'); progress.textContent = `上次读到 ${Math.round(item.ratio * 100)}% · 继续阅读 →`;
+      link.append(title, progress); list.append(link);
+      if (list.children.length === 3) break;
+    }
+    if (!list.children.length) {
+      const link = document.createElement('a'); link.href = './articles.html';
+      link.textContent = '翻开一篇文章，下次回来可从这里接着读 →'; list.append(link);
+    }
+  }
+  renderReadingReturn();
+  window.addEventListener('pageshow', renderReadingReturn);
+  window.addEventListener('storage', renderReadingReturn);
   bookmarksButton.addEventListener('click', () => {
     bookmarksMode = !bookmarksMode;
     bookmarksButton.setAttribute('aria-pressed', String(bookmarksMode));
-    searchInput.placeholder = bookmarksMode ? '搜索已收藏的标题、分类或标签……' : '搜索文章、视频或标签……';
+    searchInput.placeholder = bookmarksMode ? '搜索已收藏的标题、分类或标签……' : '搜索文章、视频、作品或标签……';
     renderSearchResults(searchInput.value);
   });
   const reducedMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 
   function workTypeLabel(work) {
-    return work.content_type === "video" ? "视频" : "文章";
+    return work.content_type === "work" ? "作品" : work.content_type === "video" ? "视频" : "文章";
   }
 
   function renderSearchResults(query) {
@@ -158,6 +261,7 @@
     const previousItems = Array.from(searchResults.children);
     const keyword = query.trim().toLowerCase();
     const draw = () => {
+      typeFilters.hidden = bookmarksMode;
       searchResults.replaceChildren();
       if (bookmarksMode) {
         let bookmarks = [];
@@ -206,23 +310,32 @@
       all.onclick = showBookmarks; searchResults.append(all);
       return;
       }
-      const matches = (searchableWorks || []).filter((work) => {
-      const text = [work.title, work.excerpt, work.category, ...(work.tags || [])].join(" ").toLowerCase();
-      return text.includes(keyword);
-    }).slice(0, 8);
+      const allMatches = [...localWorks(), ...(searchableWorks || [])].filter(work => {
+        const text = [work.title, work.excerpt, work.category, ...(work.tags || [])].join(' ').toLowerCase();
+        return (searchType === 'all' || (work.content_type || 'article') === searchType) && text.includes(keyword);
+      });
+      const matches = allMatches.slice(0, searchLimit);
+      const count = document.createElement('p'); count.className = 'site-search-caption';
+      count.textContent = `找到 ${allMatches.length} 项内容`; searchResults.append(count);
       if (!matches.length) {
       window.InkAssets?.state(searchResults, { title: '未寻得合卷内容', detail: `没有找到与“${keyword}”相关的内容，换个关键词试试。` });
       return;
       }
       matches.forEach((work) => {
       const link = document.createElement("a");
-      link.href = window.articleService?.articleUrl(work) || `./article.html?slug=${encodeURIComponent(work.slug)}`;
+      link.href = work.searchUrl || window.articleService?.articleUrl(work) || `./article.html?slug=${encodeURIComponent(work.slug)}`;
       link.innerHTML = `<span></span><strong></strong><small></small>`;
       link.querySelector("span").textContent = workTypeLabel(work);
       link.querySelector("strong").textContent = work.title;
       link.querySelector("small").textContent = work.category || "随笔";
       searchResults.appendChild(link);
       });
+      if (allMatches.length > searchLimit) {
+        const more = document.createElement('button'); more.type = 'button'; more.className = 'search-more';
+        more.textContent = `查看全部结果（${allMatches.length}）`;
+        more.onclick = () => { searchLimit = allMatches.length; renderSearchResults(searchInput.value); };
+        searchResults.append(more);
+      }
     };
 
     const reduced = reducedMotionQuery.matches;
@@ -263,22 +376,16 @@
     searchInput.value = "";
     bookmarksMode = false;
     bookmarksButton.setAttribute('aria-pressed', 'false');
-    searchInput.placeholder = '搜索文章、视频或标签……';
+    searchInput.placeholder = '搜索文章、视频、作品或标签……';
     renderSearchResults("");
     window.setTimeout(() => {
       searchDialog.classList.remove("is-opening");
       searchInput.focus({ preventScroll: true });
     }, reducedMotionQuery.matches ? 0 : 230);
-    if (searchableWorks === null && window.articleService?.configured) {
-      window.InkAssets?.loading(searchResults, '正在整理全站内容……', 1);
-      try {
-        searchableWorks = await window.articleService.listPublished();
-      } catch {
-        window.InkAssets?.state(searchResults, { kind: 'error', title: '寻卷暂时受阻', detail: '稍后再试一次。', action: '重新读取', onAction: openSearch });
-        return;
-      }
-      searchResults.removeAttribute('aria-busy');
-      renderSearchResults(searchInput.value);
+    searchLimit = 8;
+    if (searchableWorks === null) {
+      searchableWorks = window.ContentCache?.read('search')?.items || null;
+      void loadSearchContent();
     }
   }
 
@@ -312,7 +419,7 @@
   searchResults.addEventListener("click", (event) => {
     if (event.target.closest("a")) closeSearchAnimated();
   });
-  searchInput.addEventListener("input", () => renderSearchResults(searchInput.value));
+  searchInput.addEventListener("input", () => { searchLimit = 8; renderSearchResults(searchInput.value); });
   window.addEventListener("keydown", (event) => {
     const editing = /INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName || "");
     if (event.key === "/" && !editing && !event.ctrlKey && !event.metaKey && !event.altKey) {

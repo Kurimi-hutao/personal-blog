@@ -33,8 +33,8 @@ const server = http.createServer((req, res) => {
         await page.route('**/assets/fonts/**', async route => { await gate; await route.continue(); });
         await page.route(/https:\/\//, route => route.abort());
         await page.goto(origin, { waitUntil: 'domcontentloaded' });
-        await page.waitForTimeout(1500);
-        assert(await page.locator('.ink-site-loader:not(.is-leaving)').isVisible(), `loader must wait for fonts: ${width}/${reducedMotion}`);
+        await page.waitForTimeout(100);
+        assert(await page.locator('.ink-site-loader:not(.is-leaving)').isVisible(), `loader initially appears: ${width}/${reducedMotion}`);
         if (reducedMotion === 'no-preference') {
           assert.equal(await page.locator('.ink-site-loader__mark img').evaluate(el => getComputedStyle(el).animationIterationCount), 'infinite');
           const cdp = await context.newCDPSession(page);
@@ -42,7 +42,11 @@ const server = http.createServer((req, res) => {
           fs.writeFileSync(path.join(root, `screenshots/loading/waiting-${width}.png`), Buffer.from(shot.data, 'base64'));
           await cdp.detach();
         }
+        await page.locator('.ink-site-loader').waitFor({ state: 'detached', timeout: 1800 });
+        assert.equal(await page.evaluate(() => document.fonts.status), 'loading', 'slow fonts must not hold the page behind the loading seal');
+        assert.equal(await page.evaluate(() => document.documentElement.classList.contains('ink-site-loading')), false);
         release();
+        await page.evaluate(() => document.fonts.ready);
         await page.locator('.ink-site-loader').waitFor({ state: 'detached', timeout: 30000 });
         assert.equal(await page.evaluate(() => document.fonts.status), 'loaded');
         assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);

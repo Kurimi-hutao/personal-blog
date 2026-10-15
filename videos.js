@@ -99,7 +99,8 @@ function renderVideoDom(filtered) {
   videoList.removeAttribute('aria-busy');
   videoList.replaceChildren();
   if (!filtered.length) {
-    renderVideoState("未寻得合卷视频", "换一个关键词或分类再试试，新的影像会在这里归档。");
+    if (!videos.length) renderVideoState("第一段影像正在路上", "这里还没有发布的视频，值得留下的片刻会在这里归档。", 'empty');
+    else renderVideoState("未寻得合卷视频", "换一个关键词或分类再试试，新的影像会在这里归档。");
     return;
   }
   filtered.forEach((video) => videoList.appendChild(createVideoCard(video)));
@@ -120,6 +121,18 @@ function scheduleRenderVideos(delay = 150) {
   videoFilterTimer = window.setTimeout(() => renderVideos(), delay);
 }
 
+function renderVideoCategories() {
+  const selected = videoCategory.value;
+  videoCategory.querySelectorAll('option:not(:first-child)').forEach(option => option.remove());
+  [...new Set(videos.map(video => video.category).filter(Boolean))].forEach(category => {
+    const option = document.createElement('option'); option.value = category; option.textContent = category;
+    videoCategory.append(option);
+  });
+  videoCategory.value = selected;
+  window.MotionCore?.setupCustomSelects?.(document.querySelector('.article-filters'));
+  videoFiltersReady = true;
+}
+
 async function loadVideos() {
   if (!articleService.configured) {
     renderVideoState("视频卷宗暂未开启", "视频服务暂不可用，请稍后再来。", 'error');
@@ -127,20 +140,20 @@ async function loadVideos() {
   }
 
   try {
+    window.ContentCache?.clearNotice(videoList);
     window.InkAssets?.loading(videoList, '正在整理影像……');
     videos = await withTimeout(articleService.listPublished(null, { contentType: "video" }), "视频服务响应超时");
-    videoCategory.querySelectorAll("option:not(:first-child)").forEach((option) => option.remove());
-    [...new Set(videos.map((video) => video.category).filter(Boolean))].forEach((category) => {
-      const option = document.createElement("option");
-      option.value = category;
-      option.textContent = category;
-      videoCategory.appendChild(option);
-    });
-    window.MotionCore?.setupCustomSelects?.(document.querySelector(".article-filters"));
-    videoFiltersReady = true;
+    window.ContentCache?.write('videos', videos);
+    renderVideoCategories();
     renderVideos({ immediate: true });
   } catch (error) {
-    renderVideoState("视频读取暂时受阻", "雾还未散，稍后再试一次。", 'error');
+    const cached = window.ContentCache?.read('videos');
+    if (cached) {
+      videos = cached.items; renderVideoCategories(); renderVideos({ immediate: true });
+      window.ContentCache.notice(videoList, loadVideos, cached.savedAt);
+      return;
+    }
+    renderVideoState("视频读取暂时受阻", "连接暂时不可用，请重新读取。这不代表视频卷宗为空。", 'error');
   }
 }
 
