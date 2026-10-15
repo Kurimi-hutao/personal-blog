@@ -126,6 +126,7 @@
         inertBeforeMenu.clear();
       }
       mobileChromeController?.reset();
+      document.dispatchEvent(new CustomEvent('mobile-navigation-change', { detail: { open } }));
     };
     closeMobileNavigation = () => setMenuOpen(false);
     menuDismiss.onclick = () => { setMenuOpen(false); menuToggle.focus({ preventScroll: true }); };

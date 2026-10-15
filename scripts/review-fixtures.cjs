@@ -3,6 +3,18 @@ const content=['## 卷首 · 记一段山河','这是浏览器排版测试样本
 const records=Array.from({length:5},(_,i)=>({id:'review-'+i,slug:'review-'+i,title:['山行记：把聚窟洲的暮色写进一页纸里','未题封面的长卷：当一个标题跨过两行之后仍然需要保持清晰的阅读层次','风起山林，故人重逢','此间的慢时光','随记 · 拾一片落叶'][i],excerpt:'仅供本地视觉验收的测试内容。远山留白，近处落墨；记录游戏里的故事，也记住生活里慢下来的片刻。',content,category:i%2?'随笔':'永劫无间',tags:i%2?['生活']:['江湖','水墨'],published:true,published_at:'2026-09-20T12:00:00Z',created_at:'2026-09-20T12:00:00Z',view_count:128+i,like_count:8,favorite_count:2,content_type:'article',attachments:i===1?[]:[{url:'http://localhost:8000/assets/'+['ink-scroll.webp','ink-scroll.webp','kurumi-mountains.webp','kurumi-tiger.webp','ink-hero.webp'][i],type:'image/webp',name:'排版检查图'}]}));
 const videos=records.slice(0,4).map((r,i)=>({...r,id:'video-'+i,slug:'video-'+i,content_type:'video',title:['一振入江湖 · 山河有回响','未题封面的录像','聚窟洲的傍晚与一场久别重逢：长标题排版样本','风起之前'][i],attachments:[],video_poster:i===1?'':i===3?'http://localhost:8000/review-missing-poster.webp':records[i].attachments[0]?.url,video_url:'',duration_seconds:127,series_name:'江湖记事',episode_number:i+1}));
 async function installFixtures(context, { origin = "http://localhost:8000" } = {}){
+ // Optional file interception makes isolated reviews work without opening a local socket.
+ if(process.env.REVIEW_LOCAL_FILES==='1') {
+  const fs=require('node:fs'),path=require('node:path'),root=path.resolve(__dirname,'..');
+  const mime={'.html':'text/html','.js':'text/javascript','.css':'text/css','.json':'application/json','.woff2':'font/woff2','.svg':'image/svg+xml','.webp':'image/webp','.png':'image/png','.jpg':'image/jpeg'};
+  await context.route(origin+'/**',async route=>{
+   const pathname=decodeURIComponent(new URL(route.request().url()).pathname);
+   let file=path.resolve(root,'.'+pathname);
+   if(file!==root&&!file.startsWith(root+path.sep))return route.fulfill({status:403,body:'Forbidden'});
+   try {if(fs.statSync(file).isDirectory())file=path.join(file,'index.html');await route.fulfill({body:fs.readFileSync(file),contentType:mime[path.extname(file)]||'application/octet-stream'});}
+   catch {await route.fulfill({status:404,body:'Not found'});}
+  });
+ }
  let comments=[{id:'comment-review',article_id:'review-0',visitor_name:'本地验收',body:'测试评论，用于确认长文字、回复和按钮排版。'.repeat(4),created_at:'2026-09-20T12:00:00Z',attachments:[],like_count:2}];
  await context.route('**/rest/v1/**',async route=>{const req=route.request(),u=new URL(req.url());let data=[];
  if(u.pathname.endsWith('/articles')){const type=u.searchParams.get('content_type');let list=[...records,...videos].filter(r=>!type||'eq.'+r.content_type===type);const slug=u.searchParams.get('slug');data=slug?[...records,...videos].find(r=>'eq.'+r.slug===slug):list;if(!data)data=null;}

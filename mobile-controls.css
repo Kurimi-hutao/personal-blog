@@ -143,3 +143,14 @@
   .nav-utilities { grid-template-columns: repeat(4,minmax(0,1fr)); margin-top: 14px; padding-top: 4px; }
 }
 @media (prefers-reduced-motion:reduce) { :is(button,a) { transition: none !important; } }
+@media (max-width:1080px) and (prefers-reduced-motion:no-preference) {
+  .mobile-touch-pressed { opacity: .72; translate: 0 1px; }
+  .nav-utilities > button::before { transition: rotate 240ms ease,opacity 180ms ease; }
+  .nav-utilities > button:active::before { rotate: -8deg; }
+  :is(.tag-filter-list,.works-toolbar,.search-type-filters) button { position: relative; border-bottom-color: transparent !important; }
+  :is(.tag-filter-list,.works-toolbar,.search-type-filters) button::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: var(--cinnabar); transform: scaleX(0); transform-origin: left; transition: transform 220ms ease; }
+  :is(.tag-filter-list,.works-toolbar,.search-type-filters) button:is(.active,[aria-pressed="true"])::after { transform: scaleX(1); }
+  .motion-reveal { transition-duration: 420ms; filter: none; }
+  :is(.article-card,.article-list-card,.video-card,.home-video-card).motion-reveal:not(.is-visible):not(.visible) { transform: translateY(12px); }
+}
+@media (prefers-reduced-motion:reduce) { .mobile-touch-pressed { translate: none; } }

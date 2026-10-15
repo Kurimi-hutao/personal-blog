@@ -92,6 +92,13 @@
     refresh();
     say(urlInput.value ? '将使用此图片地址作为封面。' : '已恢复默认封面。');
   });
+  document.querySelectorAll('[data-library-cover]').forEach(button => {
+    button.addEventListener('click', () => {
+      urlInput.value = new URL(`./assets/mobile-publication/${button.dataset.libraryCover}`, location.href).href;
+      urlInput.dispatchEvent(new Event('input', { bubbles: true }));
+      say(`已选「${button.dataset.coverLabel}」，保存作品后生效。`);
+    });
+  });
   document.querySelector('#clearCover').addEventListener('click', () => {
     urlInput.value = '';
     urlInput.dispatchEvent(new Event('input', { bubbles: true }));

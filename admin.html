@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="./motion-core.css?v=20261015-touch-1" />
     <link rel="stylesheet" href="./lottie-core.css?v=20261010-loading-1" />
     <link rel="stylesheet" href="./article-pages.css?v=13" />
-    <link rel="stylesheet" href="./admin-cover.css?v=1" />
+    <link rel="stylesheet" href="./admin-cover.css?v=20261015-assets-4" />
     <script defer src="./assets/vendor/lottie-web/lottie_light-5.13.0.min.js"></script>
     <script defer src="./lottie-core.js?v=20261015"></script>
     <link rel="stylesheet" href="./layout-polish.css?v=20260929-1" />
@@ -24,8 +24,8 @@
     <link rel="stylesheet" href="./ink-assets.css?v=20261008-visual" />
     <link rel="stylesheet" href="./site-features.css?v=20261010-p1" />
     <link rel="stylesheet" href="./blog-refinements.css?v=20261015-editorial-1" />
-    <link rel="stylesheet" href="./mobile-editorial.css?v=20261015-publication-3" media="(max-width:1080px)" />
-    <link rel="stylesheet" href="./mobile-controls.css?v=20261015-publication-3" media="(max-width:1080px)" />
+    <link rel="stylesheet" href="./mobile-editorial.css?v=20261015-assets-4" media="(max-width:1080px)" />
+    <link rel="stylesheet" href="./mobile-controls.css?v=20261015-assets-4" media="(max-width:1080px)" />
   </head>
   <body class="inner-page" data-page="admin">
     <div class="paper-noise" aria-hidden="true"></div>
@@ -187,6 +187,13 @@
                 <div class="cover-controls">
                   <label><span>上传封面图片</span><input type="file" name="coverFile" accept="image/jpeg,image/png,image/webp" /><small>支持 JPG、PNG、WebP，最大 10 MB；建议使用横向图片。</small></label>
                   <label><span>或填写封面图片地址</span><input type="url" name="videoPoster" placeholder="https://example.com/cover.jpg" /></label>
+                  <details class="cover-library"><summary>从国风素材库选择</summary>
+                    <p>以下是概念插画，请选择与文章主题相符的封面。</p>
+                    <div class="cover-library-options">
+                      <button type="button" data-library-cover="article-cover-physics-concept.webp" data-cover-label="物理科普 · 概念插画"><img src="./assets/mobile-publication/article-cover-physics-concept.webp" width="192" height="108" loading="lazy" alt="淡墨色光学装置概念插画" /><span>物理科普</span></button>
+                      <button type="button" data-library-cover="article-cover-education-concept.webp" data-cover-label="教育与阅读 · 概念插画"><img src="./assets/mobile-publication/article-cover-education-concept.webp" width="192" height="108" loading="lazy" alt="书本与纸张的阅读主题概念插画" /><span>教育与阅读</span></button>
+                    </div>
+                  </details>
                   <p id="coverStatus" role="status">上传图片或从视频取帧后，可在此预览。</p>
                 </div>
               </div>
@@ -227,9 +234,9 @@
     <script src="./ink-assets.js?v=20261008-visual"></script>
     <script src="./content-cache.js?v=20261015"></script>
     <script src="./works-data.js?v=20261015"></script>
-    <script src="./theme.js?v=20261015-editorial-1"></script>
+    <script src="./theme.js?v=20261015-assets-4"></script>
     <script src="./motion-core.js?v=20261015-editorial-1"></script>
-    <script src="./admin-cover.js?v=1"></script>
+    <script src="./admin-cover.js?v=20261015-assets-4"></script>
     <script src="./admin.js?v=20261007-1"></script>
   </body>
 </html>

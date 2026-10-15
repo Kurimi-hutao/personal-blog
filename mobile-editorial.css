@@ -246,3 +246,12 @@
   .home-page .article-card h3 { text-wrap: pretty; }
   .article-detail-meta time { color: var(--ink-soft); }
 }
+
+/* Supplied 02 artwork is composed for this mobile cover. */
+@media (max-width:900px) {
+  .home-page .hero-art { opacity: 1; object-position: center 72%; }
+  .home-page .spring-night { background: url('./assets/mobile-publication/homepage-night-02.webp') center 72% / cover no-repeat; }
+  .home-page .hero::after { background: linear-gradient(0deg,var(--paper),transparent 20%),linear-gradient(90deg,color-mix(in srgb,var(--paper) 24%,transparent),transparent 75%); }
+  .site-header .site-nav::after { background-image: url('./assets/mobile-publication/homepage-day-02.webp'); background-position: center 80%; }
+  html[data-theme="dark"] .site-header .site-nav::after { background-image: url('./assets/mobile-publication/homepage-night-02.webp'); }
+}
