@@ -309,7 +309,19 @@
         caption.textContent = `我的收藏 · ${matches.length} / ${bookmarks.length} 篇（当前浏览器）`;
         searchResults.append(caption);
         if (!matches.length) {
-          const empty = document.createElement('p'); empty.textContent = keyword ? '没有匹配的收藏，试试其他关键词。' : '还没有收藏，阅读时点击“收藏此卷”即可加入。'; searchResults.append(empty);
+          const empty = document.createElement('div'); empty.className = 'bookmark-empty';
+          const image = document.createElement('img'); image.src = new URL('assets/journey-ink/g1-bookmarks-empty.webp', scriptBase).href;
+          image.alt = ''; image.width = 180; image.height = 120;
+          const title = document.createElement('strong'); title.textContent = bookmarks.length ? '这一卷，尚未寻得' : '书箧尚空，等一卷心头好';
+          const copy = document.createElement('p'); copy.textContent = bookmarks.length ? '试试其他关键词，或查看全部收藏。' : '阅读文章时点击“收藏此卷”，下次便能在这里重逢。';
+          const browse = document.createElement('a'); browse.href = './articles.html'; browse.textContent = '去文章里逛逛 →';
+          empty.append(image, title, copy);
+          if (keyword) {
+            const clear = document.createElement('button'); clear.type = 'button'; clear.textContent = '清空关键词';
+            clear.onclick = () => { searchInput.value = ''; searchInput.focus(); renderSearchResults(''); };
+            empty.append(clear);
+          }
+          empty.append(browse); searchResults.append(empty);
         }
         matches.forEach(item => {
           const row = document.createElement('div'); row.className = 'bookmark-row';
@@ -331,6 +343,7 @@
       } catch {}
       if (!bookmarks.length) {
         window.InkAssets?.state(searchResults, { title: '翻开一卷江湖', detail: '输入关键词开始搜索，也可以使用上方快捷入口。' });
+        const browse = document.createElement('a'); browse.className = 'search-browse'; browse.href = './articles.html'; browse.textContent = '先去翻翻文章 →'; searchResults.append(browse);
         return;
       }
       const heading = document.createElement("p");
@@ -356,7 +369,7 @@
       const count = document.createElement('p'); count.className = 'site-search-caption';
       count.textContent = `找到 ${allMatches.length} 项内容`; searchResults.append(count);
       if (!matches.length) {
-      window.InkAssets?.state(searchResults, { title: '未寻得合卷内容', detail: `没有找到与“${keyword}”相关的内容，换个关键词试试。` });
+      window.InkAssets?.state(searchResults, { title: '未寻得合卷内容', detail: `没有找到与“${keyword}”相关的内容，换个关键词试试。`, action: '清空关键词', onAction: () => { searchInput.value = ''; searchInput.focus(); renderSearchResults(''); } });
       return;
       }
       matches.forEach((work) => {

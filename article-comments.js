@@ -52,7 +52,10 @@
     context.hidden = !form.elements.parentId.value;
     if (context.hidden) return;
     const target = comments.find(c => c.id === id);
-    context.querySelector('span').textContent = target ? `回复 ${target.visitor_name}：${(target.body || '图片').slice(0,60)}` : '正在回复此楼';
+    const copy = context.querySelector('span');
+    const body = (target?.body || '图片').replace(/\s+/g, ' ');
+    copy.textContent = target ? `回复 ${target.visitor_name}：${body.slice(0,60)}${body.length > 60 ? '…' : ''}` : '正在回复此楼';
+    copy.title = target ? `回复 ${target.visitor_name}：${body}` : '';
   }
   function updateComposer() {
     form.querySelector('[type=submit]').disabled = busy || (!form.elements.body.value.trim() && !files.length);

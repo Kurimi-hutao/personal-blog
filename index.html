@@ -29,6 +29,7 @@
     <link rel="stylesheet" href="./blog-refinements.css?v=20261015-editorial-1" />
     <link rel="stylesheet" href="./mobile-editorial.css?v=20261015-assets-4" media="(max-width:1080px)" />
     <link rel="stylesheet" href="./mobile-controls.css?v=20261015-assets-4" media="(max-width:1080px)" />
+    <link rel="stylesheet" href="./journey-ink.css?v=20261016-1" />
   </head>
   <body class="home-page" data-page="home">
     <div class="paper-noise" aria-hidden="true"></div>
@@ -57,7 +58,7 @@
         <a href="./videos.html" data-nav-page="videos">视频</a>
         <a href="./works.html" data-nav-page="works">作品</a>
         <a href="./kurumi.html" data-nav-page="kurumi">胡桃绘卷</a>
-        <a href="#links" data-nav-page="links">江湖去处</a>
+        <a href="#links" data-nav-page="links">江湖驿站</a>
         <a href="#about" data-nav-page="about">侠客志</a>
         <a href="#message" data-nav-page="message">留墨</a>
       </nav>
@@ -166,20 +167,26 @@
       <section class="section links-section" id="links">
         <div class="section-heading reveal">
           <div><h2>江湖驿站</h2></div>
-          <p>视频、工具与创作入口，按需展开。</p>
+          <p>常去的几处，先放在手边。</p>
         </div>
+        <picture class="station-scene" aria-hidden="true">
+          <source media="(max-width:600px)" srcset="./assets/journey-ink/c2-station-mobile.webp" />
+          <img src="./assets/journey-ink/c1-station-desktop.webp" alt="" width="1800" height="600" loading="lazy" />
+        </picture>
+        <div class="station-favorites" id="stationFavorites" aria-label="常用入口"></div>
         <div class="links-collapsible" id="linksCollapsible" hidden>
-        <div class="friend-group reveal">
-          <div class="friend-group-heading">
+        <details class="friend-group">
+          <summary class="friend-group-heading">
+            <img class="station-category-art" src="./assets/journey-ink/small/d1-station-category-video.webp" srcset="./assets/journey-ink/small/d1-station-category-video.webp 112w, ./assets/journey-ink/d1-station-category-video.webp 384w" sizes="72px" alt="" width="72" height="72" loading="lazy" />
             <div><span>01</span><h3>视频平台</h3></div>
-            <p>长视频、短视频与影视内容</p>
-          </div>
+            <span class="station-group-note">8 处 · 展开</span>
+          </summary>
           <div class="friend-grid">
             <a class="friend-card" style="--brand:#00aeec" href="https://space.bilibili.com/432932431" target="_blank" rel="noopener noreferrer">
               <span class="friend-logo"><img src="./assets/brands/bilibili.ico" alt="" width="36" height="36" loading="lazy" /></span>
               <span><strong>哔哩哔哩</strong><small>视频社区与创作平台</small></span><i>↗</i>
             </a>
-            <a class="friend-card" style="--brand:#fe2c55" href="https://www.douyin.com/user/self?from_tab_name=main" target="_blank" rel="noopener noreferrer">
+            <a class="friend-card" style="--brand:#fe2c55" href="https://www.douyin.com/" target="_blank" rel="noopener noreferrer">
               <span class="friend-logo"><img src="./assets/brands/douyin.ico" alt="" width="36" height="36" loading="lazy" /></span>
               <span><strong>抖音</strong><small>短视频与直播平台</small></span><i>↗</i>
             </a>
@@ -208,13 +215,14 @@
               <span><strong>快手</strong><small>短视频与生活社区</small></span><i>↗</i>
             </a>
           </div>
-        </div>
+        </details>
 
-        <div class="friend-group reveal">
-          <div class="friend-group-heading">
+        <details class="friend-group">
+          <summary class="friend-group-heading">
+            <img class="station-category-art" src="./assets/journey-ink/small/d2-station-category-tools.webp" srcset="./assets/journey-ink/small/d2-station-category-tools.webp 112w, ./assets/journey-ink/d2-station-category-tools.webp 384w" sizes="72px" alt="" width="72" height="72" loading="lazy" />
             <div><span>02</span><h3>AI 工具</h3></div>
-            <p>对话、研究、创作与编程助手</p>
-          </div>
+            <span class="station-group-note">7 处 · 展开</span>
+          </summary>
           <div class="friend-grid">
             <a class="friend-card" style="--brand:#10a37f" href="https://chatgpt.com/" target="_blank" rel="noopener noreferrer">
               <span class="friend-logo"><img src="./assets/brands/chatgpt.svg" alt="" width="36" height="36" loading="lazy" /></span>
@@ -245,13 +253,14 @@
               <span><strong>豆包</strong><small>字节跳动 AI 创作助手</small></span><i>↗</i>
             </a>
           </div>
-        </div>
+        </details>
 
-        <div class="friend-group reveal">
-          <div class="friend-group-heading">
+        <details class="friend-group">
+          <summary class="friend-group-heading">
+            <img class="station-category-art" src="./assets/journey-ink/small/d3-station-category-creation.webp" srcset="./assets/journey-ink/small/d3-station-category-creation.webp 112w, ./assets/journey-ink/d3-station-category-creation.webp 384w" sizes="72px" alt="" width="72" height="72" loading="lazy" />
             <div><span>03</span><h3>AI 音视频创作</h3></div>
-            <p>视频生成、视觉创作与智能配音</p>
-          </div>
+            <span class="station-group-note">4 处 · 展开</span>
+          </summary>
           <div class="friend-grid">
             <a class="friend-card" style="--brand:#6c55ff" href="https://kling.ai/" target="_blank" rel="noopener noreferrer">
               <span class="friend-logo"><img src="./assets/brands/kling.ico" alt="" width="36" height="36" loading="lazy" /></span>
@@ -270,9 +279,10 @@
               <span><strong>Fish Audio</strong><small>AI 配音、声音克隆与音频生成</small></span><i>↗</i>
             </a>
           </div>
+        </details>
+        <button class="station-collapse" id="linksCollapseBottom" type="button">收起分类入口 ↑</button>
         </div>
-        </div>
-        <button class="links-toggle reveal" id="linksToggle" type="button" aria-expanded="false" aria-controls="linksCollapsible">展开全部入口</button>
+        <button class="links-toggle reveal" id="linksToggle" type="button" aria-expanded="false" aria-controls="linksCollapsible">按分类找去处 ↓</button>
       </section>
 
       <section class="about-section" id="about">
@@ -286,21 +296,25 @@
           <p>喜欢土御门胡桃，也喜欢春桃笑。这里收藏游戏中的片刻、生活里的微光，以及一些没来得及说完的话。胜负交给下一局，故事留在这一页。</p>
           <div class="traits" aria-label="个人标签"><span>永劫无间</span><span>土御门胡桃</span><span>水墨创作</span></div>
           <blockquote>“刀未必接得住，桃花总能接住。”</blockquote>
+          <div class="journey-memory"><img src="./assets/journey-ink/e1-travel-memory-bookmark.webp" alt="" width="96" height="128" loading="lazy" /><p>胜负交给下一局，故事留在这一页。</p></div>
         </div>
       </section>
 
       <details class="achievement-section" id="achievements">
-        <summary>桃林签到 <span>查看我的江湖成就</span></summary>
+        <summary><span>桃林签到</span><span>到访足迹与江湖成就</span></summary>
+        <div class="achievement-layout">
         <div class="achievement-copy reveal">
           <h2>今日到访</h2>
           <p>每日来桃林留下一枚脚印，连续签到可以解锁新的江湖称号。</p>
           <button class="ink-button" id="checkinButton" type="button">今日签到</button>
           <p class="achievement-status" id="achievementStatus" role="status">正在查看你的江湖履历……</p>
+          <ol class="checkin-trail" id="checkinTrail" aria-label="连续七日足迹"></ol>
         </div>
         <div class="achievement-cards reveal" id="achievementCards">
-          <article><strong>初入江湖</strong><span>完成首次签到</span></article>
-          <article><strong>桃林常客</strong><span>连续签到 3 天</span></article>
-          <article><strong>风雨故人</strong><span>累计签到 7 天</span></article>
+          <article><img src="./assets/journey-ink/small/a1-achievement-first-steps.webp" srcset="./assets/journey-ink/small/a1-achievement-first-steps.webp 96w, ./assets/journey-ink/a1-achievement-first-steps.webp 384w" sizes="80px" alt="" width="80" height="80" loading="lazy" /><div><strong>初入江湖</strong><span>完成首次签到</span><small class="achievement-progress">尚未解锁 · 0 / 1 天</small></div></article>
+          <article><img src="./assets/journey-ink/small/a2-achievement-peach-regular.webp" srcset="./assets/journey-ink/small/a2-achievement-peach-regular.webp 96w, ./assets/journey-ink/a2-achievement-peach-regular.webp 384w" sizes="80px" alt="" width="80" height="80" loading="lazy" /><div><strong>桃林常客</strong><span>连续签到 3 天</span><small class="achievement-progress">尚未解锁 · 0 / 3 天</small></div></article>
+          <article><img src="./assets/journey-ink/small/a3-achievement-weathered-traveler.webp" srcset="./assets/journey-ink/small/a3-achievement-weathered-traveler.webp 96w, ./assets/journey-ink/a3-achievement-weathered-traveler.webp 384w" sizes="80px" alt="" width="80" height="80" loading="lazy" /><div><strong>风雨故人</strong><span>累计签到 7 天</span><small class="achievement-progress">尚未解锁 · 0 / 7 天</small></div></article>
+        </div>
         </div>
       </details>
 
@@ -335,7 +349,7 @@
     <dialog class="fortune-dialog" id="fortuneDialog" aria-labelledby="fortuneTitle">
       <div class="fortune-scroll">
         <button class="fortune-close" type="button" aria-label="收起今日运势">×</button>
-        <span class="fortune-knot" aria-hidden="true"></span>
+        <img class="fortune-knot" src="./assets/journey-ink/b2-fortune-cinnabar-knot.webp" alt="" width="54" height="108" loading="lazy" />
         <header>
           <p>桃林灵签 · 今日运势</p>
           <time id="fortuneDate"></time>
@@ -367,9 +381,9 @@
     <script defer src="./ink-assets.js?v=20261010-comments-1"></script>
     <script defer src="./content-cache.js?v=20261015"></script>
     <script defer src="./works-data.js?v=20261015"></script>
-    <script defer src="./theme.js?v=20261015-assets-4"></script>
+    <script defer src="./theme.js?v=20261016-journey-1"></script>
     <script defer src="./motion-core.js?v=20261015-editorial-1"></script>
-    <script defer src="./script.js?v=20261015-touch-1"></script>
+    <script defer src="./script.js?v=20261016-journey-1"></script>
     <script defer src="./motion-home.js?v=20261008-visual"></script>
     <script defer src="./mobile-interactions.js?v=20261015-assets-4"></script>
   </body>

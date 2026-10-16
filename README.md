@@ -24,6 +24,10 @@ node scripts/import-next-generation.mjs "原项目路径/dist"
 
 导入脚本复制构建文件、接入返回导航并更新作品封面。原项目需保持 Vite 的 `base: "./"`，以兼容博客域名及 GitHub Pages 子路径。`.download/` 为本地下载和构建临时目录，不需要部署。
 
+## 双端交互与行旅美术
+
+2026-10-16 接入 A–H 行旅素材：签到成就与七日进度、运势签纸绳结、驿站昼间小景和分类器物、书签、收藏书箧与小屋坐垫。驿站保留六个常用入口，其他入口按分类展开。修复运势大字换行、短屏关闭操作与手机回复引用挤压，统一搜索纸页样式。复查记录见 `docs/journey-ink-validation-20261016.md`；运行 `node scripts/check-journey-ink.cjs` 可执行离线浏览器回归检查。
+
 ## 配置网站数据
 
 1. 创建一个 Supabase 项目。

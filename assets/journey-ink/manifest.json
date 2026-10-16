@@ -1,0 +1,467 @@
+{
+  "project": "joestarzhang.cn",
+  "source_document": "双端界面审美检查与素材生成清单-20261016.md",
+  "created": "2026-10-16",
+  "asset_count": 17,
+  "assets": [
+    {
+      "id": "A1",
+      "name_zh": "初入江湖｜草鞋与桃瓣",
+      "filename": "a1-achievement-first-steps",
+      "source": "a_detailed_painterly_ink_wash_style_illustration_1.png",
+      "original_px": [
+        1254,
+        1254
+      ],
+      "delivery_png_px": [
+        768,
+        768
+      ],
+      "webp_px": [
+        384,
+        384
+      ],
+      "small_webp_px": [
+        96,
+        96
+      ],
+      "alpha": true,
+      "original_png_sha256": "dd71b8ce6bedd3acc664cf2cd271d5d3234a4239a4d0fbb2b857400392e99de3",
+      "size_ready_png_bytes": 807092,
+      "size_webp_bytes": 64382,
+      "size_small_bytes": 6432
+    },
+    {
+      "id": "A2",
+      "name_zh": "桃林常客｜竹制水壶与桃枝",
+      "filename": "a2-achievement-peach-regular",
+      "source": "a_detailed_high_resolution_watercolor_ink_style_i_2_batch_1.png",
+      "original_px": [
+        1254,
+        1254
+      ],
+      "delivery_png_px": [
+        768,
+        768
+      ],
+      "webp_px": [
+        384,
+        384
+      ],
+      "small_webp_px": [
+        96,
+        96
+      ],
+      "alpha": true,
+      "original_png_sha256": "d09295d16a12e6520d0286c8d7609da932c833ae558eae6d01d82efe6862126f",
+      "size_ready_png_bytes": 705224,
+      "size_webp_bytes": 63826,
+      "size_small_bytes": 6878
+    },
+    {
+      "id": "A3",
+      "name_zh": "风雨故人｜斗笠与收拢的油纸伞",
+      "filename": "a3-achievement-weathered-traveler",
+      "source": "a_detailed_watercolor_ink_style_illustration_on_a_3_batch_2.png",
+      "original_px": [
+        1254,
+        1254
+      ],
+      "delivery_png_px": [
+        768,
+        768
+      ],
+      "webp_px": [
+        384,
+        384
+      ],
+      "small_webp_px": [
+        96,
+        96
+      ],
+      "alpha": true,
+      "original_png_sha256": "00daf3bd72c217ed78922293227c80df40cdeeee1353c189d8a92f83acf325c1",
+      "size_ready_png_bytes": 745335,
+      "size_webp_bytes": 64030,
+      "size_small_bytes": 6952
+    },
+    {
+      "id": "B1",
+      "name_zh": "运势｜旧签纸底",
+      "filename": "b1-fortune-paper",
+      "source": "a_clean_isolated_png_transparent_background_image_8.png",
+      "original_px": [
+        1024,
+        1536
+      ],
+      "delivery_png_px": [
+        1200,
+        1800
+      ],
+      "webp_px": [
+        600,
+        900
+      ],
+      "small_webp_px": [
+        300,
+        450
+      ],
+      "alpha": true,
+      "original_png_sha256": "416815574cae86c287c2884575d71e91c1b011c62d97995a65be9f39a3c6b9d4",
+      "size_ready_png_bytes": 3046846,
+      "size_webp_bytes": 83664,
+      "size_small_bytes": 23940
+    },
+    {
+      "id": "B2",
+      "name_zh": "运势｜暗朱砂棉绳结与短穗",
+      "filename": "b2-fortune-cinnabar-knot",
+      "source": "a_high_resolution_isolated_transparent_background_5_batch_4.png",
+      "original_px": [
+        887,
+        1774
+      ],
+      "delivery_png_px": [
+        512,
+        1024
+      ],
+      "webp_px": [
+        256,
+        512
+      ],
+      "small_webp_px": [
+        128,
+        256
+      ],
+      "alpha": true,
+      "original_png_sha256": "57bec73858492ed7a7ead4d057391ee51721dad28eacfe6b828906472af11146",
+      "size_ready_png_bytes": 322469,
+      "size_webp_bytes": 34638,
+      "size_small_bytes": 11570
+    },
+    {
+      "id": "C1",
+      "name_zh": "江湖驿站｜桌面端横幅",
+      "filename": "c1-station-desktop",
+      "source": "wide_panoramic_ink_wash_watercolor_style_backgro_6_batch_5.png",
+      "original_px": [
+        2172,
+        724
+      ],
+      "delivery_png_px": [
+        1800,
+        600
+      ],
+      "webp_px": [
+        1200,
+        400
+      ],
+      "small_webp_px": [
+        900,
+        300
+      ],
+      "alpha": true,
+      "original_png_sha256": "3e0fc5eafc3df22d1288d54104138b2e531c5b88f11b2c1eb411aaafa3f2413f",
+      "size_ready_png_bytes": 1559808,
+      "size_webp_bytes": 196404,
+      "size_small_bytes": 110096
+    },
+    {
+      "id": "C2",
+      "name_zh": "江湖驿站｜手机端局部小景",
+      "filename": "c2-station-mobile",
+      "source": "a_wide_horizontal_painterly_ink_wash_illustratio_7_batch_6.png",
+      "original_px": [
+        1774,
+        887
+      ],
+      "delivery_png_px": [
+        1000,
+        500
+      ],
+      "webp_px": [
+        800,
+        400
+      ],
+      "small_webp_px": [
+        500,
+        250
+      ],
+      "alpha": true,
+      "original_png_sha256": "f371628dbb0b00d7e10c472c3eaeb0a09884bb189c1b99a423bb69c16cd5f3c7",
+      "size_ready_png_bytes": 930719,
+      "size_webp_bytes": 187778,
+      "size_small_bytes": 78810
+    },
+    {
+      "id": "D1",
+      "name_zh": "驿站分类｜视频·皮影戏幕与灯",
+      "filename": "d1-station-category-video",
+      "source": "a_detailed_watercolor_ink_style_still_life_illustr_1_batch_1.png",
+      "original_px": [
+        1254,
+        1254
+      ],
+      "delivery_png_px": [
+        768,
+        768
+      ],
+      "webp_px": [
+        384,
+        384
+      ],
+      "small_webp_px": [
+        112,
+        112
+      ],
+      "alpha": true,
+      "original_png_sha256": "ea175f2f6e3a8def116ca1bb4f4fac216de324b4a0c19d1378ca7cd937f46d90",
+      "size_ready_png_bytes": 733015,
+      "size_webp_bytes": 53100,
+      "size_small_bytes": 7226
+    },
+    {
+      "id": "D2",
+      "name_zh": "驿站分类｜AI工具·无字札记与算筹",
+      "filename": "d2-station-category-tools",
+      "source": "a_clean_transparent_background_illustration_in_the_2_batch_2.png",
+      "original_px": [
+        1254,
+        1254
+      ],
+      "delivery_png_px": [
+        768,
+        768
+      ],
+      "webp_px": [
+        384,
+        384
+      ],
+      "small_webp_px": [
+        112,
+        112
+      ],
+      "alpha": true,
+      "original_png_sha256": "91c392c5d5d081ad811a3f7fb4bdd3a4961ea09ffc33e1fb188e0e205da0813e",
+      "size_ready_png_bytes": 851803,
+      "size_webp_bytes": 53200,
+      "size_small_bytes": 7386
+    },
+    {
+      "id": "D3",
+      "name_zh": "驿站分类｜创作·小砚笔与刻刀",
+      "filename": "d3-station-category-creation",
+      "source": "a_detailed_watercolor_ink_style_illustration_on_a_3_batch_3.png",
+      "original_px": [
+        1254,
+        1254
+      ],
+      "delivery_png_px": [
+        768,
+        768
+      ],
+      "webp_px": [
+        384,
+        384
+      ],
+      "small_webp_px": [
+        112,
+        112
+      ],
+      "alpha": true,
+      "original_png_sha256": "07724f4ea5cacb8a99224b8454c134866722e3a121435096b2f5dc7efa6c474e",
+      "size_ready_png_bytes": 654615,
+      "size_webp_bytes": 44292,
+      "size_small_bytes": 5956
+    },
+    {
+      "id": "E1",
+      "name_zh": "个人行旅｜无字旧书签（暂用样本）",
+      "filename": "e1-travel-memory-bookmark",
+      "source": "a_single_detailed_illustration_on_a_transparent_ba_4_batch_4.png",
+      "original_px": [
+        1254,
+        1254
+      ],
+      "delivery_png_px": [
+        1000,
+        1000
+      ],
+      "webp_px": [
+        500,
+        500
+      ],
+      "small_webp_px": [
+        200,
+        200
+      ],
+      "alpha": true,
+      "original_png_sha256": "55dbe08347c9ac0bfedbffbc940fc828c3369b1116cb5eed58b4c15f5abb9589",
+      "size_ready_png_bytes": 1103215,
+      "size_webp_bytes": 82618,
+      "size_small_bytes": 17884
+    },
+    {
+      "id": "F1",
+      "name_zh": "胡桃小屋｜椭圆布坐垫",
+      "filename": "f1-hut-cushion",
+      "source": "a_single_isolated_painterly_illustration_on_a_tr_5_batch_5.png",
+      "original_px": [
+        1774,
+        887
+      ],
+      "delivery_png_px": [
+        1024,
+        512
+      ],
+      "webp_px": [
+        512,
+        256
+      ],
+      "small_webp_px": [
+        320,
+        160
+      ],
+      "alpha": true,
+      "original_png_sha256": "3eb5b899b6438ccf12ebdc4ffe02d40f7edd1bedc3c5abeb0c006adbdc4bd84a",
+      "size_ready_png_bytes": 770000,
+      "size_webp_bytes": 44542,
+      "size_small_bytes": 18900
+    },
+    {
+      "id": "F2",
+      "name_zh": "胡桃小屋｜柔和椭圆接触影",
+      "filename": "f2-hut-contact-shadow",
+      "source": "a_clean_minimal_software_graphics_asset_image_a_6_batch_6.png",
+      "original_px": [
+        1774,
+        887
+      ],
+      "delivery_png_px": [
+        1024,
+        512
+      ],
+      "webp_px": [
+        512,
+        256
+      ],
+      "small_webp_px": [
+        320,
+        160
+      ],
+      "alpha": true,
+      "original_png_sha256": "9e514746e7a44e98d9f53d4cbc3acc926a30179d93eded1e7f185e4a33c93530",
+      "size_ready_png_bytes": 99843,
+      "size_webp_bytes": 13650,
+      "size_small_bytes": 6666
+    },
+    {
+      "id": "G1",
+      "name_zh": "收藏空状态｜竹编书箧",
+      "filename": "g1-bookmarks-empty",
+      "source": "a_detailed_watercolor_ink_style_illustration_on_a_7_batch_7.png",
+      "original_px": [
+        1536,
+        1024
+      ],
+      "delivery_png_px": [
+        900,
+        600
+      ],
+      "webp_px": [
+        600,
+        400
+      ],
+      "small_webp_px": [
+        160,
+        110
+      ],
+      "alpha": true,
+      "original_png_sha256": "28cac5cdd06b4b9fbb51b550bad3771a1ae288259a232f3c1feba2ed5274c58c",
+      "size_ready_png_bytes": 681680,
+      "size_webp_bytes": 75294,
+      "size_small_bytes": 8094
+    },
+    {
+      "id": "H1",
+      "name_zh": "笔触分隔｜干笔断续",
+      "filename": "h1-divider-drybrush",
+      "source": "a_minimal_transparent_background_graphic_image_a_8_batch_8.png",
+      "original_px": [
+        2172,
+        724
+      ],
+      "delivery_png_px": [
+        1600,
+        200
+      ],
+      "webp_px": [
+        1200,
+        150
+      ],
+      "small_webp_px": [
+        800,
+        100
+      ],
+      "alpha": true,
+      "original_png_sha256": "5ae3a1eba6b2df2ed806f2ad787b228e2b02daae9e7aedec7a2e39158daf0c19",
+      "size_ready_png_bytes": 89356,
+      "size_webp_bytes": 23620,
+      "size_small_bytes": 11150
+    },
+    {
+      "id": "H2",
+      "name_zh": "笔触分隔｜回锋",
+      "filename": "h2-divider-return-stroke",
+      "source": "a_clean_transparent_background_png_like_image_of_a_9_batch_9.png",
+      "original_px": [
+        2172,
+        724
+      ],
+      "delivery_png_px": [
+        1600,
+        200
+      ],
+      "webp_px": [
+        1200,
+        150
+      ],
+      "small_webp_px": [
+        800,
+        100
+      ],
+      "alpha": true,
+      "original_png_sha256": "0890f78e8deed6023364cac56e34d5cc51869876c1f38ece52f261085957f0e6",
+      "size_ready_png_bytes": 75809,
+      "size_webp_bytes": 19664,
+      "size_small_bytes": 9682
+    },
+    {
+      "id": "H3",
+      "name_zh": "笔触分隔｜淡墨晕散",
+      "filename": "h3-divider-ink-wash",
+      "source": "a_clean_minimal_digital_transparent_background_pn_10_batch_10.png",
+      "original_px": [
+        2172,
+        724
+      ],
+      "delivery_png_px": [
+        1600,
+        200
+      ],
+      "webp_px": [
+        1200,
+        150
+      ],
+      "small_webp_px": [
+        800,
+        100
+      ],
+      "alpha": true,
+      "original_png_sha256": "0702ba54d91e02d9c47270701d4d14f3024738b57e82bee4d2aee9e55523077c",
+      "size_ready_png_bytes": 121599,
+      "size_webp_bytes": 27416,
+      "size_small_bytes": 13524
+    }
+  ]
+}

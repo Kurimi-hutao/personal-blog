@@ -252,6 +252,19 @@ function renderAchievements(result) {
   cards[0]?.classList.toggle("unlocked", total >= 1);
   cards[1]?.classList.toggle("unlocked", streak >= 3);
   cards[2]?.classList.toggle("unlocked", total >= 7);
+  [Math.min(total, 1), Math.min(streak, 3), Math.min(total, 7)].forEach((value, index) => {
+    const goal = [1, 3, 7][index];
+    const label = cards[index]?.querySelector('.achievement-progress');
+    if (label) label.textContent = `${value >= goal ? '已解锁' : '尚未解锁'} · ${value} / ${goal} 天`;
+  });
+  const trail = document.querySelector('#checkinTrail');
+  if (trail) trail.replaceChildren(...Array.from({ length: 7 }, (_, index) => {
+    const day = document.createElement('li');
+    day.className = index < Math.min(streak, 7) ? 'visited' : '';
+    day.textContent = String(index + 1);
+    day.setAttribute('aria-label', `第 ${index + 1} 日${day.className ? '，已达成' : '，待达成'}`);
+    return day;
+  }));
   document.querySelector("#achievementStatus").textContent =
     `累计签到 ${total} 天 · 当前连续 ${streak} 天`;
   const button = document.querySelector("#checkinButton");
@@ -356,6 +369,7 @@ function showFortune() {
   renderList("#fortuneBad", fortune.bad);
 
   if (!dialog.open) dialog.showModal();
+  dialog.scrollTop = 0;
   if (hasGsap && !reducedMotion) {
     gsap.fromTo(
       ".fortune-scroll",
@@ -377,9 +391,10 @@ function showFortune() {
 async function setupAchievements() {
   const button = document.querySelector("#checkinButton");
   if (!button) return;
-  const cached = JSON.parse(localStorage.getItem("hutao-achievement-state") || "null");
-  if (cached) renderAchievements(cached);
-  else document.querySelector("#achievementStatus").textContent = "尚未签到，今天就从第一步开始。";
+  let cached = null;
+  try { cached = JSON.parse(localStorage.getItem("hutao-achievement-state") || "null"); } catch {}
+  renderAchievements(cached);
+  if (!cached) document.querySelector("#achievementStatus").textContent = "尚未签到，今天就从第一步开始。";
   if (articleService.checkedInToday()) {
     button.textContent = "查看今日运势";
   }
@@ -851,13 +866,31 @@ function setupLinksToggle() {
   const section = document.querySelector(".links-section");
   const button = document.querySelector("#linksToggle");
   if (!section || !button) return;
-  button.addEventListener("click", () => {
-    const open = !section.classList.contains("is-expanded");
-    section.classList.toggle("is-expanded", open);
-    document.querySelector("#linksCollapsible").hidden = !open;
-    button.setAttribute("aria-expanded", String(open));
-    button.textContent = open ? "收起入口" : "展开全部入口";
+  const panel = document.querySelector('#linksCollapsible');
+  const favorites = document.querySelector('#stationFavorites');
+  if (favorites) {
+    const groups = [...panel.querySelectorAll('.friend-group')];
+    favorites.replaceChildren(...groups.flatMap(group => [...group.querySelectorAll('.friend-card')].slice(0, 2).map(link => link.cloneNode(true))));
+  }
+  panel.querySelectorAll('.friend-group').forEach(group => {
+    group.addEventListener('toggle', () => {
+      const count = group.querySelectorAll('.friend-card').length;
+      group.querySelector('.station-group-note').textContent = `${count} 处 · ${group.open ? '收起' : '展开'}`;
+    });
   });
+  const setExpanded = (open, returnFocus = false) => {
+    section.classList.toggle("is-expanded", open);
+    panel.hidden = !open;
+    button.setAttribute("aria-expanded", String(open));
+    button.textContent = open ? "收起分类入口 ↑" : "按分类找去处 ↓";
+    if (!open) panel.querySelectorAll('details').forEach(group => group.open = false);
+    if (returnFocus) {
+      button.focus({ preventScroll: true });
+      section.scrollIntoView({ behavior: reducedMotion ? 'instant' : 'smooth', block: 'start' });
+    }
+  };
+  button.addEventListener('click', () => setExpanded(panel.hidden));
+  document.querySelector('#linksCollapseBottom')?.addEventListener('click', () => setExpanded(false, true));
 }
 
 if (hasGsap) {
