@@ -1,0 +1,31 @@
+name: Frontend interaction regressions
+
+on:
+  push:
+    branches:
+      - main
+      - 'fix/**'
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  lifecycle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify ink loading, navigation and service worker
+        run: node --test scripts/check-motion-lifecycle.cjs
+      - name: Install browser test runtime
+        run: |
+          npm install --no-save --ignore-scripts --no-package-lock playwright@1.57.0
+          npx playwright install --with-deps chromium
+      - name: Verify desktop and mobile interactions in Chromium
+        run: node scripts/check-motion-browser.cjs

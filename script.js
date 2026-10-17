@@ -865,32 +865,75 @@ function setupInkHoverEffects() {
 function setupLinksToggle() {
   const section = document.querySelector(".links-section");
   const button = document.querySelector("#linksToggle");
-  if (!section || !button) return;
-  const panel = document.querySelector('#linksCollapsible');
-  const favorites = document.querySelector('#stationFavorites');
+  const panel = document.querySelector("#linksCollapsible");
+  if (!section || !button || !panel) return;
+  const favorites = document.querySelector("#stationFavorites");
   if (favorites) {
-    const groups = [...panel.querySelectorAll('.friend-group')];
-    favorites.replaceChildren(...groups.flatMap(group => [...group.querySelectorAll('.friend-card')].slice(0, 2).map(link => link.cloneNode(true))));
+    const groups = [...panel.querySelectorAll(".friend-group")];
+    favorites.replaceChildren(...groups.flatMap(group => [...group.querySelectorAll(".friend-card")].slice(0, 2).map(link => link.cloneNode(true))));
   }
-  panel.querySelectorAll('.friend-group').forEach(group => {
-    group.addEventListener('toggle', () => {
-      const count = group.querySelectorAll('.friend-card').length;
-      group.querySelector('.station-group-note').textContent = `${count} 处 · ${group.open ? '收起' : '展开'}`;
+  panel.querySelectorAll(".friend-group").forEach(group => {
+    group.addEventListener("toggle", () => {
+      const count = group.querySelectorAll(".friend-card").length;
+      group.querySelector(".station-group-note").textContent = `${count} 处 · ${group.open ? "收起" : "展开"}`;
     });
   });
+
+  let expanded = !panel.hidden;
+  let activeTransition = null;
+  const resetPanel = () => {
+    panel.style.removeProperty("height");
+    panel.style.removeProperty("overflow");
+    panel.style.removeProperty("opacity");
+  };
+  const closeGroups = () => panel.querySelectorAll("details").forEach(group => { group.open = false; });
+
   const setExpanded = (open, returnFocus = false) => {
+    // Use explicit state so rapid clicks cannot race the closing animation.
+    expanded = open;
     section.classList.toggle("is-expanded", open);
-    panel.hidden = !open;
     button.setAttribute("aria-expanded", String(open));
     button.textContent = open ? "收起分类入口 ↑" : "按分类找去处 ↓";
-    if (!open) panel.querySelectorAll('details').forEach(group => group.open = false);
+    panel.inert = !open;
+
+    const previousHeight = panel.hidden ? 0 : panel.getBoundingClientRect().height;
+    activeTransition?.cancel();
+    activeTransition = null;
+
+    if (reducedMotion || typeof panel.animate !== "function") {
+      panel.hidden = !open;
+      resetPanel();
+      if (!open) closeGroups();
+    } else {
+      panel.hidden = false;
+      panel.style.height = `${previousHeight}px`;
+      panel.style.overflow = "hidden";
+      const nextHeight = open ? panel.scrollHeight : 0;
+      const animation = panel.animate([
+        { height: `${previousHeight}px`, opacity: open ? 0.6 : 1 },
+        { height: `${nextHeight}px`, opacity: open ? 1 : 0.6 },
+      ], {
+        duration: open ? 260 : 220,
+        easing: "cubic-bezier(.22, 1, .36, 1)",
+        fill: "forwards",
+      });
+      activeTransition = animation;
+      animation.finished.then(() => {
+        if (activeTransition !== animation) return;
+        activeTransition = null;
+        animation.cancel();
+        panel.hidden = !open;
+        resetPanel();
+        if (!open) closeGroups();
+      }).catch(() => {}); // Expected for an interrupted animation.
+    }
     if (returnFocus) {
       button.focus({ preventScroll: true });
-      section.scrollIntoView({ behavior: reducedMotion ? 'instant' : 'smooth', block: 'start' });
+      button.scrollIntoView({ behavior: reducedMotion ? "instant" : "smooth", block: "nearest" });
     }
   };
-  button.addEventListener('click', () => setExpanded(panel.hidden));
-  document.querySelector('#linksCollapseBottom')?.addEventListener('click', () => setExpanded(false, true));
+  button.addEventListener("click", () => setExpanded(!expanded));
+  document.querySelector("#linksCollapseBottom")?.addEventListener("click", () => setExpanded(false, true));
 }
 
 if (hasGsap) {
