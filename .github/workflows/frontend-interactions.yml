@@ -15,7 +15,7 @@ permissions:
 jobs:
   lifecycle:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -23,3 +23,9 @@ jobs:
           node-version: '22'
       - name: Verify ink loading, navigation and service worker
         run: node --test scripts/check-motion-lifecycle.cjs
+      - name: Install browser test runtime
+        run: |
+          npm install --no-save --ignore-scripts --no-package-lock playwright@1.57.0
+          npx playwright install --with-deps chromium
+      - name: Verify desktop and mobile interactions in Chromium
+        run: node scripts/check-motion-browser.cjs
