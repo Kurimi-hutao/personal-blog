@@ -7,6 +7,7 @@
   const reduceQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
   const animationCache = new Map();
   const instances = new Set();
+  const introSessionKey = "hutao-site-intro-seen-v1";
   const config = {
     inkLoading: "ink-drop-loading.json",
   };
@@ -94,8 +95,24 @@
     await document.fonts.ready;
   }
 
+  function shouldShowSiteLoader() {
+    if (isReduced()) return false;
+    // One intro per tab, shared by all pages. Mark before asynchronous work.
+    try {
+      if (sessionStorage.getItem(introSessionKey) === "1") return false;
+      sessionStorage.setItem(introSessionKey, "1");
+    } catch {
+      // In storage-restricted contexts the page still remains usable.
+    }
+    return true;
+  }
+
   async function setupSiteLoader() {
     if (!document.body) return;
+    if (!shouldShowSiteLoader()) {
+      void fontsReady().catch(() => {});
+      return;
+    }
     const loader = document.createElement("div");
     loader.className = "ink-site-loader";
     loader.setAttribute("role", "status");
@@ -118,7 +135,10 @@
     loader.classList.add("is-leaving");
     document.documentElement.classList.remove('ink-site-loading');
     await new Promise((resolve) => {
+      let completed = false;
       const finish = () => {
+        if (completed) return;
+        completed = true;
         window.clearTimeout(timer);
         loader.remove();
         resolve();
@@ -126,7 +146,7 @@
       const timer = window.setTimeout(finish, 280);
       loader.addEventListener("transitionend", (event) => {
         if (event.target === loader && event.propertyName === "opacity") finish();
-      });
+      }, { once: true });
     });
   }
 
