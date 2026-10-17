@@ -1,4 +1,4 @@
-const CACHE_NAME = "hutao-journey-ink-20261016-1";
+const CACHE_NAME = "hutao-motion-lifecycle-20261017-1";
 // Install only the offline fallback. Artwork, fonts and page modules are cached
 // on demand, so a home visit never downloads the pet room or other pages.
 const APP_SHELL = ["./offline.html"];
@@ -34,14 +34,14 @@ self.addEventListener("fetch", event => {
       try { return await update(); }
       catch { return cached || await cache.match("./offline.html") || Response.error(); }
     }
-    // Reuse downloaded fonts/artwork immediately; refresh scripts/styles in
-    // the background. Versioned URLs and cache rotation carry asset updates.
-    if (cached) {
-      if (request.destination === "script" || request.destination === "style") {
-        event.waitUntil(update().catch(() => {}));
-      }
-      return cached;
+    // Scripts/styles are network-first to avoid stale handlers with fresh HTML.
+    // The cached response (including its version query) remains an offline fallback.
+    if (request.destination === "script" || request.destination === "style") {
+      try { return await update(); }
+      catch { return cached || Response.error(); }
     }
+    // Fonts and artwork remain cache-first.
+    if (cached) return cached;
     try { return await update(); } catch { return Response.error(); }
   })());
 });
