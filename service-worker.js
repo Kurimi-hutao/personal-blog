@@ -1,4 +1,4 @@
-const CACHE_NAME = "hutao-mobile-botanicals-20261018-1";
+const CACHE_NAME = "hutao-mobile-wuxia-20261018-v3";
 // Install only the offline fallback. Artwork, fonts and page modules are cached
 // on demand, so a home visit never downloads the pet room or other pages.
 const APP_SHELL = ["./offline.html"];
@@ -45,3 +45,6 @@ self.addEventListener("fetch", event => {
     try { return await update(); } catch { return Response.error(); }
   })());
 });
+
+
+

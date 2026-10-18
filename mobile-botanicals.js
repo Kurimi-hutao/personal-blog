@@ -4,8 +4,10 @@
   const reduced = matchMedia('(prefers-reduced-motion:reduce)');
   const scenes = new Set();
   let suspended = false;
+  let motionPaused = false;
+  try { motionPaused = localStorage.getItem('hutao-wuxia-paused') === '1'; } catch {}
   const random = (a,b) => a + Math.random() * (b-a);
-  const active = scene => compact.matches && !reduced.matches && !document.hidden && !suspended && scene.visible && !document.body.classList.contains('mobile-nav-open') && !document.querySelector('dialog[open]');
+  const active = scene => compact.matches && !reduced.matches && !motionPaused && !navigator.connection?.saveData && !document.hidden && !suspended && scene.visible && !document.body.classList.contains('mobile-nav-open') && !document.querySelector('dialog[open]');
 
   function sync(scene) {
     const playing = active(scene);
@@ -75,6 +77,8 @@
   reduced.addEventListener('change',refresh);
   document.addEventListener('visibilitychange',refresh);
   document.addEventListener('mobile-navigation-change',refresh);
+  document.addEventListener('mobile-illustration-motion-change',event=>{motionPaused=event.detail.paused;refresh();});
+  navigator.connection?.addEventListener('change',refresh);
   new MutationObserver(refresh).observe(document.body,{attributes:true,attributeFilter:['class']});
   new MutationObserver(records => { if(records.some(r=>r.target.matches('dialog'))) refresh(); }).observe(document.body,{attributes:true,subtree:true,attributeFilter:['open']});
   window.addEventListener('pagehide',()=>{suspended=true;refresh();});
