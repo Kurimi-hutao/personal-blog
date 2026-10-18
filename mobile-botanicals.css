@@ -1,0 +1,23 @@
+/* Small transparent botanical layers, clipped to each mobile chapter head. */
+.mobile-peach-garden { display: none; }
+@media (max-width:900px) {
+  .mobile-peach-host { position: relative; isolation: isolate; }
+  .mobile-peach-garden { display: block; position: absolute; inset: 0 -20px 0 0; overflow: clip; pointer-events: none; user-select: none; z-index: 1; }
+  .home-page .hero > .mobile-peach-garden { top: calc(66px + var(--mobile-safe-top)); right: 0; }
+  .mobile-peach-branch { position: absolute; top: -6px; right: -20px; width: clamp(180px,54vw,250px); height: auto; max-width: none; transform-origin: 98% 5%; opacity: .9; }
+  .mobile-peach-host.scene-banner > :not(.mobile-peach-garden) { position: relative; z-index: 2; }
+  .mobile-peach-host.scene-banner .mobile-peach-branch { width: clamp(160px,48vw,220px); top: -14px; opacity: .78; }
+  .article-detail-header > .mobile-peach-garden { top: -32px; bottom: auto; height: 72px; }
+  .article-detail-header .mobile-peach-branch { width: 146px; top: -12px; opacity: .65; }
+  .article-detail-header > :not(.mobile-peach-garden) { position: relative; z-index: 2; }
+  .mobile-peach-fall { position: absolute; inset: 0; overflow: clip; pointer-events: none; }
+  .mobile-peach-petal { position: absolute; top: 0; right: 0; width: 9px; height: 13px; border-radius: 80% 12% 70% 28%; background: radial-gradient(ellipse at 30% 25%,#f7d2c5 5%,#e7a29c 62%,#cb7b7c); opacity: 0; }
+  .mobile-peach-petal::after { content: ''; position: absolute; inset: 20% 40% 16% 45%; background: #bd737333; border-radius: 50%; transform: rotate(-20deg); }
+  .mobile-peach-petal:nth-child(3n) { border-radius: 35% 75% 20% 75%; }
+  html[data-theme="dark"] .mobile-peach-branch { filter: brightness(.76) saturate(.72); }
+  html[data-theme="dark"] .mobile-peach-petal { filter: brightness(.8) saturate(.8); }
+  body.mobile-nav-open .mobile-peach-garden { visibility: hidden; }
+}
+@media (prefers-reduced-motion:reduce) {
+  .mobile-peach-fall { display: none; }
+}
