@@ -42,6 +42,24 @@
     return (article.attachments || []).find((file) => file.type?.startsWith("image/"));
   }
 
+  const coverBase = new URL('.', document.currentScript.src);
+  const defaultCovers = [
+    'assets/ink-scroll.webp',
+    'assets/mobile-publication/article-cover-education-concept.webp',
+    'assets/mobile-publication/article-cover-physics-concept.webp',
+    'assets/hutao-entry-shanshui.webp',
+  ];
+  function fallbackCover(article) {
+    // A distributed choice tied to the article: filtering and revisiting never shuffle it.
+    const key = String(article.id || article.slug || article.title || 'untitled');
+    let hash = 2166136261;
+    for (const char of key) hash = Math.imul(hash ^ char.codePointAt(0), 16777619) >>> 0;
+    return { url: new URL(defaultCovers[hash % defaultCovers.length], coverBase).href, type: 'image/webp' };
+  }
+  function articleCover(article) {
+    return (article.attachments || []).find(file => file.role === 'cover' && file.type?.startsWith('image/')) || firstImage(article) || fallbackCover(article);
+  }
+
   function isSchemaMismatch(error) {
     return /column .* does not exist|schema cache|could not find|deleted_at|pinned|series_name|duration_seconds/i.test(error?.message || "");
   }
@@ -601,6 +619,8 @@
     contentLabel,
     isOwner,
     firstImage,
+    articleCover,
+    fallbackCover,
     getVisitorToken,
     listPublished,
     getPublished,

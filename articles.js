@@ -57,7 +57,7 @@ function createListCard(article) {
   link.className = "article-list-card reveal";
   link.href = articleService.articleUrl(article);
 
-  const cover = articleService.firstImage(article);
+  const cover = articleService.articleCover(article);
   const visual = document.createElement("div");
   visual.className = `article-list-cover ${cover ? "" : "placeholder-cover"}`;
   if (cover) {
@@ -65,6 +65,7 @@ function createListCard(article) {
     image.src = cover.url;
     image.alt = "";
     image.loading = "lazy";
+    image.addEventListener('error', () => { image.src = articleService.fallbackCover(article).url; }, { once: true });
     visual.appendChild(image);
   } else {
     visual.innerHTML = '<span aria-hidden="true">文</span>';

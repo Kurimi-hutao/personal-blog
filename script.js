@@ -65,7 +65,7 @@ function revealInsertedCards(container) {
 
 function createHomepageArticleCard(article, index) {
   const card = document.createElement("article");
-  const cover = articleService.firstImage(article);
+  const cover = articleService.articleCover(article);
   card.className = `article-card ${index === 0 ? "featured" : ""} reveal`;
 
   const visual = document.createElement("div");
@@ -75,7 +75,7 @@ function createHomepageArticleCard(article, index) {
     image.src = cover.url;
     image.alt = "";
     image.loading = "lazy";
-    image.addEventListener("error", () => image.remove());
+    image.addEventListener("error", () => { image.src = articleService.fallbackCover(article).url; }, { once: true });
     visual.appendChild(image);
   } else if (index === 0) {
     const mountain = document.createElement("div");

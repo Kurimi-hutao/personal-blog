@@ -1,3 +1,15 @@
+/* Desktop cards give the entire image a wide frame above the copy. */
+@media (min-width: 901px) {
+  .home-page .article-card, .home-page .article-card.featured {
+    display: flex; flex-direction: column; grid-column: auto; min-height: 0;
+  }
+  .home-page .article-card .card-visual {
+    width: 100%; aspect-ratio: 16 / 9; height: auto; min-height: 0; flex: none;
+  }
+  .home-page .card-visual.article-cover > img { object-fit: contain; }
+  .home-page .article-card .card-content { flex: 1; padding: 26px 30px; }
+  .home-page .article-card h3 { font-size: clamp(24px,2vw,32px); }
+}
 /* Round glass playback controls on both desktop and mobile. */
 :is(.home-page .home-video-card, .video-card) .media-play-button,
 :is(.home-page .home-video-card, .video-card):hover .media-play-button {

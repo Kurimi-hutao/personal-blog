@@ -39,13 +39,13 @@ fs.mkdirSync(out, {recursive: true});
         await page.locator('#latestArticles .article-card').first().waitFor();
         await page.waitForFunction(() => document.querySelector('#latestArticles .article-card:not(.static-fallback)'));
         if (width === 1440 && process.env.REVIEW_OVERLAY) {
-          const geometry = () => [...document.querySelectorAll('#articles .article-card, #articles .card-visual, #articles .card-content, #links .friend-card')].map(e => {
+          const geometry = () => [...document.querySelectorAll('#links .friend-card')].map(e => {
             const r = e.getBoundingClientRect(), s = getComputedStyle(e);
             return [r.x,r.y,r.width,r.height,s.fontSize,s.backgroundColor];
           });
           const before = await page.evaluate(geometry);
           await page.locator('link[href*="mobile-redesign.css"]').evaluate(e => e.disabled = true);
-          assert.deepEqual(await page.evaluate(geometry), before, 'mobile-only designs changed desktop geometry');
+          assert.deepEqual(await page.evaluate(geometry), before, 'mobile station design changed desktop geometry');
           await page.locator('link[href*="mobile-redesign.css"]').evaluate(e => e.disabled = false);
         }
         if (width <= 1080) {
