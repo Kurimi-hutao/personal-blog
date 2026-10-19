@@ -11,6 +11,36 @@ function setMeta(name, content, property = false) {
   element.content = content;
 }
 
+
+/**
+ * Convert an approved Bilibili video page/player URL into its official embed URL.
+ * The browser connects to Bilibili directly; no media bytes pass through our host.
+ */
+function getBilibiliEmbedUrl(rawUrl) {
+  if (typeof rawUrl !== "string") return null;
+  try {
+    const source = new URL(rawUrl);
+    if (source.protocol !== "https:") return null;
+    const pageHost = ["www.bilibili.com", "bilibili.com", "m.bilibili.com"].includes(source.hostname);
+    const playerHost = source.hostname === "player.bilibili.com";
+    if (!pageHost && !playerHost) return null;
+
+    const match = pageHost && source.pathname.match(/^\/video\/(BV[a-zA-Z0-9]{10})(?:\/|$)/);
+    const bvid = match?.[1] || (playerHost && source.pathname === "/player.html" ? source.searchParams.get("bvid") : null);
+    if (!bvid || !/^BV[a-zA-Z0-9]{10}$/.test(bvid)) return null;
+
+    const embed = new URL("https://player.bilibili.com/player.html");
+    embed.searchParams.set("bvid", bvid);
+    embed.searchParams.set("autoplay", "0");
+    embed.searchParams.set("danmaku", "0");
+    const page = source.searchParams.get("p");
+    if (page && /^[1-9]\d{0,2}$/.test(page)) embed.searchParams.set("p", page);
+    return embed.toString();
+  } catch {
+    return null;
+  }
+}
+
 function renderArticle(article) {
   const root = document.querySelector("#articleDetail");
   root.replaceChildren();
@@ -48,16 +78,40 @@ function renderArticle(article) {
   const body = document.createElement("div");
   body.className = "article-body";
   if (article.content_type === "video") {
-    const player = document.createElement("video");
-    player.className = "work-video-player";
-    player.controls = true;
-    player.preload = "metadata";
-    player.playsInline = true;
-    player.src = article.video_url;
-    if (article.video_poster) player.poster = article.video_poster;
-    player.setAttribute("aria-label", article.title);
-    body.appendChild(player);
-    setupVideoExperience(player, article);
+    const embedUrl = getBilibiliEmbedUrl(article.video_url);
+    if (embedUrl) {
+      const iframe = document.createElement("iframe");
+      iframe.className = "work-video-player work-video-player--embed";
+      iframe.src = embedUrl;
+      iframe.title = `哔哩哔哩播放器：${article.title}`;
+      iframe.loading = "lazy";
+      iframe.allow = "fullscreen; autoplay; picture-in-picture";
+      iframe.allowFullscreen = true;
+      body.appendChild(iframe);
+
+      const info = document.createElement("div");
+      info.className = "video-playback-info";
+      const note = document.createElement("span");
+      note.textContent = "视频由哔哩哔哩直接播放，本站不代理视频流；站内不统计此播放器的完播进度。";
+      const origin = document.createElement("a");
+      origin.href = article.video_url;
+      origin.target = "_blank";
+      origin.rel = "noopener noreferrer";
+      origin.textContent = "前往哔哩哔哩观看";
+      info.append(note, origin);
+      body.appendChild(info);
+    } else {
+      const player = document.createElement("video");
+      player.className = "work-video-player";
+      player.controls = true;
+      player.preload = "metadata";
+      player.playsInline = true;
+      player.src = article.video_url;
+      if (article.video_poster) player.poster = article.video_poster;
+      player.setAttribute("aria-label", article.title);
+      body.appendChild(player);
+      setupVideoExperience(player, article);
+    }
     const description = document.createElement("div");
     description.className = "video-description";
     description.innerHTML = window.blogMarkdown.render(article.content || article.excerpt);
