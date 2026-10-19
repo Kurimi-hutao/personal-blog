@@ -520,6 +520,7 @@ function beginEdit(article) {
   renderExistingAttachments(article);
   updateEditorMode();
   renderMarkdownPreview();
+  window.BilibiliCover?.schedule();
   switchPanel("editorWorkPanel");
   articleForm.scrollIntoView({ behavior: "smooth", block: "start" });
 }
@@ -942,10 +943,16 @@ articleForm.addEventListener("submit", async (event) => {
     return;
   }
 
-  let coverSelection;
-  try { coverSelection = window.adminCover.selection(); }
-  catch (error) { setStatus(error.message, true); return; }
   savingWork = true;
+  let coverSelection;
+  try {
+    await window.BilibiliCover?.resolve();
+    coverSelection = window.adminCover.selection();
+  } catch (error) {
+    savingWork = false;
+    setStatus(error.message, true);
+    return;
+  }
   articleForm.inert = true;
   clearTimeout(autosaveTimer);
   const savedDraftKey = draftKey();
