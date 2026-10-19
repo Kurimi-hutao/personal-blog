@@ -17,7 +17,8 @@
         date: "2026-09",
         demo: "./zhengshen-atlas/",
         demoLabel: "进入图鉴",
-        cover: "./zhengshen-atlas/hero.png",
+        cover: "./assets/works/atlas-cover-1280.webp",
+        coverSrcset: "./assets/works/atlas-cover-640.webp 640w, ./assets/works/atlas-cover-1280.webp 1280w",
       },
       {
         title: "下一代，来信了",

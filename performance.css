@@ -1,0 +1,8 @@
+/* Reserve the final geometry while published content and enhancements arrive. */
+.article-detail-shell, .article-page-shell { min-height: 100svh; }
+.works-toolbar { min-height: 44px; }
+.works-grid:empty { min-height: 100svh; }
+.filter-summary:has(#tagFilters) { min-height: 44px; }
+@media (max-width: 900px) {
+  .filter-summary:has(#tagFilters) { min-height: 86px; }
+}
