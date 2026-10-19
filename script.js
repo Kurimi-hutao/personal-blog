@@ -182,10 +182,15 @@ function createHomepageVideoCard(video) {
   const poster = video.video_poster || articleService.firstImage(video)?.url;
   if (poster) {
     const image = document.createElement("img");
+    image.referrerPolicy = "no-referrer";
     image.src = poster;
     image.alt = "";
     image.loading = "lazy";
-    image.addEventListener("error", () => image.remove());
+    image.addEventListener("error", async () => {
+      const restored = await articleService.resolveBilibiliThumbnail(video);
+      if (restored && image.src !== restored) image.src = restored;
+      else image.remove();
+    });
     visual.appendChild(image);
   }
   const play = document.createElement("span");
