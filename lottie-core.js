@@ -7,6 +7,7 @@
   const reduceQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
   const animationCache = new Map();
   const instances = new Set();
+  let enginePromise;
   const introSessionKey = "hutao-site-intro-seen-v1";
   const config = {
     inkLoading: "ink-drop-loading.json",
@@ -45,8 +46,23 @@
     return animationCache.get(name);
   }
 
+  function loadEngine() {
+    if (window.lottie) return Promise.resolve();
+    if (!enginePromise) {
+      enginePromise = new Promise((resolve, reject) => {
+        const engine = document.createElement('script');
+        engine.src = asset('./assets/vendor/lottie-web/lottie_light-5.13.0.min.js');
+        engine.onload = resolve;
+        engine.onerror = () => { enginePromise = null; engine.remove(); reject(new Error('Lottie engine could not load')); };
+        document.head.append(engine);
+      });
+    }
+    return enginePromise;
+  }
+
   async function createAnimation(container, options = {}) {
-    if (!container || isReduced() || typeof window.lottie === "undefined") return null;
+    if (!container || isReduced()) return null;
+    await loadEngine();
     const data = options.animationData || await loadData(options.name);
     if (!container.isConnected || isReduced()) return null;
     const instance = window.lottie.loadAnimation({
@@ -126,7 +142,8 @@
     document.body.prepend(loader);
     document.documentElement.classList.add('ink-site-loading');
 
-    // Show readable fallback text after a short budget, even on slow font requests.
+    // Keep the original seal timing and bounded font wait. This module now
+    // starts at the beginning of body rather than after all page modules.
     await Promise.all([
       withTimeout(fontsReady().catch(() => {}), 900),
       withTimeout(loader.querySelector('img').decode().catch(() => {}), 780),

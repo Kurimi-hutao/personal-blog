@@ -1,6 +1,7 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="light">
   <head>
+    <script id="theme-bootstrap">try{document.documentElement.dataset.theme=localStorage.getItem('hutao-theme')==='dark'?'dark':'light'}catch{}</script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="description" content="胡桃小屋：会呼吸、眨眼、跟随光标并回应互动的 Live2D 桌面宠物。" />
@@ -13,11 +14,10 @@
     <link rel="stylesheet" href="./pet.css?v=20261010-loading-1" />
     <link rel="stylesheet" href="./motion-core.css?v=20261015-touch-1" />
     <link rel="stylesheet" href="./lottie-core.css?v=20261010-loading-1" />
-    <script defer src="./assets/vendor/lottie-web/lottie_light-5.13.0.min.js"></script>
-    <script defer src="./lottie-core.js?v=20261017-motion-1"></script>
+
     <link rel="stylesheet" href="./ink-system.css?v=20260928-2" />
     <link rel="stylesheet" href="./layout-polish.css?v=20260929-1" />
-    <link rel="stylesheet" href="./site-footer.css?v=20261007-1" />
+    <link rel="stylesheet" href="./site-footer.css?v=20261019-perf-1" />
     <script defer src="./site-footer.js?v=20261007-1"></script>
       <link rel="icon" href="./assets/visual-refresh/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" sizes="32x32" href="./assets/visual-refresh/favicon-32.png" />
@@ -31,6 +31,7 @@
     <link rel="stylesheet" href="./journey-ink.css?v=20261016-1" />
   </head>
   <body class="pet-page pet-entry-active" data-page="pet" data-nav-parent="works">
+    <script src="./lottie-core.js?v=20261019-perf-1"></script>
     <div class="pet-entry" id="petEntry" aria-label="正在进入胡桃小屋" aria-live="polite">
       <div class="pet-entry-landscape" aria-hidden="true"></div>
       <div class="pet-entry-mist pet-entry-mist-back" aria-hidden="true"></div>
@@ -198,7 +199,7 @@
     <script src="./assets/vendor/pixi-live2d-display.min.js"></script>
     <script src="./ink-assets.js?v=20261008-visual"></script>
     <script src="./content-cache.js?v=20261015"></script>
-    <script src="./works-data.js?v=20261015"></script>
+    <script src="./works-data.js?v=20261019-perf-1"></script>
     <script src="./theme.js?v=20261016-journey-1"></script>
     <script src="./pet-rig.js?v=20261009-room"></script>
     <script src="./pet-voices.js?v=20261009-game-2"></script>

@@ -1,37 +1,21 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="light">
   <head>
+    <script id="theme-bootstrap">try{document.documentElement.dataset.theme=localStorage.getItem('hutao-theme')==='dark'?'dark':'light'}catch{}</script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="description" content="虎桃不会振刀的作品卷宗，整理站内可确认的网页、Live2D 与视觉实验作品。" />
     <link rel="manifest" href="./manifest.webmanifest" />
     <title>作品卷宗 | 虎桃不会振刀</title>
-    <link rel="stylesheet" href="./fonts-headings.css?v=20261015" />
-    <link rel="stylesheet" href="./styles.css?v=20260928" />
-    <link rel="stylesheet" href="./motion-core.css?v=20261015-touch-1" />
-    <link rel="stylesheet" href="./lottie-core.css?v=20261010-loading-1" />
-    <link rel="stylesheet" href="./works.css?v=20260927" />
-    <script defer src="./assets/vendor/lottie-web/lottie_light-5.13.0.min.js"></script>
-    <script defer src="./lottie-core.js?v=20261017-motion-1"></script>
-    <link rel="stylesheet" href="./ink-system.css?v=20260928-2" />
-    <link rel="stylesheet" href="./page-scenes.css?v=20260929-1" />
-    <link rel="stylesheet" href="./layout-polish.css?v=20260929-1" />
-    <link rel="stylesheet" href="./site-footer.css?v=20261007-1" />
+    <link rel="preload" as="image" href="./assets/works/atlas-cover-1280.webp" imagesrcset="./assets/works/atlas-cover-640.webp 640w, ./assets/works/atlas-cover-1280.webp 1280w" imagesizes="(max-width: 900px) calc(100vw - 62px), (max-width: 1244px) calc(100vw - 64px), 1180px" fetchpriority="high" />
+    <link rel="stylesheet" href="./page-works.bundle.css?v=b7f5f3fc434a" />
     <script defer src="./site-footer.js?v=20261007-1"></script>
       <link rel="icon" href="./assets/visual-refresh/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" sizes="32x32" href="./assets/visual-refresh/favicon-32.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="./assets/visual-refresh/home-icon-180.png" />
-    <link rel="stylesheet" href="./ink-assets.css?v=20261008-visual" />
-    <link rel="stylesheet" href="./site-features.css?v=20261010-p1" />
-    <link rel="stylesheet" href="./blog-refinements.css?v=20261015-editorial-1" />
-    <link rel="stylesheet" href="./mobile-editorial.css?v=20261015-assets-4" media="(max-width:1080px)" />
-    <link rel="stylesheet" href="./mobile-controls.css?v=20261015-assets-4" media="(max-width:1080px)" />
-    <link rel="stylesheet" href="./journey-ink.css?v=20261016-1" />
-    <link rel="stylesheet" href="./mobile-reference.css?v=20261018-1" media="(max-width:900px)" />
-    <link rel="stylesheet" href="./mobile-botanicals.css?v=20261019-ink" media="(max-width:900px)" />
-    <link rel="stylesheet" href="./mobile-wuxia.css?v=20261019-clarity" media="(max-width:900px)" />
   </head>
   <body class="inner-page works-page" data-page="works">
+    <script src="./lottie-core.js?v=20261019-perf-1"></script>
     <div class="paper-noise" aria-hidden="true"></div>
     <header class="site-header scrolled" data-site-header>
       <a class="brand" href="./index.html" aria-label="返回首页">
@@ -54,7 +38,7 @@
     </header>
 
     <main>
-      <section class="works-hero scene-banner">
+      <section class="works-hero scene-banner wuxia-chapter">
         <div>
           <p class="eyebrow">造物有记 · 作品卷宗</p>
           <h1>作品卷宗</h1>
@@ -77,15 +61,12 @@
     <footer><p>© 2026 虎桃不会振刀</p><a href="./admin.html">站长入口</a></footer>
     <script src="./ink-assets.js?v=20261008-visual"></script>
     <script src="./content-cache.js?v=20261015"></script>
-    <script src="./works-data.js?v=20261015"></script>
+    <script src="./works-data.js?v=20261019-perf-1"></script>
     <script src="./theme.js?v=20261016-journey-1"></script>
     <script src="./motion-core.js?v=20261015-editorial-1"></script>
-    <script src="./works.js?v=20261015"></script>
+    <script src="./works.js?v=20261019-perf-1"></script>
     <script defer src="./mobile-interactions.js?v=20261015-assets-4"></script>
     <script defer src="./mobile-botanicals.js?v=20261019-ink"></script>
     <script defer src="./mobile-wuxia.js?v=20261019-clarity"></script>
   </body>
 </html>
-
-
-
