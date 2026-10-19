@@ -266,6 +266,15 @@
     if (error) throw error;
   }
 
+  async function fetchBilibiliCover(bvid) {
+    if (!/^BV[a-zA-Z0-9]{10}$/.test(bvid)) throw new Error("无效的 B站 BV 号");
+    const { data, error } = await requireClient().functions.invoke("bilibili-cover", {
+      body: { bvid },
+    });
+    if (error || !data?.coverUrl) throw new Error("B站封面暂时无法获取，请手动填写封面链接");
+    return data;
+  }
+
   async function uploadVideo(file, userId) {
     const cleanName = file.name.replace(/[^\w.\-]+/g, "-") || "video";
     const path = `${userId}/${crypto.randomUUID()}-${cleanName}`;
@@ -580,6 +589,7 @@
     signOut,
     uploadFiles,
     removeFiles,
+    fetchBilibiliCover,
     uploadVideo,
     removeVideo,
     publishArticle,

@@ -17,10 +17,12 @@
   let processing = false;
   let savedAttachments = [];
   let attachmentPreviewUrl = '';
+  let manuallyChosen = false;
 
   function say(text, error = false) { status.textContent = text; status.classList.toggle('error', error); }
   function draftChanged() { form.dispatchEvent(new Event('input', { bubbles: true })); }
   function show(url) {
+    preview.referrerPolicy = 'no-referrer';
     preview.hidden = !url;
     placeholder.hidden = Boolean(url);
     if (url) preview.src = url;
@@ -56,6 +58,7 @@
     localFile = fileFromData(data);
     localData = data;
     savedCover = null;
+    manuallyChosen = true;
     urlInput.value = '';
     show(data);
     say(message);
@@ -88,6 +91,7 @@
     localFile = null;
     localData = '';
     savedCover = null;
+    manuallyChosen = Boolean(urlInput.value.trim());
     fileInput.value = '';
     refresh();
     say(urlInput.value ? '将使用此图片地址作为封面。' : '已恢复默认封面。');
@@ -176,7 +180,30 @@
   form.elements.videoUrl.addEventListener('input', unloadVideo);
   window.addEventListener('pagehide', unloadVideo);
 
+  function isBilibiliCover(url) {
+    try {
+      const parsed = new URL(url);
+      return parsed.protocol === 'https:' && /^i\d{1,2}\.hdslb\.com$/.test(parsed.hostname)
+        && parsed.pathname.startsWith('/bfs/archive/');
+    } catch { return false; }
+  }
+  function canApplyBilibiliCover() {
+    const current = urlInput.value.trim();
+    return !processing && !localFile && !localData && !manuallyChosen
+      && (!current || isBilibiliCover(current));
+  }
+
   window.adminCover = {
+    canApplyBilibiliCover,
+    applyBilibiliCover(url) {
+      if (!isBilibiliCover(url) || !canApplyBilibiliCover()) return false;
+      urlInput.value = url;
+      savedCover = null;
+      refresh();
+      say('已自动匹配 B站视频原始封面；你仍可手动替换。');
+      draftChanged();
+      return true;
+    },
     reset(article = null) {
       revision++;
       processing = false;
@@ -187,6 +214,7 @@
       savedAttachments = article?.attachments || [];
       savedCover = savedAttachments.find(file => file.role === 'cover') || null;
       urlInput.value = article?.video_poster || savedCover?.url || '';
+      manuallyChosen = Boolean(urlInput.value.trim()) && !isBilibiliCover(urlInput.value.trim());
       unloadVideo();
       refresh();
       say('上传图片或从视频取帧后，可在此预览。');

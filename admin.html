@@ -172,7 +172,7 @@
                   <button class="text-button" type="button" id="retryVideoUpload" hidden>重新上传</button>
                 </div>
               </div>
-              <label><span>或填写视频直链</span><input type="url" name="videoUrl" placeholder="https://example.com/video.mp4" /></label>
+              <label><span>或填写视频直链 / B站视频链接</span><input type="url" name="videoUrl" placeholder="https://www.bilibili.com/video/BVxxxxxxxxxx/" /><small id="bilibiliCoverHint" aria-live="polite" hidden></small></label>
               <p class="current-video" id="currentVideo" hidden></p>
             </div>
             <div class="editor-writing-grid"><label><span id="contentFieldLabel">正文（Markdown）</span><textarea name="content" rows="16" required placeholder="# 标题&#10;&#10;支持列表、引用、链接、图片、代码块与 LaTeX 公式。"></textarea></label>
@@ -227,7 +227,7 @@
     </main>
     <script src="./assets/vendor/supabase/supabase-2.108.2.js"></script>
     <script src="./supabase-config.js"></script>
-    <script src="./article-service.js?v=20261010-p1"></script>
+    <script src="./article-service.js?v=20261019-bili-cover-1"></script>
     <script src="./video-uploader.js?v=1"></script>
     <script src="./markdown.js?v=5"></script>
     <script defer src="./assets/vendor/katex/katex-0.16.22.min.js"></script>
@@ -237,7 +237,8 @@
     <script src="./works-data.js?v=20261015"></script>
     <script src="./theme.js?v=20261016-journey-1"></script>
     <script src="./motion-core.js?v=20261015-editorial-1"></script>
-    <script src="./admin-cover.js?v=20261015-assets-4"></script>
-    <script src="./admin.js?v=20261007-1"></script>
+    <script src="./admin-cover.js?v=20261019-bili-cover-1"></script>
+    <script src="./bilibili-cover.js?v=20261019-bili-cover-1"></script>
+    <script src="./admin.js?v=20261019-bili-cover-1"></script>
   </body>
 </html>
