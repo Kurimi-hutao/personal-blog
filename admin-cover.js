@@ -189,7 +189,7 @@
       // Cached, original Bilibili image inside this site's own public Supabase bucket.
       const supabaseOrigin = new URL(window.BLOG_CONFIG.supabaseUrl).origin;
       return parsed.origin === supabaseOrigin &&
-        /^\/storage\/v1\/object\/public\/article-attachments\/bilibili-covers\/BV[a-zA-Z0-9]{10}\.(?:jpg|jpeg|png|webp)$/.test(parsed.pathname);
+        /^\/storage\/v1\/object\/public\/article-attachments\/bilibili-covers\/BV[a-zA-Z0-9]{10}(?:-[a-z0-9-]+)?\.(?:jpg|jpeg|png|webp)$/.test(parsed.pathname);
     } catch { return false; }
   }
   function canApplyBilibiliCover() {

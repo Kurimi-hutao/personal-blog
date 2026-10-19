@@ -6,6 +6,11 @@ const ANON=Deno.env.get("SUPABASE_ANON_KEY")||ROLE;
 const BUCKET="article-attachments";
 const ORIGINS=new Set(["https://joestarzhang.cn","https://www.joestarzhang.cn","https://kurimi-hutao.github.io","http://localhost:8000","http://127.0.0.1:8000","http://localhost:5173","http://127.0.0.1:5173"]);
 const MAX=3*1024*1024;
+// Verified from the IceCube video page's og:image; the earlier thumbnail
+// came from a *related video* in Bilibili's embedded player, not IceCube.
+const VERIFIED_ICECUBE_ID="BV1Urp26gEky";
+const VERIFIED_ICECUBE_PIC="https://i1.hdslb.com/bfs/archive/7f8f848ad1d177800c3c16ce35f7887cece16ef2.jpg";
+const VERIFIED_ICECUBE_REV="-canonical-20261019";
 function respond(data:unknown,status:number,headers:Record<string,string>){
   return new Response(JSON.stringify(data),{status,headers:{...headers,"Content-Type":"application/json;charset=utf-8","Cache-Control":"no-store"}});
 }
@@ -37,15 +42,35 @@ async function published(id:string):Promise<Row|null>{
   return rows.find((row:Row)=>row.video_url.includes(id))||null;
 }
 async function metadata(id:string){
-  const r=await fetch("https://api.bilibili.com/x/web-interface/view?bvid="+id,{
-    headers:{Accept:"application/json",Referer:"https://www.bilibili.com/","User-Agent":"Mozilla/5.0"},signal:AbortSignal.timeout(12000)
+  // Only read this BV's primary official metadata; never take thumbnails
+  // from the Bilibili iframe because it contains unrelated recommendations.
+  try {
+    const r=await fetch("https://api.bilibili.com/x/web-interface/view?bvid="+id,{
+      headers:{Accept:"application/json",Referer:"https://www.bilibili.com/","User-Agent":"Mozilla/5.0"},
+      signal:AbortSignal.timeout(12000),
+    });
+    if(r.ok){
+      const v=await r.json();
+      if(v?.code===0&&v?.data?.bvid===id){
+        const cover=pic(v.data.pic);
+        if(cover)return cover;
+      }
+    }
+  }catch{ /* Cloud networks sometimes receive Bilibili 412. */ }
+  // Fallback: the video page's own social-preview cover (og:image).
+  const response=await fetch("https://www.bilibili.com/video/"+id+"/",{
+    headers:{Accept:"text/html","User-Agent":"Mozilla/5.0","Referer":"https://www.bilibili.com/"},
+    signal:AbortSignal.timeout(12000),
   });
-  if(!r.ok)throw Error("Bilibili metadata HTTP "+r.status);
-  const v=await r.json();
-  if(v?.code!==0||v?.data?.bvid!==id)throw Error("Bilibili video metadata unavailable");
-  const u=pic(v.data.pic);
-  if(!u)throw Error("Invalid original Bilibili thumbnail URL");
-  return u;
+  if(!response.ok)throw Error("Bilibili page metadata HTTP "+response.status);
+  const html=await response.text();
+  const tag=(html.match(/<meta\b[^>]*>/gi)||[]).find(t=>
+    /\b(?:property|name)=["']og:image["']/i.test(t)
+  )||"";
+  const raw=tag.match(/\bcontent=["']([^"']+)/i)?.[1]?.replace(/&amp;/g,"&");
+  const cover=pic(raw);
+  if(!cover)throw Error("Video page has no valid official og:image cover");
+  return cover;
 }
 async function imageBytes(source:URL){
   const formats:Record<string,string>={"image/jpeg":"jpg","image/png":"png","image/webp":"webp"};
@@ -63,8 +88,8 @@ async function imageBytes(source:URL){
   }
   throw Error("Cannot fetch Bilibili cover from CDN");
 }
-async function upload(id:string,data:{bytes:Uint8Array;type:string;ext:string}){
-  const path="bilibili-covers/"+id+"."+data.ext;
+async function upload(id:string,data:{bytes:Uint8Array;type:string;ext:string},revision=""){
+  const path="bilibili-covers/"+id+revision+"."+data.ext;
   const r=await fetch(BASE+"/storage/v1/object/"+BUCKET+"/"+path,{
     method:"POST",headers:serviceHeaders({"Content-Type":data.type,"x-upsert":"true","cache-control":"public, max-age=86400"}),
     body:data.bytes,signal:AbortSignal.timeout(15000)
@@ -73,10 +98,12 @@ async function upload(id:string,data:{bytes:Uint8Array;type:string;ext:string}){
   return BASE+"/storage/v1/object/public/"+BUCKET+"/"+path;
 }
 async function backfill(row:Row,publicUrl:string){
-  if(row.video_poster&&!pic(row.video_poster))return;
+  const prefix=BASE+"/storage/v1/object/public/"+BUCKET+"/bilibili-covers/";
+  const isAuto=(url:unknown)=>typeof url==="string"&&(pic(url)!==null||url.startsWith(prefix));
+  if(row.video_poster&&!isAuto(row.video_poster))return;
   const existing=Array.isArray(row.attachments)?row.attachments:[];
   const former=existing.find(x=>x.role==="cover");
-  if(former&&typeof former.url==="string"&&!pic(former.url))return;
+  if(former&&typeof former.url==="string"&&!isAuto(former.url))return;
   const attachments=[{name:"B站原始封面",role:"cover",url:publicUrl,type:"image/jpeg"},...existing.filter(x=>x.role!=="cover")];
   const r=await fetch(BASE+"/rest/v1/articles?id=eq."+encodeURIComponent(row.id),{
     method:"PATCH",headers:serviceHeaders({"Content-Type":"application/json",Prefer:"return=minimal"}),
@@ -104,11 +131,18 @@ Deno.serve(async(req:Request)=>{
     const row=await published(id);
     if(req.method==="GET"&&!row)return respond({error:"Not a published video"},404,cors);
     const prefix=BASE+"/storage/v1/object/public/"+BUCKET+"/bilibili-covers/";
-    if(row?.video_poster?.startsWith(prefix))return respond({bvid:id,coverUrl:row.video_poster,cached:true},200,cors);
-    if(row?.video_poster&&!pic(row.video_poster))return respond({bvid:id,coverUrl:row.video_poster,custom:true},200,cors);
-    const source=pic(row?.video_poster)||await metadata(id);
+    const correctingIceCube=id===VERIFIED_ICECUBE_ID;
+    if(row?.video_poster?.startsWith(prefix) &&
+       (!correctingIceCube||row.video_poster.includes(VERIFIED_ICECUBE_REV)))
+      return respond({bvid:id,coverUrl:row.video_poster,cached:true},200,cors);
+    if(row?.video_poster&&!pic(row.video_poster)&&!row.video_poster.startsWith(prefix))
+      return respond({bvid:id,coverUrl:row.video_poster,custom:true},200,cors);
+    // Never derive the cover from the player's recommendations.
+    const source=correctingIceCube ? pic(VERIFIED_ICECUBE_PIC) :
+      (pic(row?.video_poster)||await metadata(id));
+    if(!source)throw Error("Verified Bilibili poster missing");
     const bytes=await imageBytes(source);
-    const coverUrl=await upload(id,bytes);
+    const coverUrl=await upload(id,bytes,correctingIceCube?VERIFIED_ICECUBE_REV:"");
     if(row)await backfill(row,coverUrl);
     return respond({bvid:id,coverUrl,cached:false},200,cors);
   }catch(err){return respond({error:String(err instanceof Error?err.message:err)},502,cors);}
