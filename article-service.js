@@ -44,7 +44,9 @@
 
   const coverBase = new URL('.', document.currentScript.src);
   const defaultCovers = [
-    'assets/ink-scroll.webp',
+    'assets/article-covers/mist-river.webp',
+    'assets/article-covers/bamboo-bridge.webp',
+    'assets/article-covers/moon-pavilion.webp',
     'assets/mobile-publication/article-cover-education-concept.webp',
     'assets/mobile-publication/article-cover-physics-concept.webp',
     'assets/hutao-entry-shanshui.webp',

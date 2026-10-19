@@ -19,6 +19,7 @@ for(const width of (process.env.REVIEW_WIDTHS ? process.env.REVIEW_WIDTHS.split(
   for(const card of await p.locator(sel).all()){
    const visual=await card.locator(cover).boundingBox(),copy=await card.locator(home?'.card-content':'.article-list-copy').boundingBox();
    const ratio=width<=900?2:16/9;assert(Math.abs(visual.width/visual.height-ratio)<.035,'cover ratio');
+   assert.equal(await card.locator('img').evaluate(e=>getComputedStyle(e).objectFit),'cover','image must fill its frame');
    if(width<=900)assert(visual.y+visual.height<=copy.y+1,'mobile copy overlaps image');
    assert.equal(await card.evaluate(e=>getComputedStyle(e).backgroundColor),'rgba(0, 0, 0, 0)','heavy card panel remains');
   }

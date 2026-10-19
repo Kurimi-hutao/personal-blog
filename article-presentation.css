@@ -14,7 +14,7 @@ body[data-page="articles"] .article-list-cover {
   flex: none; align-self: auto; overflow: hidden; border-radius: 5px; background: var(--paper-deep);
 }
 .home-page #articles .card-visual > img, body[data-page="articles"] .article-list-cover > img {
-  position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: contain;
+  position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; object-position: center;
   transform: scale(1); transition: transform 750ms cubic-bezier(.22,1,.36,1), filter 500ms ease;
 }
 .home-page #articles .card-index { display: none; }
