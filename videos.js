@@ -46,6 +46,7 @@ function createVideoCard(video) {
   if (poster) {
     const image = document.createElement("img");
     image.src = poster;
+    image.referrerPolicy = "no-referrer";
     image.alt = "";
     image.loading = "lazy";
     image.addEventListener("load", () => { fallback.hidden = true; });
