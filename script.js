@@ -538,7 +538,7 @@ function createPiece(options = {}) {
   const isPetal = options.type ? options.type === "petal" : Math.random() > 0.28;
   piece.className = `falling-piece ${isPetal ? "petal" : "leaf"}`;
   if (isPetal) {
-    piece.style.setProperty("--petal-image", `url("./assets/spring-ink/petal-${1 + Math.floor(Math.random() * 8)}.webp")`);
+    piece.style.setProperty("--petal-image", `url("./assets/spring-ink/small/petal-${1 + Math.floor(Math.random() * 8)}-144.webp")`);
   }
   field.appendChild(piece);
   pieces.add(piece);
@@ -624,7 +624,7 @@ function summonPetals() {
     const count = lowPowerDevice ? 5 : 8;
     for (let i = 0; i < count; i++) {
       const petal = document.createElement('span'); petal.className = 'manual-petal'; petal.setAttribute('aria-hidden', 'true');
-      petal.style.backgroundImage = `url('./assets/spring-ink/petal-${1 + i % 8}.webp')`;
+      petal.style.backgroundImage = `url('./assets/spring-ink/small/petal-${1 + i % 8}-144.webp')`;
       document.body.append(petal); manualPetals.add(petal);
       const x = random(innerWidth * .12, innerWidth * .88), drift = random(-36, 36);
       const animation = petal.animate([

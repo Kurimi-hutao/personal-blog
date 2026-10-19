@@ -12,6 +12,15 @@ python -m http.server 8000
 
 然后访问 `http://localhost:8000`。
 
+## Lighthouse CI 性能检查
+
+根目录 npm 包仅用于质量检查，不改变静态网站构建方式。安装 Node 22+ 和 Chrome 后，运行
+`npm ci --ignore-scripts`、`npm run build:perf`、`npm run perf`、`npm run perf:summary`。
+桌面和移动端分别检查首页、文章列表/详情、视频列表/详情、作品页。检测使用本地合成数据，
+报告写入被 Git 忽略的 `.lighthouseci-reports/`，不公开上传，也不连接生产 Supabase。
+详细配置见 [Lighthouse CI 说明](docs/lighthouse-ci.md)，
+基线与验证记录见 [2026-10-19 性能报告](docs/lighthouse-baseline-20261019.md)。
+
 ## 《下一代，来信了》子站
 
 作品页 `works.html` 已收录子站，入口为 `next-generation-letter/`。子站使用独立样式与脚本，顶部“返回作品”链接回到博客。整个博客作为静态文件部署时，保留这个目录即可，无需额外服务。

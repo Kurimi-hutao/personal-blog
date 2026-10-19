@@ -12,7 +12,7 @@ const read = name => fs.readFileSync(path.join(root, name), 'utf8');
 test('all blog pages reference the updated loader and home scripts', () => {
   for (const page of ['404.html', 'admin.html', 'article.html', 'articles.html',
     'index.html', 'kurumi.html', 'pet.html', 'videos.html', 'works.html']) {
-    assert.match(read(page), /lottie-core\.js\?v=20261017-motion-1/, page);
+    assert.match(read(page), /lottie-core\.js\?v=20261019-perf-1/, page);
   }
   assert.match(read('index.html'), /script\.js\?v=\d{8}-[a-z0-9-]+/);
   for (const name of ['lottie-core.js', 'script.js', 'service-worker.js']) {

@@ -1,6 +1,7 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="light">
   <head>
+    <script id="theme-bootstrap">try{document.documentElement.dataset.theme=localStorage.getItem('hutao-theme')==='dark'?'dark':'light'}catch{}</script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="description" content="虎桃不会振刀的个人博客，记录永劫无间、土御门胡桃与江湖闲谈。" />
@@ -8,33 +9,14 @@
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="alternate" type="application/rss+xml" title="虎桃不会振刀 RSS" href="./rss.xml" />
     <title>虎桃不会振刀 | 一卷桃花江湖</title>
-    <link rel="stylesheet" href="./fonts-headings.css?v=20261015" />
-    <link rel="stylesheet" href="./styles.css?v=20260928" />
-    <link rel="stylesheet" href="./hutao-exhibit.css?v=20261008-cover" />
-    <link rel="stylesheet" href="./motion-core.css?v=20261015-touch-1" />
-    <link rel="stylesheet" href="./lottie-core.css?v=20261010-loading-1" />
-    <link rel="stylesheet" href="./motion-home.css?v=20260927" />
-    <script defer src="./assets/vendor/lottie-web/lottie_light-5.13.0.min.js"></script>
-    <script defer src="./lottie-core.js?v=20261017-motion-1"></script>
-    <link rel="stylesheet" href="./ink-system.css?v=20260928-2" />
-    <link rel="stylesheet" href="./spring-ink.css?v=20261010-loading-1" />
-    <link rel="stylesheet" href="./site-footer.css?v=20261007-1" />
+    <link rel="stylesheet" href="./page-index.bundle.css?v=6fd38f63677b" />
     <script defer src="./site-footer.js?v=20261007-1"></script>
       <link rel="icon" href="./assets/visual-refresh/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" sizes="32x32" href="./assets/visual-refresh/favicon-32.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="./assets/visual-refresh/home-icon-180.png" />
-    <link rel="stylesheet" href="./ink-assets.css?v=20261008-visual" />
-    <link rel="stylesheet" href="./site-features.css?v=20261010-p1" />
-    <link rel="stylesheet" href="./comment-ui.css?v=20261010-2" />
-    <link rel="stylesheet" href="./blog-refinements.css?v=20261015-editorial-1" />
-    <link rel="stylesheet" href="./mobile-editorial.css?v=20261015-assets-4" media="(max-width:1080px)" />
-    <link rel="stylesheet" href="./mobile-controls.css?v=20261015-assets-4" media="(max-width:1080px)" />
-    <link rel="stylesheet" href="./journey-ink.css?v=20261016-1" />
-    <link rel="stylesheet" href="./mobile-reference.css?v=20261018-1" media="(max-width:900px)" />
-    <link rel="stylesheet" href="./mobile-botanicals.css?v=20261019-ink" media="(max-width:900px)" />
-    <link rel="stylesheet" href="./mobile-wuxia.css?v=20261019-clarity" media="(max-width:900px)" />
   </head>
   <body class="home-page" data-page="home">
+    <script src="./lottie-core.js?v=20261019-perf-1"></script>
     <div class="paper-noise" aria-hidden="true"></div>
     <div class="ink-atmosphere" aria-hidden="true">
       <span class="ink-drift ink-drift-one"></span>
@@ -75,10 +57,10 @@
         </picture>
         <div class="spring-night" aria-hidden="true"></div>
         <div class="spring-scene" aria-hidden="true">
-          <img class="spring-mist" src="./assets/spring-ink/mist.webp" alt="" width="1672" height="941" />
-          <img class="spring-branch" src="./assets/spring-ink/branch.webp" alt="" width="1672" height="941" />
-          <img class="spring-foreground spring-rocks" src="./assets/spring-ink/foreground-rocks.webp" alt="" width="1672" height="941" />
-          <img class="spring-foreground spring-grass" src="./assets/spring-ink/foreground-grass.webp" alt="" width="1672" height="941" />
+          <picture><source media="(min-width: 901px)" srcset="./assets/spring-ink/mist.webp" /><img class="spring-mist" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="" width="1672" height="941" /></picture>
+          <picture><source media="(min-width: 901px)" srcset="./assets/spring-ink/branch.webp" /><img class="spring-branch" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="" width="1672" height="941" /></picture>
+          <picture><source media="(min-width: 901px)" srcset="./assets/spring-ink/foreground-rocks.webp" /><img class="spring-foreground spring-rocks" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="" width="1672" height="941" /></picture>
+          <picture><source media="(min-width: 901px)" srcset="./assets/spring-ink/foreground-grass.webp" /><img class="spring-foreground spring-grass" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="" width="1672" height="941" /></picture>
         </div>
         <div class="hero-copy">
           <p class="eyebrow">此间江湖 · 随笔一卷</p>
@@ -383,16 +365,13 @@
     <script defer src="./article-service.js?v=20261019-cover-cache-1"></script>
     <script defer src="./ink-assets.js?v=20261010-comments-1"></script>
     <script defer src="./content-cache.js?v=20261015"></script>
-    <script defer src="./works-data.js?v=20261015"></script>
+    <script defer src="./works-data.js?v=20261019-perf-1"></script>
     <script defer src="./theme.js?v=20261016-journey-1"></script>
     <script defer src="./motion-core.js?v=20261015-editorial-1"></script>
-    <script defer src="./script.js?v=20261019-cover-cache-1"></script>
+    <script defer src="./script.js?v=20261019-perf-1"></script>
     <script defer src="./motion-home.js?v=20261008-visual"></script>
     <script defer src="./mobile-interactions.js?v=20261015-assets-4"></script>
     <script defer src="./mobile-botanicals.js?v=20261019-ink"></script>
     <script defer src="./mobile-wuxia.js?v=20261019-clarity"></script>
   </body>
 </html>
-
-
-

@@ -1,6 +1,7 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="light">
   <head>
+    <script id="theme-bootstrap">try{document.documentElement.dataset.theme=localStorage.getItem('hutao-theme')==='dark'?'dark':'light'}catch{}</script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="description" content="虎桃不会振刀的江湖随笔。" />
@@ -9,33 +10,14 @@
     <link rel="alternate" type="application/rss+xml" title="虎桃不会振刀 RSS" href="./rss.xml" />
     <title>文章 | 虎桃不会振刀</title>
     <link rel="stylesheet" href="./assets/vendor/katex/katex-0.16.22.min.css" />
-    <link rel="stylesheet" href="./fonts-headings.css?v=20261015" />
-    <link rel="stylesheet" href="./styles.css?v=20260928" />
-    <link rel="stylesheet" href="./article-pages.css?v=20261019-bilibili-1" />
-    <link rel="stylesheet" href="./motion-core.css?v=20261015-touch-1" />
-    <link rel="stylesheet" href="./lottie-core.css?v=20261010-loading-1" />
-    <script defer src="./assets/vendor/lottie-web/lottie_light-5.13.0.min.js"></script>
-    <script defer src="./lottie-core.js?v=20261017-motion-1"></script>
-      <link rel="stylesheet" href="./editorial.css?v=20260928-2" />
-    <link rel="stylesheet" href="./ink-system.css?v=20260928-2" />
-    <link rel="stylesheet" href="./page-scenes.css?v=20260929-1" />
-    <link rel="stylesheet" href="./site-footer.css?v=20261007-1" />
+    <link rel="stylesheet" href="./page-article.bundle.css?v=4b741d937a46" />
     <script defer src="./site-footer.js?v=20261007-1"></script>
       <link rel="icon" href="./assets/visual-refresh/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" sizes="32x32" href="./assets/visual-refresh/favicon-32.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="./assets/visual-refresh/home-icon-180.png" />
-    <link rel="stylesheet" href="./ink-assets.css?v=20261008-visual" />
-    <link rel="stylesheet" href="./site-features.css?v=20261010-p1" />
-    <link rel="stylesheet" href="./comment-ui.css?v=20261010-2" />
-    <link rel="stylesheet" href="./blog-refinements.css?v=20261015-editorial-1" />
-    <link rel="stylesheet" href="./mobile-editorial.css?v=20261015-assets-4" media="(max-width:1080px)" />
-    <link rel="stylesheet" href="./mobile-controls.css?v=20261015-assets-4" media="(max-width:1080px)" />
-    <link rel="stylesheet" href="./journey-ink.css?v=20261016-1" />
-    <link rel="stylesheet" href="./mobile-reference.css?v=20261018-1" media="(max-width:900px)" />
-    <link rel="stylesheet" href="./mobile-botanicals.css?v=20261019-ink" media="(max-width:900px)" />
-    <link rel="stylesheet" href="./mobile-wuxia.css?v=20261019-clarity" media="(max-width:900px)" />
   </head>
   <body class="inner-page" data-page="articles">
+    <script src="./lottie-core.js?v=20261019-perf-1"></script>
     <div class="reading-progress" id="readingProgress" aria-hidden="true"></div>
     <div class="paper-noise" aria-hidden="true"></div>
     <header class="site-header scrolled" data-site-header>
@@ -115,7 +97,7 @@
     <script src="./assets/vendor/gsap/gsap-3.13.0.min.js"></script>
     <script src="./ink-assets.js?v=20261010-comments-1"></script>
     <script src="./content-cache.js?v=20261015"></script>
-    <script src="./works-data.js?v=20261015"></script>
+    <script src="./works-data.js?v=20261019-perf-1"></script>
     <script src="./theme.js?v=20261016-journey-1"></script>
     <script src="./article-reading.js?v=20261015-publication-3"></script>
     <script src="./article-comments.js?v=20261016-journey-1"></script>
@@ -126,6 +108,3 @@
     <script defer src="./mobile-wuxia.js?v=20261019-clarity"></script>
   </body>
 </html>
-
-
-

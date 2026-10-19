@@ -1,9 +1,12 @@
 import { cp, mkdir, readdir, readFile, stat, writeFile, appendFile, access } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createRequire } from 'node:module';
+
+createRequire(import.meta.url)('./build-page-styles.cjs').buildPageStyles({ check: true });
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const output = path.join(root, '_deploy');
+const output = path.join(root, process.env.LHCI_BUILD === '1' ? '.lighthouseci-site' : '_deploy');
 const runtimeDirectories = ['assets', 'next-generation-letter', 'zhengshen-atlas'];
 const runtimeFile = /\.(html|css|js|webmanifest|xml|txt|ico|svg)$/i;
 const forbidden = new Set(['node_modules', 'sources', 'outputs', 'screenshots', 'docs', 'scripts']);
