@@ -50,7 +50,11 @@ function createVideoCard(video) {
     image.alt = "";
     image.loading = "lazy";
     image.addEventListener("load", () => { fallback.hidden = true; });
-    image.addEventListener("error", () => { image.remove(); fallback.hidden = false; });
+    image.addEventListener("error", async () => {
+      const restored = await articleService.resolveBilibiliThumbnail(video);
+      if (restored && image.src !== restored) image.src = restored;
+      else { image.remove(); fallback.hidden = false; }
+    });
     visual.appendChild(image);
   }
   const play = document.createElement("span");

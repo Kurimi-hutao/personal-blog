@@ -266,6 +266,28 @@
     if (error) throw error;
   }
 
+  // Recover old cached Bilibili CDN posters when mobile Safari blocks hotlinks.
+  // The public endpoint only serves a thumbnail for an already published video.
+  async function resolveBilibiliThumbnail(video) {
+    try {
+      const poster = new URL(video.video_poster || "");
+      if (!/^i\d{1,2}\.hdslb\.com$/.test(poster.hostname)) return null;
+      const target = new URL(video.video_url || "");
+      if (!["www.bilibili.com", "m.bilibili.com", "bilibili.com"].includes(target.hostname)) return null;
+      const match = target.pathname.match(/^\/video\/(BV[a-zA-Z0-9]{10})(?:\/|$)/);
+      if (!match) return null;
+      const response = await fetch(config.supabaseUrl + "/functions/v1/bilibili-cover?bvid=" + match[1], {
+        signal: AbortSignal.timeout(9000),
+      });
+      if (!response.ok) return null;
+      const data = await response.json();
+      const prefix = config.supabaseUrl + "/storage/v1/object/public/article-attachments/bilibili-covers/";
+      return typeof data.coverUrl === "string" && data.coverUrl.startsWith(prefix) ? data.coverUrl : null;
+    } catch {
+      return null;
+    }
+  }
+
   async function fetchBilibiliCover(bvid) {
     if (!/^BV[a-zA-Z0-9]{10}$/.test(bvid)) throw new Error("无效的 B站 BV 号");
     const { data, error } = await requireClient().functions.invoke("bilibili-cover", {
@@ -589,6 +611,7 @@
     signOut,
     uploadFiles,
     removeFiles,
+    resolveBilibiliThumbnail,
     fetchBilibiliCover,
     uploadVideo,
     removeVideo,
