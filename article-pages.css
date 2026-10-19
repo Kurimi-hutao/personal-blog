@@ -590,6 +590,13 @@
   box-shadow: 0 18px 45px rgba(32, 24, 20, 0.2);
 }
 
+/* An external iframe streams directly from Bilibili, not via CloudBase. */
+.work-video-player--embed {
+  aspect-ratio: 16 / 9;
+  height: auto;
+  border: 0;
+}
+
 .video-series-label {
   color: var(--cinnabar);
   font-weight: 600;
