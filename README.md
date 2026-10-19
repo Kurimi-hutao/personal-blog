@@ -12,6 +12,15 @@ python -m http.server 8000
 
 然后访问 `http://localhost:8000`。
 
+## Lighthouse CI 性能检查
+
+根目录 npm 包仅用于质量检查，不改变静态网站构建方式。安装 Node 22+ 和 Chrome 后，运行
+`npm ci --ignore-scripts`、`npm run build:perf`、`npm run perf`、`npm run perf:summary`。
+桌面和移动端分别检查首页、文章列表/详情、视频列表/详情、作品页。检测使用本地合成数据，
+报告写入被 Git 忽略的 `.lighthouseci-reports/`，不公开上传，也不连接生产 Supabase。
+详细配置见 [Lighthouse CI 说明](docs/lighthouse-ci.md)，
+初始基线见 [性能基线](docs/lighthouse-baseline-20261019.md)，最新版本核对、修改清单和剩余建议见 [优化结果](docs/lighthouse-optimization-20261019.md)。
+
 ## 《下一代，来信了》子站
 
 作品页 `works.html` 已收录子站，入口为 `next-generation-letter/`。子站使用独立样式与脚本，顶部“返回作品”链接回到博客。整个博客作为静态文件部署时，保留这个目录即可，无需额外服务。
@@ -25,6 +34,8 @@ node scripts/import-next-generation.mjs "原项目路径/dist"
 导入脚本复制构建文件、接入返回导航并更新作品封面。原项目需保持 Vite 的 `base: "./"`，以兼容博客域名及 GitHub Pages 子路径。`.download/` 为本地下载和构建临时目录，不需要部署。
 
 ## 双端交互与行旅美术
+
+2026-10-19 完成桌面、手机和平板断点复查，修复短窗口搜索裁切、筛选动画残留、减少动态效果下的键盘反馈和快速关闭筛选菜单后的焦点问题。范围、截图位置及验证限制见 [双端检查记录](docs/dual-ui-review-20261019.md)；运行 `node scripts/check-interaction-polish.cjs` 可回归上述问题。
 
 2026-10-16 接入 A–H 行旅素材：签到成就与七日进度、运势签纸绳结、驿站昼间小景和分类器物、书签、收藏书箧与小屋坐垫。驿站保留六个常用入口，其他入口按分类展开。修复运势大字换行、短屏关闭操作与手机回复引用挤压，统一搜索纸页样式。复查记录见 `docs/journey-ink-validation-20261016.md`；运行 `node scripts/check-journey-ink.cjs` 可执行离线浏览器回归检查。
 

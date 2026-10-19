@@ -1,4 +1,4 @@
-const CACHE_NAME = "hutao-ink-covers-20261019-1";
+const CACHE_NAME = "hutao-ink-ui-20261019-2";
 // Install only the offline fallback. Artwork, fonts and page modules are cached
 // on demand, so a home visit never downloads the pet room or other pages.
 const APP_SHELL = ["./offline.html"];
@@ -45,6 +45,3 @@ self.addEventListener("fetch", event => {
     try { return await update(); } catch { return Response.error(); }
   })());
 });
-
-
-

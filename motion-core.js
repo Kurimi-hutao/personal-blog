@@ -31,6 +31,7 @@
       });
     });
     document.querySelectorAll(".click-petal, .ink-click-core, .ink-click-ripple").forEach((element) => element.remove());
+    document.querySelectorAll(".motion-pressing, .motion-released").forEach((element) => element.classList.remove("motion-pressing", "motion-released"));
   });
 
   const revealSelector = [
@@ -239,6 +240,7 @@
       if (event.key === "Enter" || event.key === " ") release();
     });
     document.addEventListener("keydown", (event) => {
+      if (state.reduced || event.repeat) return;
       if (event.key !== "Enter" && event.key !== " ") return;
       const target = event.target.closest?.("button, a, [role='button'], [role='option'], summary");
       if (!target || target.matches(":disabled, [aria-disabled='true']")) return;
@@ -304,6 +306,7 @@
     let optionButtons = [];
     let activeIndex = Math.max(0, select.selectedIndex);
     let open = false;
+    let focusTimer = 0;
     let panelAnimation = null;
     let optionAnimations = [];
 
@@ -361,6 +364,7 @@
     }
 
     function cancelAnimations() {
+      window.clearTimeout(focusTimer);
       panelAnimation?.cancel();
       panelAnimation = null;
       optionAnimations.forEach((animation) => animation.cancel());
@@ -422,7 +426,9 @@
         );
         optionAnimations.push(animation);
       });
-      window.setTimeout(() => optionButtons[activeIndex]?.focus({ preventScroll: true }), state.reduced ? 0 : 40);
+      focusTimer = window.setTimeout(() => {
+        if (open) optionButtons[activeIndex]?.focus({ preventScroll: true });
+      }, state.reduced ? 0 : 40);
     }
 
     function close(returnFocus = false) {
@@ -540,6 +546,7 @@
     if (previousHeight) container.style.minHeight = `${previousHeight}px`;
     const oldItems = Array.from(container.children);
     const reduced = state.reduced;
+    const entranceAnimations = [];
     const exitAnimations = oldItems.map((item) => item.animate(
       [
         { opacity: 1, transform: "translate3d(0,0,0) scale(1)" },
@@ -550,6 +557,7 @@
 
     controller.signal.addEventListener("abort", () => {
       exitAnimations.forEach((animation) => animation.cancel());
+      entranceAnimations.forEach((animation) => animation.cancel());
     }, { once: true });
 
     return Promise.allSettled(exitAnimations.map((animation) => animation.finished))
@@ -558,7 +566,7 @@
         renderCallback();
         const newItems = Array.from(container.children);
         newItems.forEach((item, index) => {
-          item.animate(
+          const animation = item.animate(
             [
               { opacity: 0, transform: "translate3d(0,14px,0) scale(.98)" },
               { opacity: 1, transform: "translate3d(0,0,0) scale(1)" },
@@ -570,13 +578,17 @@
               fill: "both",
             },
           );
+          entranceAnimations.push(animation);
+          // Release filled keyframes so CSS hover/focus/press feedback can take over.
+          animation.finished.then(() => animation.cancel(), () => {});
           window.MotionCore?.revealInserted?.(item);
         });
+        return Promise.allSettled(entranceAnimations.map((animation) => animation.finished));
       })
       .finally(() => {
         if (listAnimations.get(container) === controller) {
           listAnimations.delete(container);
-          window.setTimeout(() => { container.style.minHeight = ""; }, reduced ? 0 : 260);
+          container.style.minHeight = "";
         }
       });
   }

@@ -1,12 +1,16 @@
 node_modules/
 package-lock.json
+!/package-lock.json
+.lighthouseci/
+.lighthouseci-site/
+.lighthouseci-reports/
 test-results/
 mobile-qa*.js
 mobile-qa*.spec.js
 .download/
 blog-source.zip
+_deploy/
+.cloudbase-tools/
 
 # Raw browser captures; review-sized comparisons live in docs/issue-2/.
 /screenshots/issue-2/
-_deploy/
-.cloudbase-tools/
