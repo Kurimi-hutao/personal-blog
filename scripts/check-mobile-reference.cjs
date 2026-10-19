@@ -36,10 +36,10 @@ fs.mkdirSync(output,{recursive:true});
           await fit(type+' '+theme);
           if(type==='index') {
             await page.locator('#latestArticles .article-card').first().waitFor();
+            await page.waitForFunction(() => document.querySelector('#latestArticles .article-card:not(.static-fallback)'));
             const card=page.locator('#latestArticles .article-card').first();
             const v=await card.locator('.card-visual').boundingBox(),c=await card.locator('.card-content').boundingBox();
-            if(width>=360&&width<=900)assert(v.x<c.x && Math.abs(v.y-c.y)<2,'home horizontal card');
-            if(width===320)assert(v.y<c.y,'narrow stacked card');
+            if(width<=900)assert(v.y+v.height<=c.y+1 && Math.abs(v.width/v.height-2.85)<.05,'home wide cover above copy');
             if(width<=900)assert(await page.locator('#latestArticles .article-card').nth(1).locator('.card-visual').isVisible(),'second cover remains visible');
             if(width<=900){await page.locator('.menu-toggle').click();assert(await page.locator('.site-nav.open').isVisible());await page.keyboard.press('Escape');}
           }

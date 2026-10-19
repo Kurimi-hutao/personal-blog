@@ -83,6 +83,8 @@
     navigation.append(primary, secondary);
     const inertBeforeMenu = new Map();
     navigation.classList.add("site-nav");
+    const mobileNavigation = matchMedia('(max-width:1080px)');
+    navigation.inert = mobileNavigation.matches;
     if (!navigation.id) navigation.id = "siteNav";
 
     if (!menuToggle) {
@@ -109,6 +111,7 @@
     const setMenuOpen = (open) => {
       if (open) mobileChromeController?.forceVisible();
       navigation.classList.toggle("open", open);
+      navigation.inert = mobileNavigation.matches && !open;
       menuToggle.classList.toggle("open", open);
       menuToggle.setAttribute("aria-expanded", String(open));
       menuToggle.setAttribute("aria-label", open ? "关闭导航" : "打开导航");
@@ -144,9 +147,7 @@
         event.preventDefault(); targets[next].focus({ preventScroll: true }); targets[next].scrollIntoView({ block: 'nearest' });
       }
     });
-    window.addEventListener("resize", () => {
-      if (window.innerWidth > 1080 && navigation.classList.contains("open")) setMenuOpen(false);
-    }, { passive: true });
+    mobileNavigation.addEventListener('change', () => setMenuOpen(false));
   }
 
   const searchButton = document.createElement("button");

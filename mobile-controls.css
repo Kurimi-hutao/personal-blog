@@ -1,5 +1,7 @@
 /* Mobile publication: typography carries hierarchy, controls stay quiet. */
 @media (max-width:1080px) {
+  /* Utilities explicitly override inherited visibility; close the whole subtree. */
+  .site-header .site-nav:not(.open), .site-header .site-nav:not(.open) * { visibility: hidden; pointer-events: none; }
   :root { --ui-font: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif; --ui-edge: color-mix(in srgb,var(--ink) 24%,transparent); --ui-sheet: var(--paper); --ui-wash: color-mix(in srgb,var(--ink) 4%,var(--paper)); --ui-seal: #963c2e; --ui-on-seal: #fff7e8; }
   html[data-theme="dark"] { --ui-seal: #cc8070; --ui-on-seal: #17201c; }
   :is(button,a,input,textarea,select,summary):focus-visible { outline: 2px solid var(--cinnabar); outline-offset: 3px; }

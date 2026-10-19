@@ -1,0 +1,111 @@
+/* Round glass playback controls on both desktop and mobile. */
+:is(.home-page .home-video-card, .video-card) .media-play-button,
+:is(.home-page .home-video-card, .video-card):hover .media-play-button {
+  left: clamp(12px, 2vw, 20px); top: auto; bottom: clamp(12px, 2vw, 20px);
+  width: clamp(46px, 5vw, 58px); height: clamp(46px, 5vw, 58px);
+  display: grid; place-items: center; transform: none; border-radius: 50%;
+  border: 1px solid #fff9; color: #343831;
+  background: linear-gradient(145deg, #fffaf0ed, #e6e2d8c9);
+  box-shadow: inset 0 1px 2px #fff9, 0 4px 14px #0003;
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+}
+:is(.home-page .home-video-card, .video-card) .media-play-button__icon {
+  width: 0; height: 0; margin-left: 4px;
+  border-top: 9px solid transparent; border-bottom: 9px solid transparent;
+  border-left: 14px solid currentColor;
+}
+html[data-theme="dark"] :is(.home-page .home-video-card, .video-card) .media-play-button {
+  color: #fffaf0; background: linear-gradient(145deg, #e2e5df6b, #b1bdb82b);
+  border-color: #f9f8eeb3; box-shadow: inset 0 1px 2px #fff5, 0 4px 14px #0004;
+}
+@media (max-width: 900px) {
+  /* Wide covers and a quiet, readable rhythm, shared by home and archive. */
+  .home-page .article-grid, .all-articles-grid { display: grid; grid-template-columns: minmax(0,1fr); gap: 12px; }
+  .home-page .article-card, .home-page .article-card.featured, .article-list-card {
+    display: block; padding: 10px; border: 1px solid var(--line); border-radius: 9px;
+    background: color-mix(in srgb, var(--paper) 45%, transparent); box-shadow: none;
+  }
+  .home-page .article-card + .article-card { padding-top: 10px; }
+  .home-page .card-visual, .home-page .article-card + .article-card .card-visual, .article-list-cover {
+    display: block; width: 100%; height: auto; min-height: 0; aspect-ratio: 2.85 / 1;
+    border-radius: 6px; overflow: hidden;
+  }
+  .home-page .card-visual img, .article-list-cover img { width: 100%; height: 100%; object-fit: cover; }
+  .home-page .card-content, .article-list-copy { padding: 10px 4px 0; }
+  .home-page .article-card .article-meta, .article-list-copy .article-card-meta {
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+    font: 12px/1.7 var(--font-body); color: var(--ink-soft);
+  }
+  .home-page .article-meta > span:first-child, .article-list-copy .article-card-meta > span:first-child {
+    padding: 1px 14px; background: url('./assets/spring-ink/brush-1.webp') center / 100% 100% no-repeat;
+  }
+  .home-page .article-card h3, .home-page .article-card + .article-card h3, .article-list-copy h2 {
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
+    overflow: hidden; margin: 7px 0; font: 400 clamp(20px, 5.1vw, 25px)/1.45 var(--font-body);
+    letter-spacing: .025em; overflow-wrap: anywhere;
+  }
+  .home-page .card-content > p, .article-list-copy > p {
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden;
+    margin: 0; font: 14px/1.85 var(--font-body); color: var(--ink-soft);
+  }
+  .home-page .card-content > a { display: flex; gap: 8px; margin-top: 6px; min-height: 34px; font: 14px/1.5 var(--font-body); }
+  .home-page .card-content > a::before { content: ''; display: block; order: 2; flex: 1; align-self: center; margin-left: 12px; border-top: 1px solid var(--line); }
+  .article-card-stats { font: 12px/1.7 var(--font-body); margin-top: 12px; }
+
+  /* The station: six compact shortcuts, then full-width illustrated rows. */
+  .home-page #links { --station-sheet: #faf6ed; --station-edge: #ded4c3; --station-arrow: #ede4d5; }
+  html[data-theme="dark"] .home-page #links { --station-sheet: #242e27; --station-edge: #485246; --station-arrow: #354136; }
+  .home-page #links .section-heading { min-height: 0; padding: 135px 0 0; display: block; }
+  .home-page #links .section-heading p { max-width: 21em; margin-top: 8px; }
+  .home-page #links .station-scene { position: absolute; grid-area: auto; top: 24px; right: -20px; width: 100%; height: 135px; margin: 0; z-index: -1; opacity: .65; }
+  .home-page #links .mobile-wuxia-umbrella { display: none; }
+  .home-page #links .links-toggle { font: 20px/1.5 var(--font-body); min-height: 44px; padding: 4px 0; border-color: var(--station-edge); }
+  .home-page #links .station-favorites { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; margin-top: 14px; }
+  .home-page #links .friend-grid { display: grid; grid-template-columns: minmax(0,1fr); gap: 7px; }
+  .home-page #links .friend-card {
+    position: relative; isolation: isolate; grid-template-columns: 42px minmax(0,1fr) 26px;
+    gap: 12px; min-height: 68px; padding: 9px 12px; overflow: hidden;
+    border: 1px solid var(--station-edge); border-radius: 10px;
+    background: linear-gradient(115deg, color-mix(in srgb, var(--station-sheet) 90%, #fff), var(--station-sheet));
+    box-shadow: inset 0 1px 0 #ffffff38, 0 5px 16px #33271508;
+  }
+  .home-page #links .friend-card::before { display: none; }
+  .home-page #links .friend-card::after {
+    content: ''; position: absolute; z-index: -1; inset: 0; pointer-events: none; opacity: .14;
+    background: url('./assets/spring-ink/closing-landscape.webp') right bottom / auto 110px no-repeat;
+    mask-image: linear-gradient(90deg,transparent 30%,#000);
+  }
+  .home-page #links .friend-card:nth-child(3n+2)::after { background-image: url('./assets/spring-ink/branch.webp'); background-size: auto 115px; }
+  .home-page #links .friend-card:nth-child(3n)::after { background-image: url('./assets/journey-ink/c2-station-mobile.webp'); }
+  html[data-theme="dark"] .home-page #links .friend-card::after { opacity: .12; filter: invert(1); }
+  .home-page #links .friend-logo { width: 42px; height: 44px; border: 0; border-radius: 8px; background: #fff; }
+  .home-page #links .friend-logo img { width: 34px; height: 34px; object-fit: contain; }
+  .home-page #links .friend-card strong { font: 400 19px/1.45 var(--font-body); }
+  .home-page #links .friend-card small { margin-top: 2px; font: 13px/1.6 var(--font-body); }
+  .home-page #links .friend-card > i {
+    display: grid; place-items: center; width: 26px; height: 26px; border: 1px solid var(--station-edge);
+    border-radius: 50%; background: var(--station-arrow); font-size: 0; transform: none;
+  }
+  .home-page #links .friend-card > i::after { content: ''; width: 7px; height: 7px; border-top: 1px solid currentColor; border-right: 1px solid currentColor; transform: translateX(-2px) rotate(45deg); }
+  .home-page #links .station-favorites .friend-card { grid-template-columns: 36px minmax(0,1fr) 20px; min-height: 58px; padding: 8px; gap: 8px; }
+  .home-page #links .station-favorites .friend-logo { width: 36px; height: 38px; border-radius: 7px; }
+  .home-page #links .station-favorites .friend-logo img { width: 30px; height: 30px; }
+  .home-page #links .station-favorites strong { font-size: 15px; letter-spacing: -.02em; }
+  .home-page #links .station-favorites .friend-card > i { width: 20px; height: 20px; }
+  .home-page #links .station-favorites .friend-card small { display: none; }
+  .home-page #links .links-collapsible { margin-top: 24px; }
+  .home-page #links .friend-group { border: 0; margin-bottom: 18px; }
+  .home-page #links .friend-group-heading { grid-template-columns: 62px minmax(0,1fr) auto; gap: 10px; min-height: 86px; padding: 6px 0 12px; }
+  .home-page #links .station-category-art { width: 62px; height: 62px; }
+  .home-page #links .friend-group-heading > div { display: block; }
+  .home-page #links .friend-group-heading > div > span { display: none; }
+  .home-page #links .friend-group-heading h3 { font-size: 26px; }
+  .home-page #links .station-group-note { padding: 6px 10px; border: 1px solid var(--station-edge); border-radius: 24px; font-size: 11px; }
+  .home-page #links .friend-card:active { background: var(--station-arrow); }
+}
+@media (max-width: 359px) {
+  .home-page #links .station-favorites .friend-card { gap: 5px; grid-template-columns: 30px minmax(0,1fr) 16px; padding: 7px 5px; }
+  .home-page #links .station-favorites .friend-logo { width: 30px; height: 34px; }
+  .home-page #links .station-favorites strong { font-size: 14px; }
+  .home-page #links .station-favorites .friend-card > i { width: 16px; height: 16px; }
+}
