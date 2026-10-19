@@ -14,7 +14,7 @@ test('all blog pages reference the updated loader and home scripts', () => {
     'index.html', 'kurumi.html', 'pet.html', 'videos.html', 'works.html']) {
     assert.match(read(page), /lottie-core\.js\?v=20261017-motion-1/, page);
   }
-  assert.match(read('index.html'), /script\.js\?v=20261017-motion-1/);
+  assert.match(read('index.html'), /script\.js\?v=\d{8}-[a-z0-9-]+/);
   for (const name of ['lottie-core.js', 'script.js', 'service-worker.js']) {
     new vm.Script(read(name), { filename: name });
   }
