@@ -2,24 +2,24 @@
 
 线上 deployment.json 与 GitHub main 同为 `7bb04f498dba7351a0f4a0ce94807fc7e6a6bfc0`。已合入相较初始本地版本的 5 次提交、14 个文件更新，包括 Bilibili 官方播放器与封面缓存逻辑；未部署后端函数或修改数据库。
 
-优化前基线基于 `e9e47e02d09fbebdd6ee8eeb13dab2a360e8cde7`，优化后基于最新线上版本加本次修改。因此以下是完整工作前后对比，不能完全归因于单项优化。两次均为 Lighthouse 12.6.1、相同 Chrome、节流、六条合成路由，每端每路由三次取中位数。
+优化前基线基于 `e9e47e02d09fbebdd6ee8eeb13dab2a360e8cde7`，优化后基于最新线上版本加本次修改，最终对独立 Git 检出中的代码提交 `5d262e3` 运行完整 36 次采集。因此以下是完整工作前后对比，不能完全归因于单项优化。两次均为 Lighthouse 12.6.1、相同 Chrome、节流、六条合成路由，每端每路由三次取中位数。
 
 | 端 | 页面 | 性能（前→后） | LCP 秒（前→后） | CLS（前→后） |
 | --- | --- | ---: | ---: | ---: |
-| desktop | `/` | 71 → 82 | 3.85 → 2.84 | 0.0492 → 0.0087 |
+| desktop | `/` | 71 → 83 | 3.85 → 2.80 | 0.0492 → 0.0087 |
 | desktop | `/articles.html` | 77 → 83 | 3.55 → 3.03 | 0.1036 → 0.0100 |
-| desktop | `/article.html?slug=review-0` | 83 → 93 | 2.08 → 1.67 | 0.1401 → 0.0071 |
-| desktop | `/videos.html` | 79 → 84 | 3.41 → 2.91 | 0.0725 → 0.0100 |
-| desktop | `/article.html?slug=video-0` | 83 → 93 | 2.09 → 1.67 | 0.1403 → 0.0074 |
-| desktop | `/works.html` | 56 → 82 | 3.32 → 3.15 | 0.7878 → 0.0089 |
-| mobile | `/` | 55 → 62 | 24.63 → 15.32 | 0.0006 → 0.0000 |
+| desktop | `/article.html?slug=review-0` | 83 → 93 | 2.08 → 1.69 | 0.1401 → 0.0071 |
+| desktop | `/videos.html` | 79 → 84 | 3.41 → 2.90 | 0.0725 → 0.0100 |
+| desktop | `/article.html?slug=video-0` | 83 → 93 | 2.09 → 1.69 | 0.1403 → 0.0098 |
+| desktop | `/works.html` | 56 → 82 | 3.32 → 3.14 | 0.7878 → 0.0089 |
+| mobile | `/` | 55 → 62 | 24.63 → 15.24 | 0.0006 → 0.0000 |
 | mobile | `/articles.html` | 49 → 62 | 11.95 → 9.90 | 0.2103 → 0.0137 |
-| mobile | `/article.html?slug=review-0` | 36 → 60 | 14.52 → 11.56 | 0.6737 → 0.0062 |
-| mobile | `/videos.html` | 49 → 63 | 11.34 → 8.48 | 0.2219 → 0.0000 |
-| mobile | `/article.html?slug=video-0` | 36 → 60 | 14.75 → 11.56 | 0.6737 → 0.0062 |
-| mobile | `/works.html` | 43 → 62 | 20.20 → 13.06 | 0.2986 → 0.0000 |
+| mobile | `/article.html?slug=review-0` | 36 → 61 | 14.52 → 11.41 | 0.6737 → 0.0062 |
+| mobile | `/videos.html` | 49 → 62 | 11.34 → 8.63 | 0.2219 → 0.0000 |
+| mobile | `/article.html?slug=video-0` | 36 → 61 | 14.75 → 11.48 | 0.6737 → 0.0062 |
+| mobile | `/works.html` | 43 → 62 | 20.20 → 10.73 | 0.2986 → 0.0000 |
 
-优化后全部 12 组无障碍和 SEO 均为 100；CLS 最大 0.0138，TBT 最大 111ms，JS 启动执行最大 160ms。36 次采集无运行错误、控制台错误或 Lighthouse 运行警告；本地检查未发现真实后端地址进入报告。性能/LCP 仍有 20 条预算警告（桌面 8、移动 12），预算未放宽。
+优化后全部 12 组无障碍和 SEO 均为 100；CLS 最大 0.0137，TBT 最大 108ms，JS 启动执行最大 137ms。36 次采集无运行错误、控制台错误或 Lighthouse 运行警告；本地检查未发现真实后端地址进入报告。性能/LCP 仍有 20 条预算警告（桌面 8、移动 12），预算未放宽。
 
 ## 已完成（按主要影响排序）
 
@@ -31,13 +31,25 @@
 
 ## 后续建议与限制
 
-1. 高影响：移动端 LCP 仍为 8.48–15.32 秒。继续针对首屏大背景、字体及首屏样式临界路径做分阶段拆分，配合真实 CDN 的 Brotli/缓存和用户 RUM；避免用隐藏动画或清空首屏来降低数值。先确认生产瀑布图再调整托管配置。
+1. 高影响：移动端 LCP 仍为 8.63–15.24 秒。继续针对首屏大背景、字体及首屏样式临界路径做分阶段拆分，配合真实 CDN 的 Brotli/缓存和用户 RUM；避免用隐藏动画或清空首屏来降低数值。先确认生产瀑布图再调整托管配置。
 2. 中影响：为非首屏脚本和样式进一步按路由加载，重点检查文章 Markdown/公式工具和全站动画库；目前 JS/TBT 已低于预算，拆分应以交互回归为前提。
-3. 中影响：添加真实媒体播放启动和解码专项检查。当前视频是合成记录，不含真实视频流；第三方 HTTPS 被阻止，结果不代表 Bilibili 外网或 Supabase 延迟。
-4. 工具链：npm 报告开发依赖 17 个漏洞（11 high、4 moderate、2 low），生产依赖为空。应等待/评估兼容的 LHCI 更新，未使用会破坏工具版本的强制修复。
+3. 中影响：页面级 CSS bundle 重复共享样式，首访请求减少，但跨页缓存效果需结合 RUM 评估；后续可提取共享包。
+4. 中影响：添加真实媒体播放启动和解码专项检查。当前视频是合成记录，不含真实视频流；第三方 HTTPS 被阻止，结果不代表 Bilibili 外网或 Supabase 延迟。
+5. 工具链：npm 报告开发依赖 17 个漏洞（11 high、4 moderate、2 low），生产依赖为空。应等待/评估兼容的 LHCI 更新，未使用会破坏工具版本的强制修复。
 
 ## 验证与隐私
 
-性能包复用原生产打包器，输出隔离目录，原有 `_deploy` 不覆盖。静态检测 16 项通过；响应式浏览器检查覆盖 320/375/390/430/768/900/1440、明暗主题及核心路由；花瓣运动、暂停和尺寸切换检查通过。原始 36 份报告、截图、API 配置仅保存在被忽略的本地目录，不提交或公开上传。GitHub Actions 仅输出数值摘要，不携带后端 secrets。
+性能包复用原生产打包器，输出隔离目录，原有 `_deploy` 不覆盖；独立 Git 检出额外执行实际生产打包成功（2018 个文件、306.1 MiB），未上传产物。静态检测 16 项通过；响应式浏览器检查覆盖 320/375/390/430/768/900/1440、明暗主题及核心路由；花瓣运动、暂停和尺寸切换检查通过。原始 36 份报告、截图、API 配置仅保存在被忽略的本地目录，不提交或公开上传。GitHub Actions 仅输出数值摘要，不携带后端 secrets。
 
 提交独立修复分支供审阅；不合并、不触发主分支生产部署。GitHub Actions 的实际远端结果以 PR 检查为准，不能由本地通过推断。
+
+## 修改文件范围
+
+- 配置与入口：`package.json`、`package-lock.json`、`lighthouserc.cjs`、`.gitignore`、`.github/workflows/lighthouse.yml`。
+- 检测与构建：`scripts/{build,run,summarize,check}-lighthouse.cjs`、`scripts/lighthouse-server.cjs`、`scripts/prepare-cloudbase.mjs`、`scripts/build-page-styles.cjs`、`scripts/page-styles.json`，及原动画生命周期检查的版本引用。
+- 页面与样式：九个使用加载动画的 HTML、五个生成的页面 bundle、`performance.css`、`fonts-headings.css`、`mobile-botanicals.css`、`site-footer.css`。
+- 运行逻辑：`lottie-core.js`、`script.js`、`works.js`、`works-data.js`、`service-worker.js`。
+- 素材维护：两个新增 Python 导出脚本及原素材导出入口；325 个字体资源、18 张透明花瓣/作品缩图，原素材保留。
+- 说明：README、初始基线、优化报告、操作说明和仅含数值的 metrics JSON。共 388 个文件，绝大部分为生成资源。
+
+代码提交 `5d262e3` 的远端验证均通过：[Lighthouse 桌面/移动工作流](https://github.com/Kurimi-hutao/personal-blog/actions/runs/39242477349)、[原有交互回归](https://github.com/Kurimi-hutao/personal-blog/actions/runs/39242477407)。最终补充提交仅更新 README 和检测结果文档，不改运行代码。草稿 PR：[#9](https://github.com/Kurimi-hutao/personal-blog/pull/9)。

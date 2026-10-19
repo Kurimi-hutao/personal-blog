@@ -19,7 +19,7 @@ python -m http.server 8000
 桌面和移动端分别检查首页、文章列表/详情、视频列表/详情、作品页。检测使用本地合成数据，
 报告写入被 Git 忽略的 `.lighthouseci-reports/`，不公开上传，也不连接生产 Supabase。
 详细配置见 [Lighthouse CI 说明](docs/lighthouse-ci.md)，
-基线与验证记录见 [2026-10-19 性能报告](docs/lighthouse-baseline-20261019.md)。
+初始基线见 [性能基线](docs/lighthouse-baseline-20261019.md)，最新版本核对、修改清单和剩余建议见 [优化结果](docs/lighthouse-optimization-20261019.md)。
 
 ## 《下一代，来信了》子站
 
