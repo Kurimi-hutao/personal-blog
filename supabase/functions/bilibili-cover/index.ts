@@ -42,15 +42,35 @@ async function published(id:string):Promise<Row|null>{
   return rows.find((row:Row)=>row.video_url.includes(id))||null;
 }
 async function metadata(id:string){
-  const r=await fetch("https://api.bilibili.com/x/web-interface/view?bvid="+id,{
-    headers:{Accept:"application/json",Referer:"https://www.bilibili.com/","User-Agent":"Mozilla/5.0"},signal:AbortSignal.timeout(12000)
+  // Only read this BV's primary official metadata; never take thumbnails
+  // from the Bilibili iframe because it contains unrelated recommendations.
+  try {
+    const r=await fetch("https://api.bilibili.com/x/web-interface/view?bvid="+id,{
+      headers:{Accept:"application/json",Referer:"https://www.bilibili.com/","User-Agent":"Mozilla/5.0"},
+      signal:AbortSignal.timeout(12000),
+    });
+    if(r.ok){
+      const v=await r.json();
+      if(v?.code===0&&v?.data?.bvid===id){
+        const cover=pic(v.data.pic);
+        if(cover)return cover;
+      }
+    }
+  }catch{ /* Cloud networks sometimes receive Bilibili 412. */ }
+  // Fallback: the video page's own social-preview cover (og:image).
+  const response=await fetch("https://www.bilibili.com/video/"+id+"/",{
+    headers:{Accept:"text/html","User-Agent":"Mozilla/5.0","Referer":"https://www.bilibili.com/"},
+    signal:AbortSignal.timeout(12000),
   });
-  if(!r.ok)throw Error("Bilibili metadata HTTP "+r.status);
-  const v=await r.json();
-  if(v?.code!==0||v?.data?.bvid!==id)throw Error("Bilibili video metadata unavailable");
-  const u=pic(v.data.pic);
-  if(!u)throw Error("Invalid original Bilibili thumbnail URL");
-  return u;
+  if(!response.ok)throw Error("Bilibili page metadata HTTP "+response.status);
+  const html=await response.text();
+  const tag=(html.match(/<meta\b[^>]*>/gi)||[]).find(t=>
+    /\b(?:property|name)=["']og:image["']/i.test(t)
+  )||"";
+  const raw=tag.match(/\bcontent=["']([^"']+)/i)?.[1]?.replace(/&amp;/g,"&");
+  const cover=pic(raw);
+  if(!cover)throw Error("Video page has no valid official og:image cover");
+  return cover;
 }
 async function imageBytes(source:URL){
   const formats:Record<string,string>={"image/jpeg":"jpg","image/png":"png","image/webp":"webp"};
