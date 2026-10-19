@@ -10,7 +10,7 @@
   const imageEngine = /AppleWebKit/.test(navigator.userAgent) && !/Chrome|Chromium|Edg|OPR|Android/.test(navigator.userAgent);
   let paused = false, suspended = false, control;
   try { paused = localStorage.getItem('hutao-wuxia-paused') === '1'; } catch {}
-  const url = file => new URL(file, base).href;
+  const url = file => new URL(file + '?v=20261019-clarity', base).href;
   const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
       const scene = [...scenes].find(s => s.root === entry.target);
@@ -25,6 +25,7 @@
   function sync(scene, playing) {
     scene.playing = playing;
     scene.root.dataset.motion = playing ? 'playing' : 'paused';
+    scene.root.dataset.renderer = scene.imageMode ? 'image' : 'video';
     if (scene.failed) return;
     if (scene.imageMode) {
       if (playing) {
@@ -36,7 +37,7 @@
       }
       return;
     }
-    if (!playing) { scene.video.pause(); return; }
+    if (!playing) { scene.video.pause(); scene.root.dataset.ready = 'false'; return; }
     if (!scene.video.getAttribute('src')) scene.video.src = url(scene.name + '.webm');
     scene.video.play().catch(() => { scene.root.dataset.ready = 'false'; });
   }

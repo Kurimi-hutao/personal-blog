@@ -1,22 +1,25 @@
 {
-  "version": "20261018-v3",
+  "version": "20261019-clarity",
   "source": "After Effects corrected V3 native renders",
   "characters": {
     "duration": 8,
     "fps": 60,
+    "fallbackFps": 24,
     "corrections": [
       "closed mouth",
       "whole raised arm follows forehead",
-      "complete bell contour masks"
+      "complete bell contour masks",
+      "384px character image fallback"
     ]
   },
   "assets": [
     {
       "name": "reading",
       "width": 384,
+      "fallbackWidth": 384,
       "videoBytes": 526507,
       "posterBytes": 34546,
-      "fallbackBytes": 1098464,
+      "fallbackBytes": 6785868,
       "posterAlphaExtrema": [
         0,
         255
@@ -25,9 +28,10 @@
     {
       "name": "parasol-hero",
       "width": 384,
+      "fallbackWidth": 384,
       "videoBytes": 425836,
       "posterBytes": 31790,
-      "fallbackBytes": 926722,
+      "fallbackBytes": 6283756,
       "posterAlphaExtrema": [
         0,
         255
@@ -36,9 +40,10 @@
     {
       "name": "resting",
       "width": 384,
+      "fallbackWidth": 384,
       "videoBytes": 484936,
       "posterBytes": 34258,
-      "fallbackBytes": 1095896,
+      "fallbackBytes": 6712584,
       "posterAlphaExtrema": [
         0,
         255
@@ -47,9 +52,10 @@
     {
       "name": "peeking",
       "width": 384,
+      "fallbackWidth": 384,
       "videoBytes": 450428,
       "posterBytes": 30564,
-      "fallbackBytes": 941274,
+      "fallbackBytes": 6007534,
       "posterAlphaExtrema": [
         0,
         255
@@ -58,6 +64,7 @@
     {
       "name": "parasol",
       "width": 256,
+      "fallbackWidth": 128,
       "videoBytes": 106227,
       "posterBytes": 19274,
       "fallbackBytes": 790720,
@@ -69,6 +76,7 @@
     {
       "name": "prayer",
       "width": 192,
+      "fallbackWidth": 128,
       "videoBytes": 58363,
       "posterBytes": 4446,
       "fallbackBytes": 284354,
@@ -80,6 +88,7 @@
     {
       "name": "seal",
       "width": 128,
+      "fallbackWidth": 128,
       "videoBytes": 65216,
       "posterBytes": 9100,
       "fallbackBytes": 165014,
@@ -91,6 +100,7 @@
     {
       "name": "river",
       "width": 768,
+      "fallbackWidth": 320,
       "videoBytes": 81301,
       "posterBytes": 38256,
       "fallbackBytes": 1016016,

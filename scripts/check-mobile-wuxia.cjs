@@ -14,7 +14,7 @@ for(const width of [320,390,430,900])for(const theme of ['light','dark']){
  await context.addInitScript(t=>{localStorage.setItem('hutao-theme',t);sessionStorage.setItem('hutao-site-intro-seen-v1','1');},theme);
  const page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
  for(const file of ['index.html','articles.html','works.html','article.html?slug=review-0']){
-  const videos=[];page.on('request',r=>{if(r.url().includes('mobile-wuxia-v3')&&r.url().endsWith('.webm'))videos.push(r.url())});
+  const videos=[];page.on('request',r=>{if(r.url().includes('mobile-wuxia-v3')&&new URL(r.url()).pathname.endsWith('.webm'))videos.push(r.url())});
   await page.goto('http://localhost:8000/'+file,{waitUntil:'domcontentloaded'});
   await page.evaluate(()=>document.fonts.ready);
   await page.locator('.mobile-wuxia-art').first().waitFor({state:'attached'});

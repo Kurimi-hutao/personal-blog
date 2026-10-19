@@ -26,8 +26,8 @@
     const root = document.createElement('div');
     root.className = 'mobile-peach-garden'; root.setAttribute('aria-hidden','true'); root.inert = true;
     const branch = document.createElement('img');
-    branch.className = 'mobile-peach-branch'; branch.src = './assets/mobile-botanicals/peach-branch.svg';
-    branch.alt = ''; branch.width = 520; branch.height = 300; branch.decoding = 'async'; branch.draggable = false;
+    branch.className = 'mobile-peach-branch'; branch.src = './assets/mobile-botanicals/peach-branch-ink.webp';
+    branch.alt = ''; branch.width = 1040; branch.height = 520; branch.decoding = 'async'; branch.draggable = false;
     const fall = document.createElement('div'); fall.className = 'mobile-peach-fall';
     root.append(branch,fall); host.classList.add('mobile-peach-host'); host.prepend(root);
     const scene = {host,root,animations:[],visible:false}; scenes.add(scene);
