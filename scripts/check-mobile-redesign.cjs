@@ -88,7 +88,7 @@ fs.mkdirSync(out, {recursive: true});
           for (const card of await cards.all()) {
             const cover = await card.locator('.card-visual').boundingBox(), copy = await card.locator('.card-content').boundingBox();
             assert(cover.y + cover.height <= copy.y + 1);
-            assert(Math.abs(cover.width / cover.height - 2.85) < .05);
+            assert(Math.abs(cover.width / cover.height - 2) < .05);
           }
           await page.locator('#articles').scrollIntoViewIfNeeded();
           if (width === 390) await page.locator('#articles').screenshot({path: path.join(out, `articles-${theme}.png`)});

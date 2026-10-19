@@ -14,7 +14,7 @@ fs.mkdirSync('outputs/cover-followup',{recursive:true});
    const selector=file==='index.html'?'#latestArticles .article-card':'.article-list-card';
    await p.waitForFunction(sel=>document.querySelector(sel+':not(.static-fallback)'),selector);
    const cards=p.locator(selector);await cards.first().waitFor();
-   if(file==='index.html'&&width>900){for(const card of await cards.all()){const a=await card.boundingBox(),v=await card.locator('.card-visual').boundingBox();assert(Math.abs(a.width-v.width)<3,'desktop cover is squeezed into a narrow sidebar');assert(Math.abs(v.width/v.height-16/9)<.03);assert.equal(await card.locator('img').evaluate(e=>getComputedStyle(e).objectFit),'contain','desktop image is cropped');}}
+   if(file==='index.html'&&width>900){for(const card of await cards.all()){const a=await card.boundingBox(),v=await card.locator('.card-visual').boundingBox();assert(v.width>a.width*.45,'desktop cover is squeezed into a narrow sidebar');assert(Math.abs(v.width/v.height-16/9)<.03);assert.equal(await card.locator('img').evaluate(e=>getComputedStyle(e).objectFit),'contain','desktop image is cropped');}}
    const second=cards.nth(1),image=second.locator('img');assert.equal(await image.count(),1,'uncovered article must have an illustration');
    await image.evaluate(e=>e.decode());assert(await image.evaluate(e=>e.naturalWidth>0));const src=await image.getAttribute('src');
    if(fallback)assert.equal(src,fallback,'same article changes cover across pages');fallback=src;

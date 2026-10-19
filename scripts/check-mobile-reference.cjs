@@ -39,7 +39,7 @@ fs.mkdirSync(output,{recursive:true});
             await page.waitForFunction(() => document.querySelector('#latestArticles .article-card:not(.static-fallback)'));
             const card=page.locator('#latestArticles .article-card').first();
             const v=await card.locator('.card-visual').boundingBox(),c=await card.locator('.card-content').boundingBox();
-            if(width<=900)assert(v.y+v.height<=c.y+1 && Math.abs(v.width/v.height-2.85)<.05,'home wide cover above copy');
+            if(width<=900)assert(v.y+v.height<=c.y+1 && Math.abs(v.width/v.height-2)<.05,'home wide cover above copy');
             if(width<=900)assert(await page.locator('#latestArticles .article-card').nth(1).locator('.card-visual').isVisible(),'second cover remains visible');
             if(width<=900){await page.locator('.menu-toggle').click();assert(await page.locator('.site-nav.open').isVisible());await page.keyboard.press('Escape');}
           }
