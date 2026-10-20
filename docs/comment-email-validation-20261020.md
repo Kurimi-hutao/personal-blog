@@ -1,0 +1,22 @@
+# 评论邮件部署测试记录（2026-10-20）
+
+## 已验证
+
+- 生产数据库核对了 `public.comments`、`public.articles`、5 条 comments RLS 与旧通知触发器。
+- 原通知实现没有可用 Vault Key，也没有幂等、重试与审计。现已替换为队列与 Edge Function。
+- `comment-notify` 与 `resend-delivery` 已在指定项目部署为 ACTIVE；原 `bilibili-cover` 保留。
+- 现有 `blog-new-comment` 模板已清理并发布，ID 不变；全部 5 个必需变量保留。
+- 新建域名受限 Sending-only Key；凭据与收件人只配置在 Supabase Secrets，SQL webhook 凭据由 Vault 保存。
+- 28 项本地测试通过（14 项通知/回调测试，14 项现有动效及部署回归）。
+- 两个 Edge Function 的 Deno 类型检查通过。
+- 数据库事务集成断言全部通过并回滚，覆盖评论、回复、附件上下文、审核、站长排除、重复事件、租约、不可变请求、24 小时边界、隐藏文章与送达竞态。
+- 生产 worker 无凭据及错误凭据均返回 401；未签名的送达回调返回 401。
+- 真实匿名评论 POST 返回 201，触发器创建 pending 任务；停发状态下 attempts 保持 0。
+- 原评论公开读取接口返回 200；原 5 条 comments RLS 未改动，附件与回复前端未改动。
+- 安全顾问未发现新增可公开执行的 SECURITY DEFINER；既有 RPC 与 Auth 配置告警属于原系统，未扩大此次范围。
+- 静态打包采用既有文件白名单，不包含 `supabase/`、`docs/`、`scripts/` 或 env 文件。
+
+## 当前待验证
+
+域名 DNS 尚在配置/验证中；发送开关保持 false。当前尚无生产发送邮件 ID，未宣称邮件送达。
+DNS 生效后需要启用开关，处理联调评论，核对 Resend ID、五变量实际内容、重复唤醒与签名送达事件，并由收件人在 Gmail 确认显示。

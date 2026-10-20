@@ -1,0 +1,7 @@
+[functions.comment-notify]
+# Authenticated inside the function using a random Vault credential, never an anon key.
+verify_jwt = false
+
+[functions.resend-delivery]
+# HMAC-SHA256 verification of Svix signatures and timestamp in the function.
+verify_jwt = false
