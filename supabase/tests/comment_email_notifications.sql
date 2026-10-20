@@ -62,6 +62,13 @@ begin
   if (select count(*) from public.comment_email_events where event_id='transaction-test-event')<>1 then raise exception 'Duplicate webhook persisted'; end if;
   select count(*) into ignored from public.claim_comment_emails() where comment_id=visitor;
   if ignored<>0 then raise exception 'Accepted event was reclaimed'; end if;
+  delete from public.comments where id=visitor;
+  if not exists(select 1 from public.comment_email_receipts where comment_id=visitor and status='accepted' and resend_email_id=visitor::text) then
+    raise exception 'Deleting a comment erased its idempotency tombstone or send audit'; end if;
+  insert into public.comments(id,article_id,visitor_name,body,visitor_token)
+    values(visitor,article.id,'重用 UUID 测试','不能重复发信',gen_random_uuid()::text);
+  if exists(select 1 from public.comment_email_jobs where comment_id=visitor) then
+    raise exception 'Reused comment UUID created a duplicate mail job'; end if;
   -- Expired ambiguous sends must be reconciled instead of sent outside Resend's 24h cache.
   update public.comment_email_jobs set status='retry',attempts=1,first_attempt_at=now()-interval '24 hours',
     locked_until=null,next_attempt_at=now()-interval '1 day' where comment_id=held;

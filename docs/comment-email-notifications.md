@@ -40,7 +40,7 @@ Edge Function 通过仅 service_role 可调用的 RPC 验证该凭据，公开 K
 
 ## 幂等、重试与送达
 
-- 评论 UUID 是永久队列主键；每次 claim 使用 `FOR UPDATE SKIP LOCKED`、独立 lease UUID 和 3 分钟租约。
+- 评论 UUID 是队列主键，每次 claim 使用 `FOR UPDATE SKIP LOCKED`、独立 lease UUID 和 3 分钟租约。队列保留原评论外键；另用 `comment_email_receipts` 保存不含正文、邮箱或密钥的 UUID 发送凭据，删除评论后仍保留该依据，避免 UUID 再利用造成重复通知。
 - 首次发送前保存完整请求，后续重试保持一致；Resend `Idempotency-Key` 为 `blog-comment/<UUID>`。
 - 网络超时、429、5xx 和并发 409 采用退避重试并尊重 Retry-After；其他 4xx 记为 failed，等待修正。
 - `blog-comment-email-retry` 每分钟唤醒 worker；一次最多 5 条，并限制发信速率。首次 INSERT 也立即唤醒。
