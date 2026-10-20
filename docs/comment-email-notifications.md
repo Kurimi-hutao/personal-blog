@@ -36,13 +36,13 @@ Edge Function 通过仅 service_role 可调用的 RPC 验证该凭据，公开 K
 `scripts/configure-comment-email-secrets.mjs` 接收 stdin JSON，通过官方 CLI 写入 Secrets；不用命令行参数传密钥，临时 env 文件完成后删除。
 必须先完成 `supabase login`。请勿在终端开启命令回显/调试输出，勿把真实值写进可提交脚本或聊天。
 内置 `SUPABASE_URL` 与 `SUPABASE_SERVICE_ROLE_KEY` 由平台注入，无需自建。
-域名记录见 [DNS 操作清单](resend-dns-setup.md)。域名未验证时保持发送开关关闭，队列保留且不消耗重试次数。
+域名记录见 [DNS 操作清单](resend-dns-setup.md)。配置未完成时保持发送开关关闭，队列保留且不消耗重试次数。新版双 CNAME 域名在 partially_verified 时可能可以发送，但此次实测域名受限 Key 返回 400。worker 只对此明确的域名未验证错误自动重试（至少间隔 5 分钟），不扩大 Key 权限；DNS 已正确配置时可开启服务，完整验证后自动恢复发送，仍受尝试次数和幂等窗口约束。
 
 ## 幂等、重试与送达
 
 - 评论 UUID 是队列主键，每次 claim 使用 `FOR UPDATE SKIP LOCKED`、独立 lease UUID 和 3 分钟租约。队列保留原评论外键；另用 `comment_email_receipts` 保存不含正文、邮箱或密钥的 UUID 发送凭据，删除评论后仍保留该依据，避免 UUID 再利用造成重复通知。
 - 首次发送前保存完整请求，后续重试保持一致；Resend `Idempotency-Key` 为 `blog-comment/<UUID>`。
-- 网络超时、429、5xx 和并发 409 采用退避重试并尊重 Retry-After；其他 4xx 记为 failed，等待修正。
+- 网络超时、429、5xx 和并发 409 采用退避重试并尊重 Retry-After；明确的域名未完整验证 400 至少间隔 5 分钟重试；其余 4xx 记为 failed，等待修正。
 - `blog-comment-email-retry` 每分钟唤醒 worker；一次最多 5 条，并限制发信速率。首次 INSERT 也立即唤醒。
 - Resend 只保留幂等键 24 小时。超过 23 小时的模糊结果或 8 次尝试后进入 `needs_review`，避免超出缓存后重复发信。
 - 邮件失败不会使评论失败。入队/调度异常只记录脱敏日志；运行错误不记录凭据、邮箱、评论正文或 provider 返回全文。

@@ -74,6 +74,13 @@ test('network timeout retries while invalid sender/template fails for operator c
   const invalid = fixture({ response: Response.json({ name: 'validation_error' }, { status: 422 }) });
   await invalid.handler(req(token)); assert.equal(invalid.outcome.state, 'failed');
 });
+test('restricted key waiting for full domain verification retries without weakening key permissions', async () => {
+  const f = fixture({ response: Response.json({ message: 'The associated domain with your API key is not verified. Please, create a new API key with full access or with a verified domain.' }, { status: 400 }) });
+  await f.handler(req(token));
+  assert.equal(f.outcome.state, 'retry');
+  assert.equal(f.outcome.error_code, 'resend_domain_not_verified');
+  assert.equal(f.outcome.delay_seconds, 300);
+});
 test('conflicting payload cannot retry, concurrent request can; backoff is bounded', () => {
   assert.equal(retryable(409, 'invalid_idempotent_request'), false);
   assert.equal(retryable(409, 'concurrent_idempotent_requests'), true);

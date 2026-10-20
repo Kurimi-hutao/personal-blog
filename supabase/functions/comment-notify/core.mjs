@@ -72,9 +72,12 @@ export function createHandler({ rpc, env, send = fetch, pause = ms => new Promis
             accepted++;
           } else {
             // Never store provider response text: it can echo addresses/content/secrets.
-            outcome = { state: retryable(response.status, result.name) || response.ok ? 'retry' : 'failed',
-              email_id: null, error_code: `resend_http_${response.status}`,
-              delay_seconds: retrySeconds(job.attempts, response.headers.get('retry-after')) };
+            const waitingForDomain = response.status === 400 && typeof result.message === 'string' &&
+              result.message.startsWith('The associated domain with your API key is not verified.');
+            outcome = { state: waitingForDomain || retryable(response.status, result.name) || response.ok ? 'retry' : 'failed',
+              email_id: null, error_code: waitingForDomain ? 'resend_domain_not_verified' : `resend_http_${response.status}`,
+              delay_seconds: Math.max(waitingForDomain ? 300 : 0,
+                retrySeconds(job.attempts, response.headers.get('retry-after'))) };
           }
         } catch {
           outcome = { state: 'retry', email_id: null, error_code: 'resend_network_error',
