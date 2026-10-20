@@ -17,3 +17,9 @@ DMARC 优先使用邮件子域自己的 `_dmarc.mail`；不存在时才继承组
 仅给邮件子域添加监测策略，保留根域策略与其他邮件服务。若操作时已出现根域/子域策略，先复查，不覆盖。
 
 完成后在 Resend 对现有域名点击 Verify DNS Records。需要最终看到 `verified`，不能用提交 DNS 或 API 接受代替验证通过。
+
+## 最终核验
+
+2026-10-20：用户在 DNSPod 添加以上记录后，权威 DNS 与公开递归 DNS 均核对匹配。
+Resend 最终返回域名 **verified**，DKIM 与两条发送 CNAME 全部 **verified**；Receiving 保持 disabled。
+根域 DMARC 与网站现有业务解析均未修改。实际评论通知已发送并确认 delivered，用户已在 Gmail 确认收到。

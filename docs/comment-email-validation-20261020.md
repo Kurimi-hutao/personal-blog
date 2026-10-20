@@ -9,7 +9,7 @@
 - 新建域名受限 Sending-only Key；凭据与收件人只配置在 Supabase Secrets，SQL webhook 凭据由 Vault 保存。
 - 29 项本地测试通过（15 项通知/回调测试，14 项现有动效及部署回归）。
 - 两个 Edge Function 的 Deno 类型检查通过。
-- GitHub 的 `Comment email notifications` 和 `Frontend interaction regressions` 两项 CI 均通过。
+- 最终代码提交 `0f7012a903216cd00ffb3ad18f7da2464afb9691` 的 `Comment email notifications` 和 `Frontend interaction regressions` 两项 GitHub CI 均通过。
 - 数据库事务集成断言全部通过并回滚，覆盖评论、回复、附件上下文、审核、站长排除、重复事件、租约、不可变请求、24 小时边界、隐藏文章与送达竞态。
 - 生产 worker 无凭据及错误凭据均返回 401；未签名的送达回调返回 401。
 - 真实匿名评论 POST 返回 201，触发器创建 pending 任务；停发状态下 attempts 保持 0。
@@ -18,9 +18,25 @@
 - 独立 `comment_email_receipts` 保留删除后的最小发送凭据；原评论外键保留。事务测试已验证删除评论与重用 UUID 不会重复建立发送任务，新增表和 RPC 无安全顾问告警。
 - 静态打包采用既有文件白名单，不包含 `supabase/`、`docs/`、`scripts/` 或 env 文件。
 
-## 当前待验证
+## 最终生产验收
 
-DNSPod 权威服务器及公开递归 DNS 已查到正确记录。Resend 当前为 `partially_verified`（DKIM 和 `send.mail` 已验证，`rsend.mail` pending）；发送开关保持 false。当前尚无生产发送邮件 ID，未宣称邮件送达。
-曾在主通道验证后用域名受限 Key 执行一次真实测试，Resend 返回 400：该 Key 关联的域名尚未完整验证。请求未获接受，没有邮件 ID；开关已重新关闭。保持同一冻结请求和 `blog-comment/<UUID>` 幂等键，完整验证后才恢复这条任务。
-已新增并部署仅针对明确域名未验证错误的 5 分钟重试，保留原 Key 权限。自动审批拒绝了在 partially_verified 状态提前启用生产发送，原因是可能耗尽队列重试次数；因此不会提前开启，待完整验证后再启用。
-DNS 生效后需要启用开关，处理联调评论，核对 Resend ID、五变量实际内容、重复唤醒与签名送达事件，并由收件人在 Gmail 确认显示。
+| 项目 | 结果 |
+|---|---|
+| 发送域名 | `mail.joestarzhang.cn` 为 **verified**，DKIM、`rsend.mail`、`send.mail` 全部 verified |
+| 接收功能 | disabled，仅发送 |
+| 模板 | `blog-new-comment` published，ID `8dab72c3-2ac5-4080-8509-4af11585b90f` |
+| 生产开关 | `COMMENT_NOTIFICATIONS_ENABLED=true`，Secrets 摘要核对成功 |
+| 真实访客插入 | 匿名 comments POST 返回 201，触发服务端队列，首次尝试 accepted |
+| 评论 UUID | `1ca7e50b-86a4-4598-9dff-35bf9a2b1ccf` |
+| Resend 邮件 ID | `01a157e7-eb9e-7775-83a5-6722f40043a5` |
+| 最终送达 | Resend get-email 返回 delivered；签名回调记录 email.sent、email.delivered |
+| Gmail 确认 | 用户明确确认“已收到，内容正常” |
+| 重复事件 | 同一队列再次唤醒返回 HTTP 200，processed=0、accepted=0；attempts 仍为 1；Resend 最近发送列表只有该邮件 |
+
+实际邮件包含昵称“通知联调访客”、文章“波”、两行中文正文、特殊字符、北京时间和可点击链接 `https://joestarzhang.cn/article.html?slug=wave#comments`。五个变量均已替换，没有残留模板占位符，HTML 对特殊字符正确转义。用户已确认 Gmail 显示正常。
+
+已清理两条公开联调评论（`71901ead-1ddd-4d8b-b20b-572f9f175d06`、`1ca7e50b-86a4-4598-9dff-35bf9a2b1ccf`），原外键清理对应队列；最小发送凭据与签名送达事件保留，其他评论不受影响。
+
+域名等待期间的一次受限 Key 测试被 Resend 以 400 拒绝，没有邮件 ID。随后保持停发，等待完整 verified 后启用；未改用 Full-access Key。系统保留针对明确域名未验证错误的 5 分钟重试保护，其他 4xx 不盲目重试。
+
+本次实现和生产部署已完成。PR 尚待合并，生产 Edge Function、迁移、Secrets、模板与通知开关均已生效；无需前端部署。
