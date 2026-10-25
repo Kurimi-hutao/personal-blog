@@ -1,14 +1,42 @@
 (() => {
-  const sourceAmount = new URLSearchParams(location.search).get('amount') || '';
-  const amount = Number(sourceAmount);
-  const valid = /^\d+(?:\.\d{1,2})?$/.test(sourceAmount) && amount >= 0.01 && amount <= 200;
-  document.querySelector('#paymentContent').hidden = !valid;
-  document.querySelector('#invalidAmount').hidden = valid;
-  const formatted = `¥${amount.toFixed(2)}`;
-  if (valid) {
-    document.querySelector('#paymentAmount').textContent = formatted;
-    document.querySelector('#paymentInstruction').textContent = `扫码后请手动输入 ${formatted}。此收款码不会自动填入金额，请核对后再支付。`;
+  const params = new URLSearchParams(location.search);
+  const sourceAmount = params.has('amount') ? params.get('amount') : '5.00';
+  const radios = [...document.querySelectorAll('[name="rewardAmount"]')];
+  const customInput = document.querySelector('#rewardCustom');
+  const content = document.querySelector('#paymentContent');
+  const invalid = document.querySelector('#invalidAmount');
+  const isValid = raw => /^\d+(?:\.\d{1,2})?$/.test(raw) && Number(raw) >= 0.01 && Number(raw) <= 200;
+  let chosen = isValid(sourceAmount) && ['1', '5', '10'].includes(String(Number(sourceAmount))) ? String(Number(sourceAmount)) : 'custom';
+  if (chosen === 'custom' && isValid(sourceAmount)) customInput.value = sourceAmount;
+  function renderAmount(updateUrl = false) {
+    const custom = chosen === 'custom';
+    document.querySelector('#customAmountBox').hidden = !custom;
+    customInput.disabled = !custom;
+    radios.forEach(radio => { radio.checked = radio.value === chosen; });
+    const raw = custom ? customInput.value : chosen;
+    const valid = isValid(raw);
+    invalid.hidden = valid;
+    content.hidden = !valid;
+    customInput.setAttribute('aria-invalid', String(custom && !valid));
+    if (valid) {
+      const formatted = `¥${Number(raw).toFixed(2)}`;
+      document.querySelector('#paymentAmount').textContent = formatted;
+      document.querySelector('#paymentInstruction').textContent = `扫码后请手动输入 ${formatted}，核对后再支付。`;
+      if (updateUrl) {
+        const url = new URL(location.href);
+        url.searchParams.set('amount', Number(raw).toFixed(2));
+        history.replaceState(null, '', url);
+      }
+    }
   }
+  radios.forEach(radio => radio.addEventListener('change', () => {
+    if (!radio.checked) return;
+    chosen = radio.value;
+    renderAmount(true);
+    if (chosen === 'custom') customInput.focus();
+  }));
+  customInput.addEventListener('input', () => renderAmount(true));
+  renderAmount();
   const providers = { wechat: '微信', alipay: '支付宝' };
   const image = document.querySelector('#paymentQr');
   const error = document.querySelector('#paymentError');

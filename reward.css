@@ -1,27 +1,50 @@
-:root { color-scheme: light; --paper: #f7f4ec; --ink: #28312c; --muted: #72776c; --red: #9f3029; --line: #dedbd0; }
-* { box-sizing: border-box; }
-[hidden] { display: none !important; }
-body { margin: 0; padding: 24px 18px; color: var(--ink); background: var(--paper); font-family: "Songti SC", "Noto Serif SC", "SimSun", serif; }
-.payment-card { width: min(100%, 400px); margin: auto; text-align: center; }
-.payment-seal { display: inline-grid; place-items: center; width: 38px; height: 38px; border: 1px solid var(--red); border-radius: 3px; color: var(--red); font-size: 24px; transform: rotate(-5deg); }
-.eyebrow { margin: 14px 0 8px; font: 10px/1.6 sans-serif; letter-spacing: .18em; color: var(--muted); }
-h1 { margin: 0; font-size: 25px; font-weight: 500; letter-spacing: .08em; }
-.intro { margin: 12px 0 18px; font-size: 13px; line-height: 1.8; color: var(--muted); }
-.payment-amount { display: flex; align-items: center; justify-content: center; gap: 12px; margin: 16px 0; }
-.payment-amount > span { font-size: 12px; color: var(--muted); }
-.payment-amount strong { font: 500 32px/1.2 Georgia, serif; color: var(--red); }
-.payment-methods { display: flex; gap: 8px; }
-button, a { -webkit-tap-highlight-color: transparent; }
-.payment-methods button { flex: 1; min-height: 44px; border: 1px solid var(--line); border-radius: 4px; background: transparent; color: var(--muted); cursor: pointer; font-family: inherit; font-size: 14px; }
-.payment-methods [aria-pressed="true"] { border-color: var(--red); color: var(--red); background: #9f302909; }
-.payment-qr { margin: 16px 0 12px; padding: 12px; border: 1px solid var(--line); background: #fff; border-radius: 8px; }
-.payment-qr img { display: block; width: min(100%, 256px); height: auto; margin: auto; }
-figcaption { margin: 4px 0; font-size: 12px; color: var(--muted); }
-.payment-instruction { margin: 14px 0 12px; font-size: 13px; line-height: 1.8; }
-.save-qr { display: inline-block; padding: 8px 18px; color: var(--red); font-size: 13px; text-underline-offset: 4px; }
-.payment-note, .payment-close-note { font-size: 11px; color: var(--muted); line-height: 1.8; }
-.payment-error, #invalidAmount { color: var(--red); font-size: 14px; line-height: 1.8; }
-.close-payment { width: 100%; padding: 12px 16px; min-height: 44px; border: 1px solid var(--line); border-radius: 4px; background: transparent; color: var(--ink); font-family: inherit; font-size: 13px; cursor: pointer; }
-button:focus-visible, a:focus-visible { outline: 2px solid var(--red); outline-offset: 3px; }
-footer { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 11px; color: var(--muted); letter-spacing: .08em; }
-@media (max-width: 360px) { body { padding: 20px 14px; } }
+:root { color-scheme:light;--paper:#f6f2e9;--ink:#30362f;--muted:#6b7064;--red:#9f392e;--line:#d9d2c3;--qr-paper:#fff; }
+:root[data-theme="dark"] { color-scheme:dark;--paper:#242720;--ink:#e9e3d5;--muted:#b6b8a9;--red:#d58b78;--line:#53584a; }
+* { box-sizing:border-box; }
+[hidden] { display:none!important; }
+body { position:relative;isolation:isolate;margin:0;padding:20px 22px;color:var(--ink);background:var(--paper);font-family:"Songti SC","Noto Serif SC","SimSun",serif;font-size:14px; }
+body::before { content:"";position:absolute;z-index:-1;inset:0;pointer-events:none;background:url('./assets/reward/xuan-paper.webp') center / 620px;opacity:.5; }
+[data-theme="dark"] body::before { opacity:.045; }
+.payment-card { width:min(100%,380px);margin:auto; }
+.payment-topline { display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;color:var(--muted);font-size:10px;letter-spacing:.17em; }
+.payment-seal { display:inline-grid;place-items:center;width:28px;height:28px;border:1px solid var(--red);border-radius:2px;color:var(--red);font:22px/1 "Blog Brush",serif;transform:rotate(-5deg); }
+.payment-header { display:flex;align-items:center;justify-content:space-between;gap:8px;padding-bottom:18px;border-bottom:1px solid var(--line); }
+.payment-header > div { min-width:0; }
+.payment-coffee { width:85px;height:110px;object-fit:contain;flex:0 0 auto; }
+.eyebrow { margin:0 0 7px;font-size:11px;color:var(--muted);letter-spacing:.09em; }
+h1 { margin:0;font-size:25px;line-height:1.5;font-weight:400;letter-spacing:.07em; }
+.intro { margin:8px 0 0;font-size:11px;line-height:1.9;color:var(--muted); }
+.payment-choices { border:0;padding:0;margin:16px 0 12px;min-width:0; }
+.payment-choices legend { display:flex;justify-content:space-between;width:100%;padding:0;margin-bottom:10px;font-size:12px; }
+.payment-choices legend > span { font-size:11px;color:var(--muted); }
+.payment-presets { display:grid;grid-template-columns:repeat(4,1fr);gap:8px; }
+.payment-presets label { position:relative;cursor:pointer; }
+.payment-presets input { position:absolute;opacity:0;width:1px;height:1px; }
+.payment-presets label > span { display:flex;align-items:center;justify-content:center;gap:4px;min-height:44px;border:1px solid var(--line);font-size:12px; }
+.payment-presets b { font:400 22px/1 Georgia,serif; }
+.payment-presets input:checked + span { color:var(--red);border-color:var(--red);background:color-mix(in srgb,var(--red) 6%,transparent); }
+.payment-presets input:focus-visible + span { outline:2px solid var(--red);outline-offset:3px; }
+.payment-custom { margin-top:12px; }
+.payment-custom label { display:block;margin-bottom:6px;font-size:12px; }
+.payment-custom input { width:100%;padding:10px;border:1px solid var(--line);color:var(--ink);background:var(--paper);font:inherit;font-size:16px; }
+.payment-amount { display:flex;align-items:baseline;justify-content:center;gap:9px;margin:9px 0 4px; }
+.payment-amount > span { font-size:11px;color:var(--muted); }
+.payment-amount strong { font:400 26px/1.2 Georgia,serif;color:var(--red); }
+.payment-methods { display:flex;gap:16px;border-bottom:1px solid var(--line); }
+button,a { -webkit-tap-highlight-color:transparent; }
+.payment-methods button { flex:1;min-height:42px;padding:8px;border:0;border-bottom:2px solid transparent;color:var(--muted);background:transparent;font:inherit;font-size:13px;cursor:pointer; }
+.payment-methods [aria-pressed="true"] { color:var(--red);border-bottom-color:var(--red); }
+.payment-qr { width:min(100%,224px);margin:14px auto 8px;padding:6px 6px 10px;background:var(--qr-paper);border:1px solid var(--line);text-align:center; }
+.payment-qr img { display:block;width:100%;height:auto; }
+figcaption { margin:0;font-size:11px;color:#62675f; }
+.payment-instruction { margin:6px 0 0;font-size:12px;line-height:1.8;text-align:center; }
+.save-qr { display:block;width:fit-content;padding:10px 8px;margin:auto;color:var(--red);font-size:12px;text-underline-offset:4px; }
+.save-qr span { margin-left:6px; }
+.payment-note,.payment-close-note { margin:3px 0 0;text-align:center;font-size:11px;color:var(--muted);line-height:1.8; }
+.payment-close-note:empty { display:none; }
+.payment-error,#invalidAmount { color:var(--red);font-size:12px;line-height:1.8; }
+.close-payment { display:block;width:100%;margin-top:16px;padding:11px 8px;border:0;border-block:1px solid var(--line);background:transparent;color:var(--ink);font:inherit;font-size:12px;cursor:pointer; }
+.close-payment span { padding-left:8px;color:var(--red); }
+button:focus-visible,a:focus-visible,input:focus-visible { outline:2px solid var(--red);outline-offset:3px; }
+footer { margin-top:14px;text-align:center;font-size:10px;color:var(--muted);letter-spacing:.16em; }
+@media(max-width:360px) { body { padding:16px; } .payment-coffee { width:65px;height:96px; } h1 { font-size:22px; } .intro { font-size:11px; } .payment-presets { gap:6px; } }

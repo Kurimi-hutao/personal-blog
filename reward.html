@@ -1,36 +1,46 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="light">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex,nofollow">
   <meta name="referrer" content="no-referrer">
+  <script>document.documentElement.dataset.theme = new URLSearchParams(location.search).get('theme') === 'dark' ? 'dark' : 'light';</script>
   <title>请我喝杯瑞幸 · 一杯心意</title>
   <link rel="icon" href="./assets/visual-refresh/favicon.ico">
-  <link rel="stylesheet" href="./reward.css?v=20261025">
-  <script defer src="./reward.js?v=20261025"></script>
+  <link rel="stylesheet" href="./fonts-headings.css?v=20261015">
+  <link rel="stylesheet" href="./reward.css?v=20261025-seal-1">
+  <script defer src="./reward.js?v=20261025-seal-1"></script>
 </head>
 <body>
   <main class="payment-card">
-    <header><span class="payment-seal" aria-hidden="true">赏</span><p class="eyebrow">一杯心意 · THANK YOU</p>
-      <h1>请我喝杯瑞幸</h1><p class="intro">如果这篇文章/视频对你有帮助，<br>请我喝杯瑞幸吧</p>
+    <div class="payment-topline"><span>字里行间 · 感谢相逢</span><span class="payment-seal" aria-hidden="true">谢</span></div>
+    <header class="payment-header">
+      <div><p class="eyebrow">一杯咖啡，一份心意</p><h1>请我喝杯瑞幸</h1><p class="intro">如果这篇文章/视频对你有帮助，<br>请我喝杯瑞幸吧</p></div>
+      <img class="payment-coffee" src="./assets/reward/ink-coffee.webp" width="96" height="112" alt="" aria-hidden="true">
     </header>
-    <div id="paymentContent">
-      <p class="payment-amount"><span>本次心意</span><strong id="paymentAmount"></strong></p>
-      <div class="payment-methods" role="group" aria-label="选择支付方式">
-        <button type="button" data-provider="wechat" aria-pressed="true">微信支付</button>
-        <button type="button" data-provider="alipay" aria-pressed="false">支付宝</button>
+    <fieldset class="payment-choices"><legend>选一份心意 <span>最高 200 元</span></legend>
+      <div class="payment-presets">
+        <label><input type="radio" name="rewardAmount" value="1"><span>¥ <b>1</b></span></label>
+        <label><input type="radio" name="rewardAmount" value="5" checked><span>¥ <b>5</b></span></label>
+        <label><input type="radio" name="rewardAmount" value="10"><span>¥ <b>10</b></span></label>
+        <label><input type="radio" name="rewardAmount" value="custom"><span>自选</span></label>
       </div>
+      <div class="payment-custom" id="customAmountBox" hidden><label for="rewardCustom">自选金额（元）</label><input id="rewardCustom" type="number" min="0.01" max="200" step="0.01" inputmode="decimal" placeholder="0.01–200" aria-describedby="invalidAmount" disabled></div>
+    </fieldset>
+    <p id="invalidAmount" role="alert" hidden>请输入 0.01–200 元之间的金额，最多两位小数。</p>
+    <div id="paymentContent">
+      <div class="payment-methods" role="group" aria-label="选择支付方式"><button type="button" data-provider="wechat" aria-pressed="true">微信支付</button><button type="button" data-provider="alipay" aria-pressed="false">支付宝</button></div>
       <figure class="payment-qr"><img id="paymentQr" src="./assets/reward/wechat.png" alt="微信收款二维码" width="280" height="280"><figcaption id="paymentCaption">请使用微信扫一扫</figcaption></figure>
+      <p class="payment-amount"><span>本次心意</span><strong id="paymentAmount">¥5.00</strong></p>
       <p class="payment-instruction" id="paymentInstruction" aria-live="polite"></p>
-      <a class="save-qr" id="saveQr" href="./assets/reward/wechat.png" download="wechat-reward.png">保存收款码</a>
-      <p class="payment-note">手机访问可保存收款码，在支付 App 中从相册识别。<br>感谢你的支持，量力而行，心意就好。</p>
+      <a class="save-qr" id="saveQr" href="./assets/reward/wechat.png" download="wechat-reward.png">保存收款码 <span aria-hidden="true">↓</span></a>
+      <p class="payment-note">手机可保存收款码，在支付 App 中从相册识别。</p>
       <p class="payment-error" id="paymentError" role="alert" hidden>收款码暂时无法加载，请稍后刷新重试。</p>
     </div>
-    <p id="invalidAmount" role="alert" hidden>金额无效，请返回文章选择 0.01–200 元之间的金额。</p>
     <p class="payment-close-note" id="closeNote" role="status"></p>
-    <button type="button" id="closePayment" class="close-payment">关闭窗口，继续阅读</button>
-    <footer>你的心意，是下一篇创作的动力。</footer>
+    <button type="button" id="closePayment" class="close-payment">收起心意，继续阅读 <span aria-hidden="true">↗</span></button>
+    <footer>一杯瑞幸，续写下一卷</footer>
   </main>
 </body>
 </html>

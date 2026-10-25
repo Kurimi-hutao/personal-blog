@@ -4,7 +4,7 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const { records } = require('./review-fixtures.cjs');
 const root = path.resolve(__dirname, '..');
-const article = { ...records[0], id: 'reward-preview', slug: 'reward-preview', title: '卷尾小憩 · 一杯心意', attachments: [], content: '## 写在卷尾\n\n这是打赏功能的本地预览文章。远山留白，近处落墨。\n\n文章与视频的末尾，现在都可以留下一杯瑞幸的心意。选择金额后，会打开单独的支付窗口。' };
+const article = { ...records[0], id: 'reward-preview', slug: 'reward-preview', title: '卷尾小憩 · 一杯心意', attachments: [], content: '## 写在卷尾\n\n这是打赏功能的本地预览文章。远山留白，近处落墨。\n\n文章与视频的末尾，现在都可以留下一杯瑞幸的心意。点击「赏」字，在独立窗口中选择金额与支付方式。' };
 const fixture = `<script>
 Object.assign(window.articleService, {
   configured: true,
