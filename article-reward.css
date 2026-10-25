@@ -13,5 +13,22 @@
 .reward-window-note { margin:14px 0 0;font-size:12px;color:var(--ink-soft); }
 .reward-window-note:empty { display:none; }
 .reward-window-note a { color:var(--cinnabar);text-decoration:underline;text-underline-offset:3px; }
+.reward-dialog { --dialog-paper:#f6f2e9;--dialog-ink:#30362f;--dialog-line:#d9d2c3;position:fixed;inset:auto 0 auto;top:calc(var(--visual-viewport-top,0px) + var(--visual-viewport-height,100dvh) / 2);translate:0 -50%;margin:0 auto;width:min(440px,calc(100vw - 32px));max-width:none;height:fit-content;max-height:min(860px,calc(var(--visual-viewport-height,100dvh) - 32px));padding:0;border:1px solid var(--dialog-line);border-radius:8px;background:var(--dialog-paper);color:var(--dialog-ink);box-shadow:0 24px 90px rgba(0,0,0,.22);overflow:hidden; }
+.reward-dialog[open] { display:grid;grid-template-rows:auto minmax(0,1fr); }
+.reward-dialog::backdrop { background:rgba(20,26,22,.46);backdrop-filter:blur(4px); }
+.reward-dialog[open]::backdrop { animation:reward-backdrop-in .22s ease both; }
+.reward-dialog.is-closing::backdrop { animation:reward-backdrop-out .14s ease both; }
+@keyframes reward-backdrop-in { from { opacity:0; } to { opacity:1; } }
+@keyframes reward-backdrop-out { from { opacity:1; } to { opacity:0; } }
+[data-theme="dark"] .reward-dialog { --dialog-paper:#242720;--dialog-ink:#e9e3d5;--dialog-line:#53584a; }
+.reward-dialog-bar { display:flex;align-items:center;justify-content:space-between;padding:3px 10px 3px 20px;border-bottom:1px solid var(--dialog-line);background:var(--dialog-paper);font:12px/1.6 var(--serif);letter-spacing:.1em; }
+.reward-dialog .reward-dialog-close { display:grid;place-items:center;width:40px;height:40px;padding:0;border:0;border-radius:3px;background:transparent;color:var(--dialog-ink);font:26px/1 sans-serif;cursor:pointer; }
+.reward-dialog .reward-dialog-close:hover { background:color-mix(in srgb,var(--dialog-ink) 7%,transparent); }
+.reward-dialog .reward-dialog-close:focus-visible { outline:2px solid var(--cinnabar);outline-offset:-4px; }
+.reward-dialog-scroll { min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin; }
+.reward-dialog .reward-payment footer { display:block;padding:0;border:0;background:none; }
+.reward-dialog.is-closing { pointer-events:none; }
+@media(max-width:480px) { .reward-dialog { width:calc(100vw - 24px);max-height:calc(var(--visual-viewport-height,100dvh) - 24px); } }
 @media(max-width:420px) { .article-reward { margin-top:36px;padding:28px 14px; } .reward-copy h2 { font-size:22px; } .reward-message { font-size:13px; } }
 @media(prefers-reduced-motion:reduce) { .article-reward .reward-submit { transition:none; } .article-reward .reward-submit:hover { transform:none; } }
+@media(prefers-reduced-motion:reduce) { .reward-dialog[open]::backdrop,.reward-dialog.is-closing::backdrop { animation:none; } }
