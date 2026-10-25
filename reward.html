@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="referrer" content="no-referrer">
+  <title>请我喝杯瑞幸 · 一杯心意</title>
+  <link rel="icon" href="./assets/visual-refresh/favicon.ico">
+  <link rel="stylesheet" href="./reward.css?v=20261025">
+  <script defer src="./reward.js?v=20261025"></script>
+</head>
+<body>
+  <main class="payment-card">
+    <header><span class="payment-seal" aria-hidden="true">赏</span><p class="eyebrow">一杯心意 · THANK YOU</p>
+      <h1>请我喝杯瑞幸</h1><p class="intro">如果这篇文章/视频对你有帮助，<br>请我喝杯瑞幸吧</p>
+    </header>
+    <div id="paymentContent">
+      <p class="payment-amount"><span>本次心意</span><strong id="paymentAmount"></strong></p>
+      <div class="payment-methods" role="group" aria-label="选择支付方式">
+        <button type="button" data-provider="wechat" aria-pressed="true">微信支付</button>
+        <button type="button" data-provider="alipay" aria-pressed="false">支付宝</button>
+      </div>
+      <figure class="payment-qr"><img id="paymentQr" src="./assets/reward/wechat.png" alt="微信收款二维码" width="280" height="280"><figcaption id="paymentCaption">请使用微信扫一扫</figcaption></figure>
+      <p class="payment-instruction" id="paymentInstruction" aria-live="polite"></p>
+      <a class="save-qr" id="saveQr" href="./assets/reward/wechat.png" download="wechat-reward.png">保存收款码</a>
+      <p class="payment-note">手机访问可保存收款码，在支付 App 中从相册识别。<br>感谢你的支持，量力而行，心意就好。</p>
+      <p class="payment-error" id="paymentError" role="alert" hidden>收款码暂时无法加载，请稍后刷新重试。</p>
+    </div>
+    <p id="invalidAmount" role="alert" hidden>金额无效，请返回文章选择 0.01–200 元之间的金额。</p>
+    <p class="payment-close-note" id="closeNote" role="status"></p>
+    <button type="button" id="closePayment" class="close-payment">关闭窗口，继续阅读</button>
+    <footer>你的心意，是下一篇创作的动力。</footer>
+  </main>
+</body>
+</html>

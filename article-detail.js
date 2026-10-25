@@ -145,6 +145,7 @@ function renderArticle(article) {
     body.appendChild(box);
   }
   root.append(header, body);
+  window.dispatchEvent(new CustomEvent("article:rendered", { detail: { root } }));
   if (article.content_type !== "video") {
     const ending = document.createElement("img");
     ending.className = "article-ending-scene";
