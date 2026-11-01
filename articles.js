@@ -8,6 +8,42 @@ const resultCount = document.querySelector("#articleResultCount");
 
 let allArticles = [];
 let activeTag = "";
+let activeTopic = "";
+const topicFilters = document.querySelector('#topicFilters');
+const keywordSearch = document.querySelector('#keywordSearch');
+const moreFilters = document.querySelector('#moreFilters');
+const topicDefinitions = [
+  ['AI 学习', /人工智能|机器学习|深度学习|强化学习|大模型|生成式|提示词|智能体|入门|学习路线|\bai\b|llm|chatgpt|agent|prompt/i],
+  ['神经网络', /神经网络|感知机|卷积|循环网络|注意力|transformer|cnn|rnn|lstm|架构|激活函数|反向传播/i],
+  ['模型训练', /训练|微调|优化|梯度|损失|过拟合|正则|数据集|蒸馏|量化|推理|评估|lora|fine.?tun|pytorch|tensorflow/i],
+  ['物理科学', /物理|科学|量子|力学|电磁|相对论|天文|宇宙|粒子|热学|光学|牛顿|数学/i],
+  ['技术开发', /开发|编程|代码|工程|前端|后端|数据库|算法|部署|工具|计算机|软件|python|javascript|typescript|react|vue|api|git|linux|docker|web/i],
+  ['开源周报', /开源|周报|周刊|github|开源项目/i],
+  ['教育思考', /教育|教学|思考|反思|课堂|课程|学生|教师|学习方法|认知|成长|读书/i],
+  ['设计创作', /设计|创作|绘画|插画|视觉|艺术|动画|摄影|排版|字体|视频|剪辑|水墨|ui|ux|figma|blender|after effects/i],
+];
+function syncFilterControls() {
+  topicFilters.querySelectorAll('button').forEach(button => {
+    const selected = button.dataset.topic === activeTopic;
+    button.classList.toggle('active', selected);
+    button.setAttribute('aria-pressed', String(selected));
+  });
+  tagFilters.querySelectorAll('button').forEach(button => {
+    const selected = button.dataset.tag === activeTag;
+    button.classList.toggle('active', selected);
+    button.setAttribute('aria-pressed', String(selected));
+  });
+  document.querySelector('#moreFiltersToggle').textContent = activeTag ? `更多筛选 · ${activeTag}` : '更多筛选';
+}
+function searchKeywords() {
+  const query = keywordSearch.value.trim().toLowerCase();
+  let count = 0;
+  tagFilters.querySelectorAll('button').forEach(button => {
+    button.hidden = !button.dataset.tag.toLowerCase().includes(query);
+    if (!button.hidden) count++;
+  });
+  document.querySelector('#keywordEmpty').hidden = count > 0;
+}
 let articleFilterTimer = null;
 let filtersReady = false;
 
@@ -40,6 +76,7 @@ function restoreFilterState() {
   searchInput.value = params.get("q") || "";
   categoryFilter.value = params.get("category") || "";
   activeTag = params.get("tag") || "";
+  activeTopic = topicDefinitions.some(([name]) => name === params.get("topic")) ? params.get("topic") : "";
   sortArticles.value = params.get("sort") || "newest";
 }
 
@@ -48,6 +85,7 @@ function updateFilterUrl() {
   if (searchInput.value.trim()) params.set("q", searchInput.value.trim());
   if (categoryFilter.value) params.set("category", categoryFilter.value);
   if (activeTag) params.set("tag", activeTag);
+  if (activeTopic) params.set("topic", activeTopic);
   if (sortArticles.value !== "newest") params.set("sort", sortArticles.value);
   history.replaceState(null, "", `${location.pathname}${params.size ? `?${params}` : ""}`);
 }
@@ -109,6 +147,19 @@ function createListCard(article) {
 function renderFilters() {
   categoryFilter.querySelectorAll("option:not(:first-child)").forEach((option) => option.remove());
   tagFilters.replaceChildren();
+  topicFilters.replaceChildren();
+  ['', ...topicDefinitions.map(([name]) => name)].forEach(name => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.dataset.topic = name;
+    button.textContent = name || '全部';
+    button.addEventListener('click', () => {
+      activeTopic = name;
+      activeTag = '';
+      renderArticles();
+    });
+    topicFilters.appendChild(button);
+  });
 
   const categories = [...new Set(allArticles.map((article) => article.category).filter(Boolean))];
   categories.forEach((category) => {
@@ -126,6 +177,7 @@ function renderFilters() {
     const button = document.createElement("button");
     button.type = "button";
     button.textContent = `# ${tag}`;
+    button.dataset.tag = tag;
     button.addEventListener("click", () => {
       activeTag = activeTag === tag ? "" : tag;
       renderArticles();
@@ -133,6 +185,8 @@ function renderFilters() {
     tagFilters.appendChild(button);
   });
   window.MotionCore?.setupCustomSelects?.(document.querySelector(".article-filters"));
+  searchKeywords();
+  syncFilterControls();
   filtersReady = true;
 }
 
@@ -148,7 +202,8 @@ function filteredArticles() {
       excerpt.toLowerCase().includes(keyword);
     return matchesKeyword &&
       (!category || article.category === category) &&
-      (!activeTag || (article.tags || []).includes(activeTag));
+      (!activeTag || (article.tags || []).includes(activeTag)) &&
+      (!activeTopic || (article.tags || []).some(tag => topicDefinitions.find(([name]) => name === activeTopic)[1].test(tag)));
   });
   const sorters = {
     newest: (a, b) => new Date(b.published_at || 0) - new Date(a.published_at || 0),
@@ -160,10 +215,7 @@ function filteredArticles() {
 }
 
 function renderArticleDom(filtered) {
-  [...tagFilters.children].forEach((button) => {
-    button.classList.toggle("active", button.textContent === `# ${activeTag}`);
-    button.setAttribute("aria-pressed", String(button.textContent === `# ${activeTag}`));
-  });
+  syncFilterControls();
   articleContainer.replaceChildren();
   resultCount.textContent = `共找到 ${filtered.length} 篇文章`;
   articleContainer.removeAttribute('aria-busy');
@@ -181,6 +233,7 @@ function renderArticles(options = {}) {
   const filtered = filteredArticles();
   resultCount.textContent = `共找到 ${filtered.length} 篇文章`;
   updateFilterUrl();
+  syncFilterControls();
   const render = () => renderArticleDom(filtered);
   if (options.immediate || !filtersReady || !window.MotionCore?.animateListUpdate) {
     render();
@@ -229,6 +282,9 @@ clearFilters.addEventListener("click", () => {
   searchInput.value = "";
   categoryFilter.value = "";
   activeTag = "";
+  activeTopic = "";
+  keywordSearch.value = "";
+  searchKeywords();
   sortArticles.value = "newest";
   categoryFilter.dispatchEvent(new Event("change", { bubbles: true }));
   sortArticles.dispatchEvent(new Event("change", { bubbles: true }));
@@ -241,4 +297,23 @@ window.addEventListener("popstate", () => {
   renderArticles();
 });
 
+keywordSearch.addEventListener('input', searchKeywords);
+document.querySelector('#clearKeywords').addEventListener('click', () => {
+  activeTag = '';
+  keywordSearch.value = '';
+  searchKeywords();
+  renderArticles();
+});
+moreFilters.addEventListener('toggle', () => {
+  if (moreFilters.open) keywordSearch.focus();
+});
+document.addEventListener('click', event => {
+  if (!moreFilters.contains(event.target)) moreFilters.open = false;
+});
+moreFilters.addEventListener('keydown', event => {
+  if (event.key === 'Escape') {
+    moreFilters.open = false;
+    document.querySelector('#moreFiltersToggle').focus();
+  }
+});
 loadArticles();

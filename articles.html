@@ -35,6 +35,7 @@
     <link rel="stylesheet" href="./mobile-wuxia.css?v=20261019-clarity" media="(max-width:900px)" />
     <link rel="stylesheet" href="./mobile-redesign.css?v=20261019-2" />
     <link rel="stylesheet" href="./article-presentation.css?v=20261019-2" />
+    <link rel="stylesheet" href="./article-topic-filters.css?v=20261101-topics" />
   </head>
   <body class="inner-page" data-page="articles">
     <div class="paper-noise" aria-hidden="true"></div>
@@ -79,7 +80,19 @@
         <button class="text-button" id="clearFilters" type="button">清除筛选</button>
       </section>
       <div class="filter-summary">
-        <div class="tag-filter-list" id="tagFilters" aria-label="按标签筛选"></div>
+        <div class="theme-filter-bar">
+          <div class="tag-filter-list topic-filter-list" id="topicFilters" role="group" aria-label="按主题筛选"></div>
+          <details id="moreFilters" class="keyword-filters">
+            <summary id="moreFiltersToggle">更多筛选</summary>
+            <div class="keyword-panel">
+              <div class="keyword-panel-heading"><label for="keywordSearch">细分关键词</label><button id="clearKeywords" class="text-button" type="button">清除关键词</button></div>
+              <input id="keywordSearch" type="search" placeholder="搜索关键词" autocomplete="off" />
+              <p class="keyword-hint">关键词与当前主题共同筛选，点击已选项可取消。</p>
+              <div class="tag-filter-list" id="tagFilters" role="group" aria-label="按关键词筛选"></div>
+              <p id="keywordEmpty" role="status" hidden>没有找到这个关键词，试试其他写法。</p>
+            </div>
+          </details>
+        </div>
         <p id="articleResultCount" role="status"></p>
       </div>
       <section class="all-articles-grid" id="articleList" aria-live="polite">
@@ -94,7 +107,7 @@
     <script src="./content-cache.js?v=20261015"></script>
     <script src="./works-data.js?v=20261015"></script>
     <script src="./theme.js?v=20261019-mobile-redesign"></script>
-    <script src="./articles.js?v=20261019-article-covers"></script>
+    <script src="./articles.js?v=20261101-topics"></script>
     <script src="./motion-core.js?v=20261015-editorial-1"></script>
     <script src="./motion-articles.js?v=20261015"></script>
     <script defer src="./mobile-interactions.js?v=20261015-assets-4"></script>
