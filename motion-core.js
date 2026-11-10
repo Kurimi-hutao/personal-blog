@@ -183,6 +183,8 @@
     const target = source instanceof Element ? source : null;
     if (!target?.closest("button, a, summary, [role='button']")) return;
     if (target.closest("dialog, .animated-select, .animated-select__panel, input, textarea, select, option, video, audio, iframe, canvas, [contenteditable='true'], :disabled, [aria-disabled='true']")) return;
+    // Animate these controls at the affected icon or panel.
+    if (target.closest('#bookmarkArticle,#shareArticle,.friend-group-heading,.like-button,.seal-button,[data-gallery-src],.menu-toggle,.theme-toggle,.back-to-top')) return;
     if (document.querySelectorAll('.ink-click-ripple').length >= 3) return;
 
     const duration = state.coarse ? 460 : 580;
@@ -208,6 +210,8 @@
   }
 
   function setupClickFeedback() {
+    const mobileOwnsPress = () => document.documentElement.classList.contains('has-mobile-feedback') &&
+      window.matchMedia('(max-width:1080px)').matches;
     let touch = null;
     window.addEventListener("pointerdown", (event) => {
       if (event.button !== 0 || !event.isPrimary) { touch = null; return; }
@@ -226,7 +230,7 @@
     window.addEventListener('pointercancel', () => { touch = null; }, { passive: true });
 
     document.addEventListener("pointerdown", (event) => {
-      if (state.reduced || !event.isPrimary || event.button !== 0) return;
+      if (state.reduced || mobileOwnsPress() || !event.isPrimary || event.button !== 0) return;
       const target = event.target.closest?.("button, a, [role='button'], [role='option'], summary");
       if (!target || target.matches(":disabled, [aria-disabled='true']")) return;
       target.classList.add("motion-pressing");
@@ -246,7 +250,7 @@
       if (event.key === "Enter" || event.key === " ") release();
     });
     document.addEventListener("keydown", (event) => {
-      if (state.reduced || event.repeat) return;
+      if (state.reduced || mobileOwnsPress() || event.repeat) return;
       if (event.key !== "Enter" && event.key !== " ") return;
       const target = event.target.closest?.("button, a, [role='button'], [role='option'], summary");
       if (!target || target.matches(":disabled, [aria-disabled='true']")) return;

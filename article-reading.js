@@ -65,11 +65,22 @@
     const observer = new IntersectionObserver(entries => {
       const entry = entries.filter(e => e.isIntersecting).sort((a,b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
       if (!entry) return;
-      [toc, dialog].forEach(root => root.querySelectorAll('a').forEach(link => {
-        const active = link.hash === `#${entry.target.id}`;
-        link.classList.toggle('active', active);
-        if (active) link.setAttribute('aria-current', 'location'); else link.removeAttribute('aria-current');
-      }));
+      [toc, dialog].forEach(root => {
+        const previous = root.querySelector('a.active');
+        const links = root.querySelectorAll('a');
+        let current;
+        links.forEach(link => {
+          const active = link.hash === `#${entry.target.id}`;
+          link.classList.toggle('active', active);
+          if (active) {
+            current = link;
+            link.setAttribute('aria-current', 'location');
+          } else link.removeAttribute('aria-current');
+        });
+        if (!previous || !current || previous === current || !current.getClientRects().length || motion() === 'auto') return;
+        const distance = previous.getBoundingClientRect().top - current.getBoundingClientRect().top;
+        current.style.setProperty('--toc-distance', Math.max(-56, Math.min(56, distance)) + 'px');
+      });
     }, { rootMargin: '-15% 0px -65% 0px' });
     headings.forEach(heading => observer.observe(heading));
   }

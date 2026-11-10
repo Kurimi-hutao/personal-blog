@@ -367,7 +367,11 @@ async function setupArticleExtras(article) {
       if (navigator.share) await navigator.share(data);
       else {
         await navigator.clipboard.writeText(location.href);
-        document.querySelector("#shareArticle").textContent = "链接已复制";
+        const share = document.querySelector("#shareArticle");
+        share.textContent = "链接已复制";
+        share.classList.remove("copy-confirmed");
+        void share.offsetWidth;
+        share.classList.add("copy-confirmed");
       }
     } catch {}
   });

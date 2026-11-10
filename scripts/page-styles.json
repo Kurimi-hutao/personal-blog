@@ -79,6 +79,9 @@
     },
     {
       "file": "ink-image-ui.css"
+    },
+    {
+      "file": "interaction-ink.css"
     }
   ],
   "articles.html": [
@@ -161,6 +164,9 @@
     },
     {
       "file": "ink-image-ui.css"
+    },
+    {
+      "file": "interaction-ink.css"
     }
   ],
   "article.html": [
@@ -243,6 +249,9 @@
     },
     {
       "file": "ink-image-ui.css"
+    },
+    {
+      "file": "interaction-ink.css"
     }
   ],
   "videos.html": [
@@ -310,6 +319,9 @@
     },
     {
       "file": "ink-image-ui.css"
+    },
+    {
+      "file": "interaction-ink.css"
     }
   ],
   "works.html": [
@@ -386,6 +398,9 @@
     },
     {
       "file": "ink-image-ui.css"
+    },
+    {
+      "file": "interaction-ink.css"
     }
   ]
 }

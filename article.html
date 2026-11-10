@@ -10,7 +10,7 @@
     <link rel="alternate" type="application/rss+xml" title="虎桃不会振刀 RSS" href="./rss.xml" />
     <title>文章 | 虎桃不会振刀</title>
     <link rel="stylesheet" href="./assets/vendor/katex/katex-0.16.22.min.css" />
-    <link rel="stylesheet" href="./page-article.bundle.css?v=fe545783086d" />
+    <link rel="stylesheet" href="./page-article.bundle.css?v=0fbd5253cee1" />
     <link rel="stylesheet" href="./reward.css?v=20261105-controls" />
     <link rel="stylesheet" href="./article-reward.css?v=20261105-controls" />
     <script defer src="./site-footer.js?v=20261007-1"></script>
@@ -83,7 +83,7 @@
           <input id="commentImageInput" type="file" accept="image/png,image/jpeg,image/gif,image/webp" multiple hidden />
           <input type="file" name="attachments" accept="image/png,image/jpeg,image/gif,image/webp,text/plain,application/pdf" multiple hidden />
           <div class="comment-toolbar"><div><button type="button" id="pickCommentImage">图片</button><button type="button" id="pickCommentFile">附件</button></div><span id="commentLength">0/2000</span><button class="ink-button" type="submit" disabled>发送</button></div>
-          <small id="commentHelp">可粘贴或拖入图片，最多 3 个文件，单个不超过 5 MB。Ctrl / ⌘ + Enter 发送。</small>
+          <small id="commentHelp"><span class="attachment-tally" aria-hidden="true"><i></i><i></i><i></i></span>可粘贴或拖入图片，最多 3 个文件，单个不超过 5 MB。Ctrl / ⌘ + Enter 发送。</small>
           <p class="comment-status" id="commentStatus" role="status"></p>
         </form>
         <div class="comment-list" id="commentList" aria-live="polite"></div>

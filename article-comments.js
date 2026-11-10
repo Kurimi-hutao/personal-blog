@@ -78,6 +78,9 @@
       remove.onclick = () => { filesTouched = true; files = files.filter((_,i) => i !== index); renderFiles(); scheduleSave(); };
       item.append(remove); previews.append(item);
     });
+    form.querySelectorAll('.attachment-tally i').forEach((bead, index) => {
+      bead.classList.toggle('used', index < files.length);
+    });
     previews.hidden = !files.length; updateComposer();
   }
   function addFiles(incoming) {
@@ -96,11 +99,29 @@
     if (!imageDialog) {
       imageDialog = document.createElement('dialog'); imageDialog.className = 'comment-image-dialog';
       imageDialog.setAttribute('aria-label', '评论图片预览');
-      imageDialog.innerHTML = '<button type="button" aria-label="关闭图片">×</button><img alt=""><a target="_blank" rel="noopener noreferrer">查看原图</a>';
+      imageDialog.innerHTML = '<button type="button" aria-label="关闭图片">×</button><div><button class="comment-image-sample" type="button" aria-label="轻点图片查看两倍局部"><img alt=""><span class="comment-image-lens" hidden aria-hidden="true"></span></button></div><a target="_blank" rel="noopener noreferrer">查看原图</a>';
       imageDialog.querySelector('button').onclick = () => imageDialog.close();
       imageDialog.onclick = e => { if (e.target === imageDialog) imageDialog.close(); };
+      const sample = imageDialog.querySelector('.comment-image-sample');
+      const lens = sample.querySelector('.comment-image-lens');
+      sample.addEventListener('click', event => {
+        const image = sample.querySelector('img');
+        if (!image.naturalWidth) return;
+        const bounds = image.getBoundingClientRect();
+        const x = event.detail ? event.clientX - bounds.left : bounds.width / 2;
+        const y = event.detail ? event.clientY - bounds.top : bounds.height / 2;
+        lens.hidden = false;
+        lens.classList.toggle('on-left', x > bounds.width / 2);
+        lens.style.backgroundImage = 'url(' + JSON.stringify(image.src) + ')';
+        lens.style.backgroundSize = (2 * bounds.width) + 'px ' + (2 * bounds.height) + 'px';
+        const offset = (coordinate, size, diameter) =>
+          Math.min(0, Math.max(diameter - size * 2, diameter / 2 - coordinate * 2));
+        lens.style.backgroundPosition = offset(x, bounds.width, lens.clientWidth) + 'px ' +
+          offset(y, bounds.height, lens.clientHeight) + 'px';
+      });
       document.body.append(imageDialog);
     }
+    imageDialog.querySelector('.comment-image-lens').hidden = true;
     imageDialog.querySelector('img').src = url; imageDialog.querySelector('img').alt = name;
     imageDialog.querySelector('a').href = url; imageDialog.showModal();
   }

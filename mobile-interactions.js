@@ -3,6 +3,7 @@
   'use strict';
   const compact = matchMedia('(max-width:1080px)');
   const reduce = matchMedia('(prefers-reduced-motion:reduce)');
+  document.documentElement.classList.add('has-mobile-feedback');
   const running = new Map();
   const enabled = () => compact.matches && !reduce.matches && !document.hidden;
   const controls = 'button,a,summary,[role="button"],[role="option"]';
@@ -58,10 +59,10 @@
         if (!element.open) { cancel(element); return; }
         play(element,[{ opacity: 0,transform: 'translateY(8px)' },{ opacity: 1,transform: 'translateY(0)' }],{ duration: 240 },'dialog');
       }
-      if (record.attributeName === 'aria-pressed' && element.matches('#bookmarkArticle,.like-button,.works-toolbar button,.tag-filter-list button,.search-type-filters button')) feedback(element);
+
     });
   });
-  states.observe(document.body,{ subtree: true,attributes: true,attributeFilter: ['open','aria-pressed'] });
+  states.observe(document.body,{ subtree: true,attributes: true,attributeFilter: ['open'] });
   function revealArtwork() {
     if (!enabled() || !document.body.classList.contains('home-page') || !matchMedia('(max-width:900px)').matches) return;
     const dark = document.documentElement.dataset.theme === 'dark';
