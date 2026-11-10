@@ -1,0 +1,30 @@
+name: Lighthouse baseline
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: lighthouse-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        profile: [desktop, mobile]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install quality tools
+        run: npm ci --ignore-scripts
+      - run: npm run test:perf
+      - run: npm run test:regression
+      - run: npm run build:perf
+      - run: npm run perf:${{ matrix.profile }}
+      # Intentionally no upload-artifact, LHCI token, public storage, or deploy.
