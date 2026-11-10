@@ -184,7 +184,7 @@
     if (!target?.closest("button, a, summary, [role='button']")) return;
     if (target.closest("dialog, .animated-select, .animated-select__panel, input, textarea, select, option, video, audio, iframe, canvas, [contenteditable='true'], :disabled, [aria-disabled='true']")) return;
     // Animate these controls at the affected icon or panel.
-    if (target.closest('#bookmarkArticle,#shareArticle,.friend-group-heading,.like-button,.seal-button,[data-gallery-src],.menu-toggle,.theme-toggle,.back-to-top')) return;
+    if (target.closest('#bookmarkArticle,#shareArticle,.friend-group-heading,.like-button,.seal-button,[data-gallery-src],.menu-toggle,.theme-toggle,.back-to-top,.tag-filter-list,.works-toolbar')) return;
     if (document.querySelectorAll('.ink-click-ripple').length >= 3) return;
 
     const duration = state.coarse ? 460 : 580;

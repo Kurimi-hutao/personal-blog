@@ -155,6 +155,10 @@
   searchButton.className = "site-search-trigger";
   searchButton.setAttribute("aria-label", "搜索全站内容");
   searchButton.innerHTML = '<span aria-hidden="true">⌕</span><span>搜索</span><kbd>/</kbd>';
+  const homeSearch = document.body.classList.contains('home-page');
+  if (homeSearch) {
+    searchButton.innerHTML = '<span class="search-seal" aria-hidden="true">寻</span><span>搜索全站</span><kbd aria-hidden="true">/</kbd>';
+  }
   if (header) {
     header.insertBefore(searchButton, navigation || null);
   }
@@ -506,7 +510,9 @@
   let reducedMotion = reducedMotionQuery.matches;
   reducedMotionQuery.addEventListener("change", (event) => {
     reducedMotion = event.matches;
-    document.documentElement.classList.toggle("cursor-ready", finePointer && !reducedMotion);
+    if (!document.body.classList.contains("home-page")) {
+      document.documentElement.classList.toggle("cursor-ready", finePointer && !reducedMotion);
+    }
     document.querySelectorAll(".ink-cursor-trail").forEach((trail) => {
       trail.getAnimations().forEach((animation) => animation.cancel());
       trail.remove();
@@ -719,9 +725,14 @@
     navigation.append(utilities);
     const layout = matchMedia('(max-width:1080px)');
     const placeUtilities = () => {
-      if (layout.matches) utilities.prepend(searchButton, button);
+      if (layout.matches) {
+        utilities.prepend(button);
+        if (homeSearch && !navigation.classList.contains('open')) header.insertBefore(searchButton, menuToggle);
+        else utilities.prepend(searchButton);
+      }
       else { header.insertBefore(searchButton, menuToggle); document.querySelector('.mobile-control-dock')?.append(button); }
     };
+    if (homeSearch) document.addEventListener('mobile-navigation-change', placeUtilities);
     layout.addEventListener('change', placeUtilities); placeUtilities();
     const topLink = document.createElement('button'); topLink.type = 'button'; topLink.className = 'mobile-scroll-top'; topLink.textContent = '回到卷首 ↑';
     topLink.onclick = () => backToTop.click(); document.querySelector('body > footer')?.append(topLink);

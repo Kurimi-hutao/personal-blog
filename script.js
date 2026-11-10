@@ -900,6 +900,7 @@ if (hasGsap) {
       gsap.to(cursor, { autoAlpha: 1, duration: 0.15, overwrite: "auto" });
       window.clearTimeout(cursorIdleTimer);
       cursorIdleTimer = window.setTimeout(() => {
+        if (event.target.closest?.("a, button, input, textarea, select, summary, [role=button], [role=option]")) return;
         cursor.classList.add("is-idle");
         gsap.to(cursor, { autoAlpha: 0, duration: 0.45, overwrite: "auto" });
       }, 1200);
@@ -980,7 +981,7 @@ setupLinksToggle();
 
 function applyHomeMotionPreference() {
   reducedMotion = homeMotionQuery.matches;
-  document.documentElement.classList.toggle("cursor-ready", !reducedMotion && finePointer && !lowPowerDevice);
+  document.documentElement.classList.toggle("cursor-ready", hasGsap && !reducedMotion && finePointer && !lowPowerDevice);
   ambientMotions.forEach((motion) => motion.paused(reducedMotion || document.hidden));
   if (reducedMotion || document.hidden) {
     manualPetals.forEach(node => { node.getAnimations().forEach(animation => animation.cancel()); node.remove(); });

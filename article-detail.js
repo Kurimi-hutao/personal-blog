@@ -215,6 +215,7 @@ function setupReadingTools(article) {
     if (index >= 0) items.splice(index, 1);
     else items.unshift({ id: article.id, slug: article.slug, title: article.title, category: article.category, tags: article.tags || [], savedAt: Date.now() });
     localStorage.setItem(bookmarkKey, JSON.stringify(items.slice(0, 50)));
+    bookmark.dataset.bookmarkMotion = index < 0 ? "save" : "remove";
     renderBookmark();
   });
 }

@@ -9312,8 +9312,6 @@ body .article-neighbors a[data-direction="previous"] small::before { transform:s
   :is(.message-form,.comment-form) label:focus-within::after { transform:scaleX(1); }
   .fortune-dialog[open] .fortune-knot { transform-origin:50% 5%; animation:fortune-cord .78s ease-out; }
   @keyframes fortune-cord { 0%,100% {rotate:0deg} 24% {rotate:10deg} 55% {rotate:-5deg} 78% {rotate:2deg} }
-  #bookmarkArticle::before { transform-origin:50% 0; transition:scale .25s ease,translate .25s ease,color .2s; }
-  #bookmarkArticle[aria-pressed="true"]::before { scale:1 1.13; translate:0 2px; color:var(--cinnabar); }
   :is(.article-toc,.reading-toc-dialog) li a { transition:color .22s,background-color .22s,border-color .22s; }
   .reply-context:not([hidden]) { animation:reply-bracket .24s ease-out; }
   @keyframes reply-bracket { from {clip-path:inset(0 0 85% 0)} to {clip-path:inset(0)} }
@@ -9438,4 +9436,87 @@ body .article-neighbors a[data-direction="previous"] small::before { transform:s
   }
   body[data-page="articles"] .article-filters > label,
   body[data-page="articles"] .article-filters #clearFilters { grid-column:auto; grid-row:auto; }
+}
+/* Dialogs live above the document cursor. Give the top layer the same ink tip. */
+@media (min-width:841px) and (hover:hover) and (pointer:fine) and (prefers-reduced-motion:no-preference) {
+  html.cursor-ready, html.cursor-ready body, html.cursor-ready body * { cursor:none !important; }
+  html { --ink-tip-cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Cpath d='M29 16c0 8-7 13-14 13S2 24 3 16 8 3 16 3s14 6 13 13Z' fill='%23f3ecdb' fill-opacity='.18' stroke='%238a776c' stroke-opacity='.8'/%3E%3Cpath d='M19 15c1 3-1 5-4 5-3 0-4-2-3-5s5-4 7 0Z' fill='%23953e32' stroke='%23f2e9d8' stroke-width='1'/%3E%3C/svg%3E") 16 16,auto; }
+  html:not(.cursor-ready) .home-page, html:not(.cursor-ready) .home-page * { cursor:var(--ink-tip-cursor) !important; }
+  html dialog:modal, html dialog:modal *, html dialog:modal::backdrop { cursor:var(--ink-tip-cursor) !important; }
+  html.cursor-ready:has(dialog:modal) :is(.ink-cursor,.ink-cursor-trail) { visibility:hidden !important; }
+}
+
+/* Keep lettering on its own layer while the pigment crosses the paper. */
+html[data-theme] body :is(.search-type-filters,.works-toolbar,.tag-filter-list) button {
+  position:relative; isolation:isolate;
+}
+html[data-theme] body :is(.search-type-filters,.works-toolbar,.tag-filter-list) button:is(.active,[aria-pressed="true"]) {
+  background:transparent;
+}
+html[data-theme] body :is(.search-type-filters,.works-toolbar,.tag-filter-list) button::before {
+  content:""; position:absolute; inset:0; z-index:-1; display:block; pointer-events:none;
+  width:auto; height:auto; margin:0; border:0; background:var(--loaded-brush) center / 100% 100% no-repeat;
+  clip-path:polygon(-20% 0,-13% 0,-15% 23%,-12% 40%,-17% 65%,-14% 83%,-18% 100%,-20% 100%);
+}
+html[data-theme] body :is(.search-type-filters,.works-toolbar,.tag-filter-list) button:is(.active,[aria-pressed="true"])::before {
+  clip-path:polygon(-20% 0,116% 0,114% 23%,117% 40%,112% 65%,115% 83%,111% 100%,-20% 100%);
+}
+@media(prefers-reduced-motion:no-preference) {
+  html[data-theme] body :is(.search-type-filters,.works-toolbar,.tag-filter-list) button::before { transition:clip-path .14s ease-in; }
+  html[data-theme] body :is(.search-type-filters,.works-toolbar,.tag-filter-list) button:is(.active,[aria-pressed="true"])::before { transition:clip-path .36s cubic-bezier(.24,.68,.31,1); }
+}
+html body .reading-tools #bookmarkArticle::before {
+  content:""; display:inline-block; flex:0 0 13px; width:13px; height:21px; mask:none;
+  background:currentColor; opacity:.54; clip-path:polygon(0 0,100% 0,100% 100%,50% 74%,0 100%);
+  transform-origin:50% 0; transform:scaleY(.65);
+}
+html body .reading-tools #bookmarkArticle[aria-pressed="true"]::before { background:var(--cinnabar); opacity:1; transform:scaleY(1); }
+@media(prefers-reduced-motion:no-preference) {
+  #bookmarkArticle[aria-pressed="true"][data-bookmark-motion="save"]::before { animation:insert-bookmark .48s both; }
+  #bookmarkArticle[aria-pressed="false"][data-bookmark-motion="remove"]::before { animation:withdraw-bookmark .28s both; }
+  @keyframes insert-bookmark {
+    0% { transform:translateY(-8px) scaleY(.35); opacity:.35; }
+    68% { transform:translateY(2px) scaleY(1.1); opacity:1; }
+    100% { transform:translateY(0) scaleY(1); }
+  }
+  @keyframes withdraw-bookmark {
+    0% { transform:scaleY(1); opacity:1; }
+    60% { transform:translateY(-3px) scaleY(.5); }
+    100% { transform:scaleY(.65); opacity:.54; }
+  }
+}
+html body.home-page .site-header > .site-search-trigger {
+  position:relative; display:inline-flex; gap:9px; align-items:center; justify-content:flex-start;
+  min-height:44px; width:clamp(132px,12vw,178px); padding:5px 10px; flex-shrink:0;
+  border:0; border-radius:0; box-shadow:none; backdrop-filter:none;
+  background:linear-gradient(90deg,color-mix(in srgb,var(--ink) 6%,transparent),transparent) center/100% 76% no-repeat;
+  font:15px/1.2 var(--serif); letter-spacing:.06em; color:var(--ink);
+}
+html body.home-page .site-header > .site-search-trigger::after {
+  content:""; position:absolute; inset:auto 0 5px; height:2px; pointer-events:none;
+  background:var(--ink); opacity:.39; clip-path:polygon(0 55%,9% 10%,70% 37%,100% 60%,81% 72%,3% 100%);
+}
+html body.home-page .site-header > .site-search-trigger > .search-seal {
+  display:grid;place-items:center; width:22px;height:23px; mask:none; background:#984535;
+  color:#fff3df; border-radius:2px 3px 2px 4px; rotate:-4deg; font:17px/1 var(--brush,var(--serif));
+}
+html body.home-page .site-header > .site-search-trigger kbd {margin-left:auto;padding:0;color:var(--ink-soft);border:0;background:none;font-size:13px;}
+html body.home-page .site-search-dialog .site-search-field {
+  position:relative; background:linear-gradient(90deg,color-mix(in srgb,var(--ink) 5%,transparent),transparent);
+  border:0;box-shadow:none;padding-inline:14px;gap:12px;
+}
+.home-page .site-search-field::after {
+  content:"";position:absolute;inset:auto 0 0;height:2px;
+  background:var(--ink-soft);clip-path:polygon(0 45%,13% 12%,85% 35%,100% 55%,95% 77%,2% 100%);
+}
+.home-page .site-search-field:focus-within::after {background:var(--cinnabar);}
+@media(max-width:1080px) {
+  html body.home-page .site-header > .site-search-trigger {order:1;margin:0 6px 0 auto;width:auto;padding-inline:7px;gap:5px;font-size:13px;}
+  html body.home-page .site-header > .site-search-trigger > span:nth-child(2) {display:inline;}
+  html body.home-page .site-header > .site-search-trigger kbd {display:none;}
+}
+@media(max-width:380px) {
+  .home-page .site-header .brand-name { white-space:nowrap; }
+  html body.home-page .site-header > .site-search-trigger { width:44px; margin-inline:0; justify-content:center; }
+  html body.home-page .site-header > .site-search-trigger > span:nth-child(2) { display:none; }
 }
