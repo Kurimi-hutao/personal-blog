@@ -879,7 +879,8 @@ async function loadOwnerConsole() {
 }
 
 function renderMarkdownPreview() {
-  markdownPreview.innerHTML = window.blogMarkdown.render(articleForm.elements.content.value);
+  const title = articleForm.elements.title.value.trim();
+  markdownPreview.innerHTML = window.blogMarkdown.renderArticle(articleForm.elements.content.value, title);
   if (!markdownPreview.textContent.trim()) {
     markdownPreview.innerHTML = '<p class="article-state">预览会随内容输入实时更新。</p>';
   } else if (typeof window.renderMathInElement === "function") {
@@ -893,6 +894,11 @@ function renderMarkdownPreview() {
       ignoredTags: ["script", "noscript", "style", "textarea", "pre", "code"],
       throwOnError: false,
     });
+  }
+  if (title) {
+    const heading = document.createElement("h1");
+    heading.textContent = title;
+    markdownPreview.prepend(heading);
   }
 }
 
@@ -924,6 +930,10 @@ articleForm.addEventListener("submit", async (event) => {
   const form = new FormData(articleForm);
   const slug = form.get("slug").trim();
   const contentType = form.get("contentType");
+  if (window.blogMarkdown.hasDamagedMath(form.get("content"))) {
+    setStatus("正文中的公式含有损坏的转义字符，请检查公式并在预览中确认后再保存。", true);
+    return;
+  }
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) {
     setStatus("网址标识只能包含小写字母、数字和连字符。", true);
     return;
@@ -1152,6 +1162,7 @@ window.addEventListener("beforeunload", (event) => {
   event.returnValue = "";
 });
 articleForm.elements.content.addEventListener("input", renderMarkdownPreview);
+articleForm.elements.title.addEventListener("input", renderMarkdownPreview);
 
 function draftKey() {
   return `hutao-editor-draft-${editingArticle?.id || selectedContentType()}`;

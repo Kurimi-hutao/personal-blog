@@ -15,6 +15,7 @@
       this.model = null;
       this.ready = false;
       this.enabled = true;
+      this.visible = !document.hidden;
       this.time = 0;
       this.frame = 0;
       this.gaze = { x: 0, y: 0 };
@@ -52,7 +53,8 @@
       const Live2DModel = PIXI.live2d.Live2DModel;
       this.model = await Live2DModel.from(this.modelUrl, {
         autoInteract: false,
-        autoUpdate: true,
+        // Use the application's ticker only, so a paused room also stops Live2D.
+        autoUpdate: false,
       });
       this.model.anchor.set(0.5, 0.5);
       this.app.stage.addChild(this.model);
@@ -64,6 +66,7 @@
       this.resizeObserver.observe(this.canvasHost);
 
       this.ready = true;
+      this.syncPlayback();
       this.host.classList.add("is-live2d-ready");
       this.host.dataset.live2d = "ready";
       this.host.dataset.modelUrl = this.modelUrl;
@@ -83,10 +86,11 @@
       this.baseY = this.canvasHost.clientHeight * (this.options.y || 0.51);
       this.model.scale.set(this.baseScale);
       this.model.position.set(this.baseX, this.baseY);
+      if (this.ready && (!this.enabled || !this.visible)) this.renderStill();
     }
 
     tick(deltaTime) {
-      if (!this.model) return;
+      if (!this.model || !this.enabled || !this.visible) return;
       const measuredDelta = this.app?.ticker?.deltaMS;
       const fallbackDelta = typeof deltaTime === "number" ? deltaTime * (1000 / 60) : 1000 / 60;
       const dt = Math.min((Number.isFinite(measuredDelta) ? measuredDelta : fallbackDelta) / 1000, 0.05);
@@ -123,6 +127,7 @@
         this.host.dataset.poseY = (idleY + pose.y).toFixed(2);
         this.host.dataset.action = this.action?.name || "idle";
       }
+      this.model.update(dt * 1000);
     }
 
     getPose(dt) {
@@ -292,13 +297,14 @@
     }
 
     speak(duration = 2.4) {
-      if (!this.ready) return;
+      if (!this.ready || !this.enabled || !this.visible) return;
       const safeDuration = clamp(Number(duration) || 2.4, 0.4, 8);
       this.speechStartedAt = this.time;
       this.speechUntil = this.time + safeDuration;
     }
 
     trackPointer(clientX, clientY) {
+      if (!this.enabled || !this.visible) return;
       const rect = this.canvasHost.getBoundingClientRect();
       if (!rect.width || !rect.height) return;
       this.gazeTarget.x = clamp(((clientX - rect.left) / rect.width - 0.5) * 2, -1, 1);
@@ -311,11 +317,41 @@
     }
 
     setMotion(enabled) {
-      this.enabled = enabled;
-      if (!enabled && this.model) {
-        this.gazeTarget = { x: 0, y: 0 };
-        this.model.position.set(this.baseX, this.baseY);
-        this.model.rotation = 0;
+      this.enabled = Boolean(enabled);
+      this.syncPlayback();
+    }
+
+    setVisible(visible) {
+      this.visible = Boolean(visible);
+      this.syncPlayback();
+    }
+
+    renderStill() {
+      if (!this.model || !this.app) return;
+      this.model.position.set(this.baseX, this.baseY);
+      this.model.rotation = 0;
+      this.model.scale.set(this.baseScale);
+      this.model.update(0);
+      this.app.renderer.render(this.app.stage);
+    }
+
+    syncPlayback() {
+      if (!this.ready) return;
+      const playing = this.enabled && this.visible;
+      this.host.dataset.motion = playing ? 'playing' : 'paused';
+      if (playing) {
+        this.app.start();
+      } else {
+        this.app.stop();
+        const done = this.action?.done;
+        this.action = null;
+        this.speechUntil = this.time;
+        this.gaze = { x: 0, y: 0 };
+        this.resetGaze();
+        this.blinkTime = 1;
+        this.host.dataset.action = 'idle';
+        this.renderStill();
+        done?.();
       }
     }
 
@@ -323,6 +359,10 @@
       if (!this.ready) {
         done?.();
         return false;
+      }
+      if (!this.enabled || !this.visible) {
+        done?.();
+        return true; // The interaction succeeds without a movement fallback.
       }
       const durations = { pet: 1.05, feed: 1.25, play: 1.15, dance: 2.1, sleep: 2.4, wave: 1.55 };
       this.action = { name, elapsed: 0, duration: durations[name] || 1.2, done };

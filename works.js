@@ -12,7 +12,7 @@
   const logList = document.querySelector("#worksLogList");
   let active = "全部";
 
-  function createWorkCard(work) {
+  function createWorkCard(work, index) {
     const card = document.createElement("article");
     card.className = `work-card reveal${work.featured ? " work-card-featured" : ""}`;
 
@@ -24,9 +24,16 @@
     }
     if (work.cover) {
       const image = document.createElement("img");
+      image.loading = index === 0 ? "eager" : "lazy";
+      image.fetchPriority = index === 0 ? "high" : "auto";
+      image.width = 1920;
+      image.height = 1080;
+      if (work.coverSrcset) {
+        image.srcset = work.coverSrcset;
+        image.sizes = '(max-width: 900px) calc(100vw - 62px), (max-width: 1244px) calc(100vw - 64px), 1180px';
+      }
       image.src = work.cover;
       image.alt = "";
-      image.loading = "lazy";
       image.style.objectPosition = work.coverPosition || "center";
       cover.appendChild(image);
     } else {
@@ -107,7 +114,7 @@
       grid.appendChild(state);
       return;
     }
-    filtered.forEach((work) => grid.appendChild(createWorkCard(work)));
+    filtered.forEach((work, index) => grid.appendChild(createWorkCard(work, index)));
     grid.querySelectorAll(".reveal").forEach((node) => window.MotionCore?.revealInserted(node));
   }
 

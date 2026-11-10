@@ -20,10 +20,18 @@
 
   const selectInstances = new WeakMap();
   const listAnimations = new WeakMap();
+  let revealObserver = null;
+  let illustrationPaused = false;
+  try { illustrationPaused = localStorage.getItem('hutao-wuxia-paused') === '1'; } catch {}
 
   reduceQuery.addEventListener("change", (event) => {
     state.reduced = event.matches;
-    if (!state.reduced) return;
+    syncAmbientState();
+    if (!state.reduced) {
+      setupReveal();
+      setupInkHeadings();
+      return;
+    }
     document.querySelectorAll(".motion-reveal").forEach((element) => {
       element.classList.add("is-visible", "visible");
       element.getAnimations().forEach((animation) => {
@@ -31,6 +39,8 @@
       });
     });
     document.querySelectorAll(".click-petal, .ink-click-core, .ink-click-ripple").forEach((element) => element.remove());
+    document.querySelectorAll(".motion-pressing, .motion-released").forEach((element) => element.classList.remove("motion-pressing", "motion-released"));
+    document.querySelectorAll(".ink-heading-ready").forEach(element => element.classList.add("ink-heading-visible"));
   });
 
   const revealSelector = [
@@ -71,26 +81,45 @@
     element.style.transitionDelay = `${Math.min(index % 5, 4) * 55}ms`;
   }
 
+  function getRevealObserver() {
+    if (state.reduced || !("IntersectionObserver" in window)) return null;
+    if (revealObserver) return revealObserver;
+    try {
+      revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add("is-visible", "visible", "ink-heading-visible");
+          revealObserver?.unobserve(entry.target);
+        });
+      }, { rootMargin: "0px 0px -6% 0px", threshold: 0.05 });
+      state.observers.add(revealObserver);
+    } catch {
+      // Enhancement failure must never hide content.
+      revealObserver = null;
+    }
+    return revealObserver;
+  }
+
+  function observeOrShow(element) {
+    const observer = getRevealObserver();
+    if (observer) {
+      try { observer.observe(element); return; } catch {}
+    }
+    element.classList.add("is-visible", "visible", "ink-heading-visible");
+  }
+
   function setupReveal(root = document) {
     const elements = Array.from(root.querySelectorAll?.(revealSelector) || []);
-    elements.forEach(addReveal);
+    elements.forEach((element, index) => { addReveal(element, index); observeOrShow(element); });
+    return revealObserver;
+  }
 
-    if (state.reduced || !("IntersectionObserver" in window)) {
-      elements.forEach((element) => element.classList.add("is-visible", "visible"));
-      return null;
-    }
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        entry.target.classList.add("is-visible", "visible");
-        observer.unobserve(entry.target);
-      });
-    }, { rootMargin: "0px 0px -9% 0px", threshold: 0.08 });
-
-    elements.forEach((element) => observer.observe(element));
-    state.observers.add(observer);
-    return observer;
+  function setupInkHeadings(root = document) {
+    root.querySelectorAll?.(".section-heading h2, .page-title h1, .works-hero h1, .kurumi-gallery-section h2").forEach(element => {
+      if (element.classList.contains("ink-heading-ready")) return;
+      element.classList.add("ink-heading-ready");
+      observeOrShow(element);
+    });
   }
 
   function revealInserted(node) {
@@ -102,13 +131,9 @@
     candidates.push(...node.querySelectorAll?.(revealSelector) || []);
     candidates.forEach((element, index) => {
       addReveal(element, index);
-      if (state.reduced) element.classList.add("is-visible", "visible");
+      observeOrShow(element);
     });
-
-    if (!state.reduced) {
-      const observer = [...state.observers].at(-1);
-      if (observer) candidates.forEach((element) => observer.observe(element));
-    }
+    setupInkHeadings(node);
   }
 
   function setupDynamicReveal() {
@@ -153,51 +178,33 @@
   }
 
   function createClickEffect(x, y, source) {
-    if (state.reduced || state.hidden || matchMedia('(max-width:1080px), (pointer:coarse)').matches) return;
-    if (typeof x !== "number" || typeof y !== "number") return;
+    if (state.reduced || state.hidden) return;
+    if (!Number.isFinite(x) || !Number.isFinite(y)) return;
     const target = source instanceof Element ? source : null;
-    if (target?.closest("dialog, .animated-select, .animated-select__panel, .click-petal, .falling-piece, input, textarea, select, option, video, audio, iframe, canvas, [contenteditable='true'], :disabled, [aria-disabled='true']")) return;
-    if (document.querySelectorAll('.ink-click-ripple').length >= 4) return;
+    if (!target?.closest("button, a, summary, [role='button']")) return;
+    if (target.closest("dialog, .animated-select, .animated-select__panel, input, textarea, select, option, video, audio, iframe, canvas, [contenteditable='true'], :disabled, [aria-disabled='true']")) return;
+    if (document.querySelectorAll('.ink-click-ripple').length >= 3) return;
 
-    const interactive = Boolean(target?.closest("button, a, summary, [role='button'], .ink-button, .text-button, .seal-button"));
-    const duration = state.reduced ? 180 : interactive ? 340 : state.coarse ? 360 : 430;
-    const size = state.reduced ? 34 : interactive ? 46 : state.coarse ? 68 : 96;
+    const duration = state.coarse ? 460 : 580;
+    const size = state.coarse ? 42 : 60;
+    const variant = 1 + Math.floor(Math.random() * 4);
+    const rotation = `${Math.round(Math.random() * 360)}deg`;
     const root = document.createDocumentFragment();
-
-    const ripple = document.createElement("i");
-    ripple.className = "ink-click-ripple";
-    ripple.style.setProperty("--click-x", `${x}px`);
-    ripple.style.setProperty("--click-y", `${y}px`);
-    ripple.style.setProperty("--click-size", `${size}px`);
-    ripple.style.setProperty("--click-duration", `${duration}ms`);
-    root.appendChild(ripple);
-
-    if (!state.reduced) {
-      const core = document.createElement("i");
-      core.className = "ink-click-core";
-      core.style.setProperty("--click-x", `${x}px`);
-      core.style.setProperty("--click-y", `${y}px`);
-      core.style.setProperty("--click-duration", `${duration - 30}ms`);
-      root.appendChild(core);
-    }
-
-    const count = state.reduced ? 0 : interactive ? 1 : state.coarse ? 1 : 3;
-    for (let index = 0; index < count; index += 1) {
-      const petal = document.createElement("i");
-      petal.className = "click-petal";
-      petal.style.setProperty("--click-x", `${x}px`);
-      petal.style.setProperty("--click-y", `${y}px`);
-      petal.style.setProperty("--click-duration", `${duration + 20}ms`);
-      petal.style.setProperty("--petal-x", `${(Math.random() - 0.5) * (interactive ? 24 : 48)}px`);
-      petal.style.setProperty("--petal-y", `${-8 - Math.random() * (interactive ? 14 : 28)}px`);
-      petal.style.setProperty("--petal-r", `${Math.random() * 140 - 70}deg`);
-      root.appendChild(petal);
-    }
-
+    ['ink-click-ripple', 'ink-click-core'].forEach((className) => {
+      const mark = document.createElement('i');
+      mark.className = className;
+      mark.setAttribute('aria-hidden', 'true');
+      mark.style.setProperty('--click-x', `${x}px`);
+      mark.style.setProperty('--click-y', `${y}px`);
+      mark.style.setProperty('--click-size', `${size}px`);
+      mark.style.setProperty('--click-duration', `${duration}ms`);
+      mark.style.setProperty('--ink-angle', rotation);
+      mark.style.setProperty('--ink-drop-mask', `url('./assets/ink-refinement-20261104/ink-drop-${variant}.svg')`);
+      root.appendChild(mark);
+    });
     const nodes = Array.from(root.children);
-    nodes.forEach(node => node.setAttribute('aria-hidden', 'true'));
     document.body.appendChild(root);
-    window.setTimeout(() => nodes.forEach((node) => node.remove()), duration + 80);
+    window.setTimeout(() => nodes.forEach(node => node.remove()), duration + 80);
   }
 
   function setupClickFeedback() {
@@ -239,6 +246,7 @@
       if (event.key === "Enter" || event.key === " ") release();
     });
     document.addEventListener("keydown", (event) => {
+      if (state.reduced || event.repeat) return;
       if (event.key !== "Enter" && event.key !== " ") return;
       const target = event.target.closest?.("button, a, [role='button'], [role='option'], summary");
       if (!target || target.matches(":disabled, [aria-disabled='true']")) return;
@@ -285,6 +293,7 @@
 
     const panel = document.createElement("div");
     panel.className = "animated-select__panel";
+    panel.hidden = true;
     panel.id = panelId;
     panel.dataset.selectPortal = select.id || panelId;
     const listbox = document.createElement("div");
@@ -304,6 +313,7 @@
     let optionButtons = [];
     let activeIndex = Math.max(0, select.selectedIndex);
     let open = false;
+    let focusTimer = 0;
     let panelAnimation = null;
     let optionAnimations = [];
 
@@ -361,6 +371,7 @@
     }
 
     function cancelAnimations() {
+      window.clearTimeout(focusTimer);
       panelAnimation?.cancel();
       panelAnimation = null;
       optionAnimations.forEach((animation) => animation.cancel());
@@ -394,6 +405,7 @@
       state.openSelect = api;
       cancelAnimations();
       wrapper.classList.add("is-open");
+      panel.hidden = false;
       panel.classList.add("is-portaled", "is-open");
       trigger.setAttribute("aria-expanded", "true");
       updatePosition();
@@ -422,7 +434,9 @@
         );
         optionAnimations.push(animation);
       });
-      window.setTimeout(() => optionButtons[activeIndex]?.focus({ preventScroll: true }), state.reduced ? 0 : 40);
+      focusTimer = window.setTimeout(() => {
+        if (open) optionButtons[activeIndex]?.focus({ preventScroll: true });
+      }, state.reduced ? 0 : 40);
     }
 
     function close(returnFocus = false) {
@@ -451,6 +465,7 @@
         if (open) return;
         panel.style.visibility = "hidden";
         panel.style.pointerEvents = "none";
+        panel.hidden = true;
         panel.classList.remove("is-portaled", "is-above");
       };
       if (returnFocus) trigger.focus({ preventScroll: true });
@@ -540,16 +555,18 @@
     if (previousHeight) container.style.minHeight = `${previousHeight}px`;
     const oldItems = Array.from(container.children);
     const reduced = state.reduced;
+    const entranceAnimations = [];
     const exitAnimations = oldItems.map((item) => item.animate(
       [
         { opacity: 1, transform: "translate3d(0,0,0) scale(1)" },
         { opacity: 0, transform: "translate3d(0,8px,0) scale(.985)" },
       ],
-      { duration: reduced ? 1 : 140, easing: "cubic-bezier(.4,0,.2,1)", fill: "forwards" },
+      { duration: reduced ? 1 : 100, easing: "cubic-bezier(.4,0,.2,1)", fill: "forwards" },
     ));
 
     controller.signal.addEventListener("abort", () => {
       exitAnimations.forEach((animation) => animation.cancel());
+      entranceAnimations.forEach((animation) => animation.cancel());
     }, { once: true });
 
     return Promise.allSettled(exitAnimations.map((animation) => animation.finished))
@@ -558,51 +575,78 @@
         renderCallback();
         const newItems = Array.from(container.children);
         newItems.forEach((item, index) => {
-          item.animate(
+          const animation = item.animate(
             [
               { opacity: 0, transform: "translate3d(0,14px,0) scale(.98)" },
               { opacity: 1, transform: "translate3d(0,0,0) scale(1)" },
             ],
             {
-              duration: reduced ? 1 : 220,
-              delay: reduced ? 0 : Math.min(index, 8) * 42,
+              duration: reduced ? 1 : 180,
+              delay: reduced ? 0 : Math.min(index, 3) * 18,
               easing: "cubic-bezier(.22,1,.36,1)",
               fill: "both",
             },
           );
+          entranceAnimations.push(animation);
+          // Release filled keyframes so CSS hover/focus/press feedback can take over.
+          animation.finished.then(() => animation.cancel(), () => {});
+          item.classList.add("is-visible", "visible");
           window.MotionCore?.revealInserted?.(item);
         });
+        return Promise.allSettled(entranceAnimations.map((animation) => animation.finished));
       })
       .finally(() => {
         if (listAnimations.get(container) === controller) {
           listAnimations.delete(container);
-          window.setTimeout(() => { container.style.minHeight = ""; }, reduced ? 0 : 260);
+          container.style.minHeight = "";
         }
       });
   }
 
-  function setupCardHover() {
-    if (!state.fine) return;
-    const selector = ".article-card, .article-list-card, .video-card, .home-video-card, .friend-card, .portal-card, .achievement-cards article";
-    document.addEventListener("pointermove", (event) => {
-      const card = event.target.closest?.(selector);
-      if (!card) return;
-      const rect = card.getBoundingClientRect();
-      card.style.setProperty("--motion-ink-x", `${event.clientX - rect.left}px`);
-      card.style.setProperty("--motion-ink-y", `${event.clientY - rect.top}px`);
-    }, { passive: true });
+  // Paper-edge hover feedback is CSS-only; no per-pointer geometry reads.
+  function syncAmbientState() {
+    const paused = state.hidden || state.reduced || illustrationPaused || navigator.connection?.saveData ||
+      document.documentElement.classList.contains('mobile-nav-open') ||
+      Boolean(document.querySelector('dialog[open]'));
+    if (document.documentElement.classList.contains('ink-motion-paused') !== paused) {
+      document.documentElement.classList.toggle('ink-motion-paused', paused);
+    }
+  }
+
+  function setupAmbientVisibility() {
+    syncAmbientState();
+    document.addEventListener('mobile-illustration-motion-change', event => {
+      illustrationPaused = Boolean(event.detail?.paused);
+      syncAmbientState();
+    });
+    navigator.connection?.addEventListener('change', syncAmbientState);
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(entries => entries.forEach(entry => {
+        entry.target.classList.toggle('ink-scene-paused', !entry.isIntersecting);
+      }), { threshold: 0.01 });
+      document.querySelectorAll('.hero, .kurumi-page-hero').forEach(scene => observer.observe(scene));
+      state.observers.add(observer);
+    }
+    if ('MutationObserver' in window) {
+      const observer = new MutationObserver(syncAmbientState);
+      observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+      observer.observe(document.body, { attributes: true, attributeFilter: ['open'], subtree: true });
+      state.mutationObservers.add(observer);
+    }
   }
 
   function cleanup() {
     state.observers.forEach((observer) => observer.disconnect());
     state.mutationObservers.forEach((observer) => observer.disconnect());
     state.observers.clear();
+    revealObserver = null;
     state.mutationObservers.clear();
   }
 
   document.addEventListener("visibilitychange", () => {
     state.hidden = document.hidden;
     document.documentElement.classList.toggle("page-hidden", state.hidden);
+    syncAmbientState();
   });
 
   document.addEventListener("pointerdown", (event) => {
@@ -635,7 +679,8 @@
     setupDynamicReveal();
     setupScrollProgress();
     setupClickFeedback();
-    setupCardHover();
+    setupInkHeadings();
+    setupAmbientVisibility();
     setupCustomSelects();
   });
 }());

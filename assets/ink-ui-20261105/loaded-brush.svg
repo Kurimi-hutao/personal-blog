@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 204 48" preserveAspectRatio="none">
+  <!-- A loaded centre holds the lettering. The split tip loses ink at the exit. -->
+  <g fill="#78382e">
+    <path opacity=".31" d="M7 15Q18 6 59 5Q131 1 192 7L181 10 200 11 188 16 193 24 178 36Q72 50 7 39L11 35 2 31 8 25 3 21Z"/>
+    <path d="M11 13Q42 6 88 7L137 5 175 6 190 9 169 12 195 11 181 15 201 14 183 18 191 19 177 24 196 22 180 28 190 27 176 32 188 31 165 36Q105 39 70 39Q37 43 11 38L16 35 5 35 11 30 5 28 10 24 6 21 14 18 8 17Z"/>
+    <path opacity=".7" d="M9 12Q55 2 140 4Q71 6 9 14ZM21 42Q94 38 179 35Q137 39 21 43ZM150 10L202 8 165 12ZM165 30L201 24 179 29Z"/>
+  </g>
+</svg>

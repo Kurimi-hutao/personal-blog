@@ -6,6 +6,7 @@
   const today = () => new Date().toLocaleDateString("sv-SE");
   const $ = (selector) => document.querySelector(selector);
   const $$ = (selector) => [...document.querySelectorAll(selector)];
+  const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 
   function setupEntryScene() {
     const entry = $("#petEntry");
@@ -331,7 +332,9 @@
     const claimed = state.lastGift === today();
     gift.disabled = claimed;
     gift.querySelector("strong").textContent = claimed ? "今日已领取" : "领取 10 枚桃花币";
-    setToggle($("#motionToggle"), state.motion, `动态：${state.motion ? "开" : "关"}`);
+    setToggle($("#motionToggle"), state.motion && !reducedMotionQuery.matches,
+      reducedMotionQuery.matches ? '动态：随系统静止' : `动态：${state.motion ? "开" : "关"}`);
+    $("#motionToggle").disabled = reducedMotionQuery.matches;
     setToggle($("#soundToggle"), state.sound, `音效：${state.sound ? "开" : "关"}`);
     $("#petCondition").textContent = state.energy < 15 ? "有点累了，歇一歇吧" : state.hunger < 30 ? "肚子饿了，来份点心" : state.mood < 40 ? "想和你一起玩" : "状态很好 · 今日小礼";
     updateDailyTasks();
@@ -446,6 +449,7 @@
   }
 
   function makeSparks(x, y, count = 8) {
+    if (!state.motion || reducedMotionQuery.matches || document.hidden) return;
     for (let index = 0; index < count; index += 1) {
       const spark = document.createElement("i");
       spark.className = "pet-spark";
@@ -516,6 +520,10 @@
       refreshAvailability();
     };
     setTimeout(finish, 3200);
+    if (!state.motion || reducedMotionQuery.matches || document.hidden) {
+      finish();
+      return;
+    }
     if (!rig?.play(name, finish)) {
       $("#petCharacter").animate(
         [{ transform: "translateY(0) scale(1)" }, { transform: "translateY(-24px) scale(1.02)" }, { transform: "translateY(0) scale(1)" }],
@@ -613,7 +621,7 @@
       $("#petRoom").classList.add("has-live2d");
       characterKey = nextKey;
       updateCharacterUI();
-      rig.setMotion(state.motion);
+      syncRigMotion();
       status.classList.add("is-ready");
       status.querySelector("span").textContent = character.name + "已到 · Live2D 运行中";
       pendingWelcomeVoice = null;
@@ -660,7 +668,7 @@
     $("#motionToggle").addEventListener("click", () => {
       unlockVoice({ discardWelcome: true });
       state.motion = !state.motion;
-      rig?.setMotion(state.motion);
+      syncRigMotion();
       saveState();
       updateUI();
       speakSystemMessage(characterKey === "hutao" ? getSystemVoice(state.motion ? "motionOn" : "motionOff") : state.motion ? "好啦，我继续活动活动。" : "那我先安静地待一会儿。");
@@ -730,13 +738,22 @@
     }, { passive: true });
     document.documentElement.addEventListener("mouseleave", () => rig?.resetGaze());
     document.addEventListener("visibilitychange", () => {
+      syncRigMotion();
       if (document.hidden) {
         rig?.resetGaze();
         voiceController.stop();
       }
     });
+    reducedMotionQuery.addEventListener('change', () => { syncRigMotion(); updateUI(); });
+    window.addEventListener('pagehide', () => rig?.setVisible(false));
+    window.addEventListener('pageshow', syncRigMotion);
     window.addEventListener("beforeunload", () => voiceController.stop());
     initRig();
+  }
+
+  function syncRigMotion() {
+    rig?.setMotion(state.motion && !reducedMotionQuery.matches);
+    rig?.setVisible(!document.hidden);
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);

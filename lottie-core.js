@@ -7,6 +7,7 @@
   const reduceQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
   const animationCache = new Map();
   const instances = new Set();
+  let enginePromise;
   const introSessionKey = "hutao-site-intro-seen-v1";
   const config = {
     inkLoading: "ink-drop-loading.json",
@@ -45,8 +46,23 @@
     return animationCache.get(name);
   }
 
+  function loadEngine() {
+    if (window.lottie) return Promise.resolve();
+    if (!enginePromise) {
+      enginePromise = new Promise((resolve, reject) => {
+        const engine = document.createElement('script');
+        engine.src = asset('./assets/vendor/lottie-web/lottie_light-5.13.0.min.js');
+        engine.onload = resolve;
+        engine.onerror = () => { enginePromise = null; engine.remove(); reject(new Error('Lottie engine could not load')); };
+        document.head.append(engine);
+      });
+    }
+    return enginePromise;
+  }
+
   async function createAnimation(container, options = {}) {
-    if (!container || isReduced() || typeof window.lottie === "undefined") return null;
+    if (!container || isReduced()) return null;
+    await loadEngine();
     const data = options.animationData || await loadData(options.name);
     if (!container.isConnected || isReduced()) return null;
     const instance = window.lottie.loadAnimation({
@@ -115,8 +131,7 @@
     }
     const loader = document.createElement("div");
     loader.className = "ink-site-loader";
-    loader.setAttribute("role", "status");
-    loader.setAttribute("aria-label", "正在加载页面字体");
+    loader.setAttribute("aria-hidden", "true");
     loader.innerHTML = [
       '<div class="ink-site-loader__inner">',
       `<div class="ink-site-loader__mark"><span class="ink-site-loader__drop"></span><img src="${asset('./assets/visual-refresh/seal-hutao.webp')}" width="90" height="104" alt=""></div>`,
@@ -124,13 +139,11 @@
       "</div>",
     ].join("");
     document.body.prepend(loader);
-    document.documentElement.classList.add('ink-site-loading');
-
-    // Show readable fallback text after a short budget, even on slow font requests.
+    // A small decorative seal never covers content or locks scrolling.
+    // Readiness waits for resources only, without an artificial intro delay.
     await Promise.all([
-      withTimeout(fontsReady().catch(() => {}), 900),
-      withTimeout(loader.querySelector('img').decode().catch(() => {}), 780),
-      wait(isReduced() ? 0 : 560),
+      withTimeout(fontsReady().catch(() => {}), 600),
+      withTimeout(loader.querySelector('img').decode().catch(() => {}), 400),
     ]);
     loader.classList.add("is-leaving");
     document.documentElement.classList.remove('ink-site-loading');

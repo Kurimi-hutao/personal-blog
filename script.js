@@ -19,7 +19,6 @@ const lowPowerDevice =
   (Number.isFinite(navigator.deviceMemory) && navigator.deviceMemory <= 4) ||
   (Number.isFinite(navigator.hardwareConcurrency) && navigator.hardwareConcurrency <= 4);
 
-let windActive = false;
 let windStrength = 0;
 let ownerSession = null;
 const pieces = new Set();
@@ -511,34 +510,15 @@ function setupFlowingLandscape() {
   });
 }
 
-function setupAmbientInk() {
-  if (!hasGsap || compactMotion || lowPowerDevice) return;
-  const drifts = gsap.utils.toArray(".ink-drift");
-  if (!drifts.length) return;
-
-  drifts.forEach((drift, index) => {
-    ambientMotions.add(gsap.to(drift, {
-      xPercent: index % 2 ? -18 : 20,
-      yPercent: index % 2 ? 14 : -12,
-      rotation: index % 2 ? "+=9" : "-=8",
-      scale: index === 1 ? 1.28 : 1.08,
-      opacity: index === 1 ? 0.34 : 0.44,
-      duration: 14 + index * 3,
-      repeat: -1,
-      yoyo: true,
-      ease: "sine.inOut",
-    }));
-  });
-}
 
 function createPiece(options = {}) {
-  if (reducedMotion || compactMotion || lowPowerDevice || !hasGsap || pieces.size > 28) return;
+  if (document.hidden || reducedMotion || compactMotion || lowPowerDevice || !hasGsap || pieces.size >= 18) return;
 
   const piece = document.createElement("span");
   const isPetal = options.type ? options.type === "petal" : Math.random() > 0.28;
   piece.className = `falling-piece ${isPetal ? "petal" : "leaf"}`;
   if (isPetal) {
-    piece.style.setProperty("--petal-image", `url("./assets/spring-ink/petal-${1 + Math.floor(Math.random() * 8)}.webp")`);
+    piece.style.setProperty("--petal-image", `url("./assets/spring-ink/small/petal-${1 + Math.floor(Math.random() * 8)}-144.webp")`);
   }
   field.appendChild(piece);
   pieces.add(piece);
@@ -624,7 +604,7 @@ function summonPetals() {
     const count = lowPowerDevice ? 5 : 8;
     for (let i = 0; i < count; i++) {
       const petal = document.createElement('span'); petal.className = 'manual-petal'; petal.setAttribute('aria-hidden', 'true');
-      petal.style.backgroundImage = `url('./assets/spring-ink/petal-${1 + i % 8}.webp')`;
+      petal.style.backgroundImage = `url('./assets/spring-ink/small/petal-${1 + i % 8}-144.webp')`;
       document.body.append(petal); manualPetals.add(petal);
       const x = random(innerWidth * .12, innerWidth * .88), drift = random(-36, 36);
       const animation = petal.animate([
@@ -637,7 +617,7 @@ function summonPetals() {
     }
     return;
   }
-  for (let i = 0; i < 18; i += 1) {
+  for (let i = 0; i < 12; i += 1) {
     window.setTimeout(
       () =>
         createPiece({
@@ -658,22 +638,6 @@ function showPetalNotice(message) {
   clearTimeout(petalNoticeTimer); petalNoticeTimer = setTimeout(() => { notice.hidden = true; }, 2200);
 }
 
-function setWind(active) {
-  windActive = active;
-  windStrength = active ? 170 : 0;
-  windToggle.setAttribute("aria-pressed", String(active));
-  windToggle.setAttribute('aria-label', active ? '停止桃花风' : '开启桃花风');
-  windToggle.title = active ? '停止桃花风' : '开启桃花风';
-  windLabel.textContent = active ? "风起" : "风止";
-
-  if (hasGsap && !reducedMotion) {
-    gsap.to(".wind-icon", {
-      rotation: active ? 12 : 0,
-      x: active ? 3 : 0,
-      duration: 0.35,
-    });
-  }
-}
 
 function nudgeNearbyPieces() {
   if (!hasGsap || reducedMotion) return;
@@ -714,14 +678,12 @@ window.addEventListener(
   { passive: true },
 );
 
-if (compactMotion || lowPowerDevice || !hasGsap) {
-  windToggle.classList.add('wind-toggle--summon'); windToggle.removeAttribute('aria-pressed');
-  windToggle.setAttribute('aria-label', '唤一场桃花'); windToggle.title = '唤一场桃花'; windLabel.textContent = '桃花';
-}
-windToggle.addEventListener("click", () => {
-  if (compactMotion || lowPowerDevice || !hasGsap) summonPetals();
-  else setWind(!windActive);
-});
+windToggle.classList.add('wind-toggle--summon');
+windToggle.removeAttribute('aria-pressed');
+windToggle.setAttribute('aria-label', '唤一场桃花');
+windToggle.title = '唤一场桃花';
+windLabel.textContent = '桃花';
+windToggle.addEventListener('click', summonPetals);
 summonButton.addEventListener("click", summonPetals);
 
 function renderGuestbook(messages) {
@@ -846,26 +808,8 @@ fortuneDialog.addEventListener("click", (event) => {
   if (event.target === fortuneDialog) fortuneDialog.close();
 });
 
-function setupInkHoverEffects() {
-  if (!finePointer || reducedMotion) return;
-  const targets = document.querySelectorAll(
-    ".article-card, .home-video-card, .portal-card, .achievement-cards article",
-  );
-  targets.forEach((target) => {
-    if (target.classList.contains("ink-reactive")) return;
-    target.classList.add("ink-reactive");
-    target.addEventListener("pointermove", (event) => {
-      const rect = target.getBoundingClientRect();
-      target.style.setProperty("--ink-x", `${event.clientX - rect.left}px`);
-      target.style.setProperty("--ink-y", `${event.clientY - rect.top}px`);
-      target.style.setProperty("--ink-opacity", "1");
-    });
-    target.addEventListener("pointerleave", () => {
-      target.style.setProperty("--ink-opacity", "0");
-    });
-  });
-
-}
+// Paper-edge hover feedback is shared CSS; no separate pointer tracking here.
+function setupInkHoverEffects() {}
 
 function setupLinksToggle() {
   const section = document.querySelector(".links-section");
@@ -995,13 +939,8 @@ if (hasGsap) {
     ease: "sine.inOut",
   }));
 
-  window.setInterval(() => {
-    if (!document.hidden) createPiece();
-  }, 750);
+  // Petals are a deliberate visitor action, never a constant page-wide shower.
 
-  for (let i = 0; i < 9; i += 1) {
-    window.setTimeout(createPiece, i * 280);
-  }
 }
 
 function runWhenIdle(task, timeout = 1600) {
@@ -1037,7 +976,6 @@ runWhenNear(".message-section", initializeGuestbook, "420px 0px");
 setupAchievements();
 setupInkHoverEffects();
 setupFlowingLandscape();
-setupAmbientInk();
 setupLinksToggle();
 
 function applyHomeMotionPreference() {
@@ -1048,7 +986,7 @@ function applyHomeMotionPreference() {
     manualPetals.forEach(node => { node.getAnimations().forEach(animation => animation.cancel()); node.remove(); });
     manualPetals.clear();
   }
-  if (!reducedMotion || !hasGsap) return;
+  if ((!reducedMotion && !document.hidden) || !hasGsap) return;
   pieces.forEach((piece) => { gsap.killTweensOf(piece); piece.remove(); });
   pieces.clear();
   document.querySelectorAll(".ink-cursor-trail").forEach((trail) => {

@@ -114,10 +114,10 @@ function renderArticle(article) {
     }
     const description = document.createElement("div");
     description.className = "video-description";
-    description.innerHTML = window.blogMarkdown.render(article.content || article.excerpt);
+    description.innerHTML = window.blogMarkdown.renderArticle(article.content || article.excerpt, article.title);
     body.appendChild(description);
   } else {
-    body.innerHTML = window.blogMarkdown.render(article.content);
+    body.innerHTML = window.blogMarkdown.renderArticle(article.content, article.title);
   }
   renderArticleMath(body);
 
@@ -378,8 +378,8 @@ async function setupArticleExtras(article) {
   const previous = all[index + 1];
   const next = all[index - 1];
   if (previous || next) {
-    if (previous) neighbors.appendChild(neighborLink(previous, article.content_type === "video" ? "上一个视频" : "上一篇"));
-    if (next) neighbors.appendChild(neighborLink(next, article.content_type === "video" ? "下一个视频" : "下一篇"));
+    if (previous) neighbors.appendChild(neighborLink(previous, article.content_type === "video" ? "上一个视频" : "上一篇", "previous"));
+    if (next) neighbors.appendChild(neighborLink(next, article.content_type === "video" ? "下一个视频" : "下一篇", "next"));
     neighbors.hidden = false;
   }
   const related = await articleService.listRelated(article);
@@ -390,8 +390,9 @@ async function setupArticleExtras(article) {
   }
 }
 
-function neighborLink(article, label) {
+function neighborLink(article, label, direction) {
   const link = document.createElement("a");
+  link.dataset.direction = direction;
   link.href = articleService.articleUrl(article);
   const small = document.createElement("small");
   small.textContent = label;
@@ -412,6 +413,8 @@ async function loadArticle() {
     window.InkAssets?.loading(root, '正在展开此卷……', 1);
     currentArticle = await articleService.getPublished(slug);
     if (!currentArticle) throw new Error('Article not found');
+    // Exact-version local errata are read-only and never overwrite the source.
+    if (window.ArticleContentRepairs) currentArticle = await window.ArticleContentRepairs.prepare(currentArticle);
     root.removeAttribute('aria-busy');
     renderArticle(currentArticle);
     setupComments(currentArticle);

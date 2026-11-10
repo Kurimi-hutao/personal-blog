@@ -161,25 +161,19 @@
 
   const searchDialog = document.createElement("dialog");
   searchDialog.className = "site-search-dialog";
+  searchDialog.setAttribute('aria-labelledby', 'siteSearchTitle');
   searchDialog.innerHTML = `
     <div class="site-search-shell">
       <header>
-        <div><small>QUICK ACCESS</small><strong>寻卷</strong></div>
+        <div><small>卷中寻迹 · 全站检索</small><strong id="siteSearchTitle">寻卷</strong></div>
         <button type="button" data-search-close aria-label="关闭搜索">×</button>
       </header>
       <label class="site-search-field">
         <span aria-hidden="true">⌕</span>
-        <input type="search" placeholder="搜索文章、视频、作品或标签……" autocomplete="off" />
+        <input type="search" aria-label="搜索全站内容" placeholder="搜索文章、视频、作品或标签……" autocomplete="off" />
         <kbd>ESC</kbd>
       </label>
-      <nav class="site-quick-links" aria-label="快捷入口">
-        <a href="./index.html">首页</a>
-        <a href="./articles.html">文章</a>
-        <a href="./videos.html">视频</a>
-        <a href="./works.html">作品</a>
-        <a href="./kurumi.html">胡桃绘卷</a>
-        <button type="button" data-search-bookmarks aria-pressed="false">我的收藏</button>
-      </nav>
+
       <div class="search-type-filters" role="group" aria-label="搜索内容类型">
         <button type="button" data-search-type="all" aria-pressed="true">全部</button>
         <button type="button" data-search-type="article" aria-pressed="false">文章</button>
@@ -188,8 +182,16 @@
       </div>
       <div class="search-status" role="status" hidden></div>
       <div class="site-search-results" aria-live="polite">
-        <p>输入关键词开始搜索，也可以使用上方快捷入口。</p>
+        <p>输入关键词开始搜索，也可以使用快捷入口。</p>
       </div>
+      <nav class="site-quick-links" aria-label="快捷入口">
+        <a href="./index.html">首页</a>
+        <a href="./articles.html">文章</a>
+        <a href="./videos.html">视频</a>
+        <a href="./works.html">作品</a>
+        <a href="./kurumi.html">胡桃绘卷</a>
+        <button type="button" data-search-bookmarks aria-pressed="false">我的收藏</button>
+      </nav>
     </div>`;
   document.body.appendChild(searchDialog);
 
@@ -343,7 +345,7 @@
         bookmarks = JSON.parse(localStorage.getItem("hutao-bookmarked-articles") || "[]");
       } catch {}
       if (!bookmarks.length) {
-        window.InkAssets?.state(searchResults, { title: '翻开一卷江湖', detail: '输入关键词开始搜索，也可以使用上方快捷入口。' });
+        window.InkAssets?.state(searchResults, { title: '翻开一卷江湖', detail: '输入关键词开始搜索，也可以使用快捷入口。' });
         const browse = document.createElement('a'); browse.className = 'search-browse'; browse.href = './articles.html'; browse.textContent = '先去翻翻文章 →'; searchResults.append(browse);
         return;
       }

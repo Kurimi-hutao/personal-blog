@@ -2,25 +2,16 @@
   --z-lottie-loader: 11000;
 }
 
-.ink-site-loading { overflow: hidden; }
-
 .ink-site-loader {
   position: fixed;
-  inset: 0;
+  top: max(86px, calc(env(safe-area-inset-top) + 72px));
+  right: max(18px, env(safe-area-inset-right));
   z-index: var(--z-lottie-loader);
-  display: grid;
-  place-items: center;
-  padding: max(24px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
+  pointer-events: none;
   color: var(--ink);
-  background:
-    radial-gradient(circle at 50% 42%, color-mix(in srgb, var(--paper) 82%, transparent), transparent 42%),
-    linear-gradient(135deg, color-mix(in srgb, var(--paper) 98%, white), color-mix(in srgb, var(--paper-deep) 86%, var(--paper))),
-    url("./assets/hutao-ink/PaperTexture.webp") center / 720px auto repeat;
-  opacity: 1;
+  opacity: .72;
   visibility: visible;
-  transition:
-    opacity 220ms var(--ease-ink),
-    visibility 220ms linear;
+  transition: opacity 220ms ease-out, visibility 220ms linear;
 }
 
 .ink-site-loader.is-leaving {
@@ -37,9 +28,9 @@
   transition: opacity 520ms var(--ease-ink);
 }
 
-.ink-site-loader__mark { position: relative; width: 120px; height: 130px; display: grid; place-items: center; }
-.ink-site-loader__mark img { width: 90px; height: 104px; object-fit: contain; animation: sealIntro 1600ms cubic-bezier(.22,1,.36,1) infinite; }
-.ink-site-loader__drop { position: absolute; width: 12px; height: 12px; border-radius: 45%; background: var(--cinnabar); animation: dropIntro 1600ms ease-out infinite; }
+.ink-site-loader__mark { position: relative; width: 40px; height: 44px; display: grid; place-items: center; }
+.ink-site-loader__mark img { width: 34px; height: 40px; object-fit: contain; animation: sealIntro 500ms cubic-bezier(.22,1,.36,1) both; }
+.ink-site-loader__drop { display: none; position: absolute; width: 12px; height: 12px; border-radius: 45%; background: var(--cinnabar); animation: dropIntro 1600ms ease-out infinite; }
 @keyframes sealIntro { 0%, 100% { opacity: .7; transform: translateY(-5px) scale(1.04) rotate(-6deg); } 32%, 65% { opacity: 1; transform: translateY(0) scale(1) rotate(-4deg); } }
 @keyframes dropIntro { 0%, 25% { opacity: 0; transform: scale(.3); } 35% { opacity: .2; } 80%, 100% { opacity: 0; transform: scale(8); } }
 
@@ -95,3 +86,5 @@
     display: none !important;
   }
 }
+
+.ink-site-loader__text { display: none; }

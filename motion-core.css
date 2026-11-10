@@ -40,7 +40,7 @@
     opacity var(--motion-slow) var(--ease-ink),
     transform var(--motion-slow) var(--ease-ink),
     filter var(--motion-slow) var(--ease-ink);
-  will-change: opacity, transform;
+
 }
 
 .motion-reveal.is-visible,
@@ -183,6 +183,7 @@
 .animated-select__panel.is-portaled {
   position: fixed;
 }
+.animated-select__panel[hidden] { display: none; }
 
 .animated-select__panel.is-above {
   transform-origin: bottom center;
@@ -274,7 +275,7 @@
   border-radius: inherit;
   pointer-events: none;
   opacity: 0;
-  background: radial-gradient(circle at var(--motion-ink-x) var(--motion-ink-y), color-mix(in srgb, var(--cinnabar) 18%, transparent), transparent 34%);
+  background: linear-gradient(0deg, color-mix(in srgb, var(--ink) 5%, transparent), transparent 18%);
   transition: opacity var(--motion-normal) var(--ease-ink);
 }
 
@@ -289,66 +290,36 @@
 }
 
 .ink-click-ripple,
-.ink-click-core,
-.click-petal {
+.ink-click-core {
   position: fixed;
   z-index: 10040;
   left: 0;
   top: 0;
+  width: var(--click-size, 60px);
+  height: var(--click-size, 60px);
+  margin: calc(var(--click-size, 60px) / -2);
   pointer-events: none;
-  transform: translate3d(var(--click-x), var(--click-y), 0);
+  border: 0;
+  border-radius: 0;
+  background: var(--ink);
+  -webkit-mask: var(--ink-drop-mask) center / contain no-repeat;
+  mask: var(--ink-drop-mask) center / contain no-repeat;
+  animation: inkDropSpread var(--click-duration, 580ms) cubic-bezier(.16,.7,.3,1) both;
 }
-
-.ink-click-ripple {
-  width: var(--click-size, 96px);
-  height: var(--click-size, 96px);
-  margin: calc(var(--click-size, 96px) / -2) 0 0 calc(var(--click-size, 96px) / -2);
-  border: 1px solid color-mix(in srgb, var(--ink) 34%, transparent);
-  border-radius: 50%;
-  background:
-    radial-gradient(circle, color-mix(in srgb, var(--ink) 14%, transparent), transparent 58%),
-    radial-gradient(circle at 70% 32%, color-mix(in srgb, var(--cinnabar) 16%, transparent), transparent 42%);
-  animation: inkClickRipple var(--click-duration, 420ms) var(--ease-ink) forwards;
-  mix-blend-mode: multiply;
-}
-
 .ink-click-core {
-  width: 10px;
-  height: 10px;
-  margin: -5px 0 0 -5px;
-  border-radius: 50%;
-  background: color-mix(in srgb, var(--cinnabar) 72%, var(--ink));
-  animation: inkClickCore var(--click-duration, 380ms) var(--ease-ink) forwards;
+  background: var(--cinnabar);
+  animation-name: inkDropSettle;
 }
-
-.click-petal {
-  width: 7px;
-  height: 4px;
-  margin: -2px 0 0 -3px;
-  border-radius: 90% 12% 90% 16%;
-  background: color-mix(in srgb, var(--peach) 88%, var(--cinnabar));
-  animation: inkClickPetal var(--click-duration, 440ms) var(--ease-ink) forwards;
+@keyframes inkDropSpread {
+  0% { opacity: 0; transform: translate3d(var(--click-x), var(--click-y), 0) rotate(var(--ink-angle)) scale(.18); }
+  18% { opacity: .3; }
+  65% { opacity: .15; }
+  100% { opacity: 0; transform: translate3d(var(--click-x), var(--click-y), 0) rotate(var(--ink-angle)) scale(1.05); }
 }
-
-@keyframes inkClickRipple {
-  from { opacity: 0.42; transform: translate3d(var(--click-x), var(--click-y), 0) scale(0.32); }
-  to { opacity: 0; transform: translate3d(var(--click-x), var(--click-y), 0) scale(1); }
-}
-
-@keyframes inkClickCore {
-  from { opacity: 0.72; transform: translate3d(var(--click-x), var(--click-y), 0) scale(0.8); }
-  to { opacity: 0; transform: translate3d(var(--click-x), var(--click-y), 0) scale(0.18); }
-}
-
-@keyframes inkClickPetal {
-  from {
-    opacity: 0.72;
-    transform: translate3d(var(--click-x), var(--click-y), 0) rotate(var(--petal-r, 0deg)) scale(0.8);
-  }
-  to {
-    opacity: 0;
-    transform: translate3d(calc(var(--click-x) + var(--petal-x)), calc(var(--click-y) + var(--petal-y)), 0) rotate(calc(var(--petal-r, 0deg) + 48deg)) scale(0.25);
-  }
+@keyframes inkDropSettle {
+  0% { opacity: .58; transform: translate3d(var(--click-x), var(--click-y), 0) rotate(var(--ink-angle)) scale(.24); }
+  38% { opacity: .25; }
+  100% { opacity: 0; transform: translate3d(var(--click-x), var(--click-y), 0) rotate(var(--ink-angle)) scale(.58); }
 }
 
 @media (max-width: 840px), (pointer: coarse) {
@@ -398,4 +369,13 @@
   .motion-scroll-progress {
     display: none !important;
   }
+}
+
+/* Ink atmosphere is paused by visibility, navigation, dialogs and user preference. */
+.ink-motion-paused .spring-mist,
+.ink-motion-paused .ink-mist-layer,
+.ink-scene-paused .spring-mist,
+.ink-scene-paused .ink-mist-layer { animation-play-state: paused !important; }
+@media (prefers-reduced-motion: reduce) {
+  .ink-click-ripple, .ink-click-core { display: none !important; }
 }

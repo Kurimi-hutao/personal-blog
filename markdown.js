@@ -132,5 +132,27 @@
     return output.join("");
   }
 
-  window.blogMarkdown = { render };
+  // The page template owns the article title. Remove only a matching first H1;
+  // a different heading, a later heading, or a heading inside code is content.
+  function withoutDuplicateTitle(markdown = "", title = "") {
+    const source = String(markdown || "");
+    const first = source.match(/^(?:\uFEFF)?[ \t]*(?:\r?\n[ \t]*)*#(?!#)[ \t]+([^\r\n]+)(?:\r?\n|$)/);
+    if (!first || !title.trim()) return source;
+    const normalize = (text) => text.normalize("NFKC").replace(/\s+/g, "").trim();
+    const heading = first[1].replace(/[ \t]+#+[ \t]*$/, "");
+    return normalize(heading) === normalize(title) ? source.slice(first[0].length).replace(/^\s*\n/, "") : source;
+  }
+
+  function renderArticle(markdown = "", title = "") {
+    return render(withoutDuplicateTitle(markdown, title));
+  }
+
+  function hasDamagedMath(markdown = "") {
+    // These exact signatures were caused by an upstream string escape error.
+    // Tabs, indentation, CRLF and ordinary code examples are otherwise valid.
+    const prose = String(markdown).replace(/```[^\n]*\n[\s\S]*?(?:```|$)/g, "");
+    return /\u0008oxed\{|\text\{|\times\b|\rightarrow\b/.test(prose);
+  }
+
+  window.blogMarkdown = { render, renderArticle, withoutDuplicateTitle, hasDamagedMath };
 })();

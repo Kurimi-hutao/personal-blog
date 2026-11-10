@@ -1,0 +1,120 @@
+/* Shared material system. Layout remains in each page's own stylesheet. */
+html:root {
+  --paper: #f4f0e6;
+  --paper-deep: #e9e3d6;
+  --ink: #252c28;
+  --ink-soft: #5f685f;
+  --cinnabar: #a43b32;
+  --line: rgba(57,65,53,.19);
+  --ink-fiber: url('./assets/ink-refinement-20261104/xuan-paper.webp');
+  --ink-brush: url('./assets/ink-refinement-20261104/brush-dry.svg');
+  --ui-seal: var(--cinnabar);
+  --ui-on-seal: #fff8ed;
+  --font-body: 'PingFang SC','Microsoft YaHei',system-ui,sans-serif;
+}
+html[data-theme="dark"] {
+  --paper: #18211d;
+  --paper-deep: #222e27;
+  --ink: #ece9dc;
+  --ink-soft: #b7c0b0;
+  --cinnabar: #e19a87;
+  --line: rgba(223,228,208,.21);
+  --ui-on-seal: #241d18;
+}
+body { background-color:var(--paper); background-image:none; color:var(--ink); }
+body::before { background-image:var(--ink-fiber); background-size:680px; opacity:.24; mix-blend-mode:multiply; }
+html[data-theme="dark"] body::before { background-image:var(--ink-fiber); opacity:.025; mix-blend-mode:screen; }
+body .paper-noise { display:none; }
+/* Reading sits on quiet paper, with no moving texture across the text. */
+body:has(#articleDetail)::before { opacity:.07; }
+.site-header, .site-header.scrolled { background:var(--paper); backdrop-filter:none; -webkit-backdrop-filter:none; }
+.site-search-trigger, .wind-toggle { backdrop-filter:none; -webkit-backdrop-filter:none; box-shadow:none; }
+body .site-search-trigger { border-radius:2px; background:transparent; }
+.home-page .hero { background-color:var(--paper); }
+.article-body { font-family:var(--font-body); color:var(--ink); }
+/* Three surfaces: plain paper, paper tabs, and cinnabar seals. */
+body :is(.ink-button,.seal-button) { border-radius:2px 1px 3px 1px; box-shadow:none; }
+body .ink-button { background:var(--cinnabar); color:var(--ui-on-seal); border-color:var(--cinnabar); }
+body .ink-button:hover { background:color-mix(in srgb,var(--cinnabar) 88%,var(--ink)); }
+body :is(.work-card,.video-card,.comment-card,.article-state) { border-radius:0; box-shadow:none; }
+body .work-card { border:0; border-bottom:1px solid var(--line); background:transparent; }
+body :is(.work-cover,.work-visual,.video-card-visual,.home-video-visual) { border-radius:1px; }
+body :is(.home-video-card,.video-card) .media-play-button,
+html[data-theme="dark"] body :is(.home-video-card,.video-card) .media-play-button {
+  color:var(--cinnabar); background:var(--paper); border:1px solid currentColor;
+  border-radius:2px 5px 2px 3px; box-shadow:none; backdrop-filter:none; -webkit-backdrop-filter:none;
+}
+body :is(.home-video-card,.video-card):hover .media-play-button { background:var(--cinnabar); color:var(--ui-on-seal); transform:rotate(-3deg); }
+body[data-page="articles"] .tag-filter-list button {
+  min-height:44px; border:0; border-bottom:1px solid transparent; border-radius:0; padding:8px 12px; background:transparent;
+}
+body[data-page="articles"] .tag-filter-list button.active { background:transparent; border-color:var(--cinnabar); color:var(--cinnabar); }
+body[data-page="articles"] :is(.keyword-panel,#keywordSearch) { border-radius:1px; }
+body[data-page="articles"] .keyword-panel { box-shadow:0 8px 22px #18211d14; }
+body .article-filters .animated-select__menu { border-radius:1px; box-shadow:0 8px 22px #18211d14; background:var(--paper); }
+.home-page #links .friend-card { background:transparent; border:0; border-bottom:1px solid var(--line); border-radius:0; box-shadow:none; }
+.home-page #links .friend-card > i { border:0; border-radius:0; background:transparent; }
+.home-page #links .friend-card::after { opacity:.045; }
+.home-page #links .station-group-note { border-radius:1px; }
+/* A dry stroke belongs to a heading, never over a line of readable text. */
+body .ink-heading-ready { position:relative; }
+body .ink-heading-ready::after {
+  content:''; display:block; position:relative; width:clamp(70px,40%,150px); height:12px; margin-top:8px;
+  background:var(--cinnabar); mask:var(--ink-brush) left center/100% 100% no-repeat;
+  -webkit-mask:var(--ink-brush) left center/100% 100% no-repeat;
+  opacity:.7; clip-path:inset(0 100% 0 0); pointer-events:none;
+}
+body .ink-heading-visible::after { clip-path:inset(0); transition:clip-path 760ms cubic-bezier(.22,1,.36,1); }
+.home-page .section-heading::after, .home-page .section-heading h2::before { display:none; }
+.home-page .section-heading { padding-bottom:10px; }
+body .article-body :is(h1,h2,h3)::after { content:none; }
+/* Small ink accent replaces the pointer-following glow. */
+body :is(.article-card,.article-list-card,.video-card,.friend-card)::after {
+  background:none; box-shadow:none; transform:none;
+}
+body :is(.article-card,.article-list-card,.video-card):hover { box-shadow:none; }
+body :is(.article-card,.article-list-card,.video-card) :is(h2,h3) { text-decoration-color:var(--cinnabar); text-underline-offset:7px; }
+body :is(.article-card,.article-list-card,.video-card):hover :is(h2,h3) { text-decoration-line:underline; text-decoration-thickness:1px; }
+/* Two slow layers within the existing hero only. JS marks active scene visibility. */
+.home-page .spring-mist { animation:springMist 26s ease-in-out infinite alternate; animation-play-state:running; opacity:.3; }
+.home-page .spring-scene::after {
+  content:''; position:absolute; inset:35% -8% -15% 15%;
+  background:url('./assets/spring-ink/mist.webp') center/contain no-repeat;
+  opacity:.13; animation:inkMistNear 21s ease-in-out infinite alternate; animation-play-state:running; pointer-events:none;
+}
+html.ink-motion-paused .spring-mist, html.ink-motion-paused .spring-scene::after, .hero.ink-scene-paused .spring-mist, .hero.ink-scene-paused .spring-scene::after { animation-play-state:paused; }
+html[data-theme="dark"] .home-page .spring-mist { opacity:.12; }
+html[data-theme="dark"] .home-page .spring-scene::after { opacity:.07; }
+@keyframes inkMistNear { from { transform:translate3d(2%,1%,0); } to { transform:translate3d(-2%,-1%,0); } }
+/* Preserve the drawing's light/dark structure instead of crushing all midtones. */
+html[data-theme="dark"] .scene-banner::before { filter:brightness(.68) saturate(.52); opacity:.38; }
+html[data-theme="dark"] .lost-scene { filter:brightness(.73) saturate(.5); opacity:.75; }
+html[data-theme="dark"] :is(.article-list-cover,.card-visual,.work-cover,.video-card-visual,.home-video-visual) { background-color:var(--paper-deep); }
+html[data-theme="dark"] :is(.article-list-cover,.home-page .card-visual)::after {
+  content:''; position:absolute; inset:0; pointer-events:none; background:#18211d; opacity:.1;
+}
+@media(max-width:1080px) {
+  html:root { --font-body:'Blog Mobile Serif','Songti SC',SimSun,serif; }
+  body .site-header .site-nav .nav-primary a { border-radius:0; box-shadow:none; }
+}
+@media(max-width:900px) {
+  body .work-card { padding:0 0 24px; background:transparent; border-radius:0; }
+  body .work-copy { padding:18px 0 0; }
+  .home-page #links .friend-card { background:transparent; border-radius:0; box-shadow:none; }
+  body[data-page="videos"] .article-page-shell { width:min(680px,calc(100% - 40px)); }
+  body[data-page="videos"] .page-title.scene-banner { min-height:176px; padding:24px 0; gap:12px; }
+  body[data-page="videos"] .scene-banner h1 { font:400 clamp(38px,10vw,48px)/1.25 var(--brush); }
+  body[data-page="videos"] .scene-banner > p:last-child { max-width:76%; font-size:14px; line-height:1.85; }
+  body[data-page="videos"] .scene-banner::before {
+    display:block; inset:0 -20px 0 30%; background-size:auto 165px; background-position:right bottom; opacity:.2;
+    mask-image:linear-gradient(to right,transparent,#000 70%); -webkit-mask-image:linear-gradient(to right,transparent,#000 70%);
+  }
+  body[data-page="videos"] .video-card { background:transparent; border:0; border-bottom:1px solid var(--line); padding:0 0 22px; }
+  body[data-page="videos"] .video-card-copy { padding:16px 0 0; }
+  .home-page .hero-actions .ink-button { border-radius:2px 1px 3px 1px; }
+  body .ink-heading-ready::after { height:9px; margin-top:5px; width:86px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  body .ink-heading-ready::after { clip-path:inset(0); transition:none; }
+  .home-page .spring-mist, .home-page .spring-scene::after { animation:none; }
+}

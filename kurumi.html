@@ -1,6 +1,7 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="light">
   <head>
+    <script id="theme-bootstrap">try{document.documentElement.dataset.theme=localStorage.getItem('hutao-theme')==='dark'?'dark':'light'}catch{}</script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="description" content="土御门胡桃角色介绍与水墨绘卷。" />
@@ -9,15 +10,13 @@
     <title>胡桃绘卷 | 虎桃不会振刀</title>
     <link rel="stylesheet" href="./fonts-headings.css?v=20261015" />
     <link rel="stylesheet" href="./styles.css?v=20260928" />
-    <link rel="stylesheet" href="./motion-core.css?v=20261015-touch-1" />
-    <link rel="stylesheet" href="./lottie-core.css?v=20261010-loading-1" />
-    <script defer src="./assets/vendor/lottie-web/lottie_light-5.13.0.min.js"></script>
-    <script defer src="./lottie-core.js?v=20261017-motion-1"></script>
-      <link rel="stylesheet" href="./kurumi-refinements.css?v=20260928-2" />
+    <link rel="stylesheet" href="./motion-core.css?v=20261105-controls" />
+    <link rel="stylesheet" href="./lottie-core.css?v=20261105-controls" />
+
     <link rel="stylesheet" href="./ink-system.css?v=20260928-2" />
     <link rel="stylesheet" href="./page-scenes.css?v=20260929-1" />
     <link rel="stylesheet" href="./layout-polish.css?v=20260929-1" />
-    <link rel="stylesheet" href="./site-footer.css?v=20261007-1" />
+    <link rel="stylesheet" href="./site-footer.css?v=20261019-perf-1" />
     <script defer src="./site-footer.js?v=20261007-1"></script>
       <link rel="icon" href="./assets/visual-refresh/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" sizes="32x32" href="./assets/visual-refresh/favicon-32.png" />
@@ -26,11 +25,15 @@
     <link rel="stylesheet" href="./site-features.css?v=20261010-p1" />
     <link rel="stylesheet" href="./blog-refinements.css?v=20261015-editorial-1" />
     <link rel="stylesheet" href="./mobile-editorial.css?v=20261015-assets-4" media="(max-width:1080px)" />
-    <link rel="stylesheet" href="./mobile-controls.css?v=20261019-mobile-redesign" media="(max-width:1080px)" />
-    <link rel="stylesheet" href="./journey-ink.css?v=20261016-1" />
-    <link rel="stylesheet" href="./mobile-redesign.css?v=20261019-2" />
+    <link rel="stylesheet" href="./mobile-controls.css?v=20261015-assets-4" media="(max-width:1080px)" />
+    <link rel="stylesheet" href="./journey-ink.css?v=20261019-ui-1" />
+    <link rel="stylesheet" href="./kurumi-refinements.css?v=20261104-ink" />
+    <link rel="stylesheet" href="./ink-materials.css?v=20261104-1" />
+    <link rel="stylesheet" href="./ink-controls.css?v=20261110-ink">
+    <link rel="stylesheet" href="./ink-image-ui.css?v=20261110-ink">
   </head>
   <body class="kurumi-page" data-page="kurumi">
+    <script src="./lottie-core.js?v=20261105-ink"></script>
     <div class="paper-noise" aria-hidden="true"></div>
     <header class="site-header kurumi-header" data-site-header>
       <a class="brand" href="./index.html" aria-label="返回首页">
@@ -54,11 +57,9 @@
 
     <main>
       <section class="kurumi-page-hero">
-        <div class="kurumi-hero-media" aria-hidden="true">
-          <picture>
-            <source media="(prefers-reduced-motion: reduce)" srcset="./assets/ink-hero.webp" />
-            <img class="kurumi-hero-gif" src="./assets/next/hero_bg_from_mp4_optimized.gif" alt="" fetchpriority="high" />
-          </picture>
+        <div class="kurumi-hero-media" aria-hidden="true" data-motion="paused">
+          <img class="kurumi-hero-poster" src="./assets/ink-refinement-20261104/kurumi-poster.webp" alt="" width="960" height="477" fetchpriority="high" />
+          <video class="kurumi-hero-video" data-src="./assets/ink-refinement-20261104/kurumi-hero.mp4" muted playsinline loop preload="none" tabindex="-1" disablepictureinpicture></video>
         </div>
         <div class="kurumi-hero-shade" aria-hidden="true"></div>
         <div class="kurumi-hero-depth kurumi-hero-depth--far" aria-hidden="true"></div>
@@ -69,6 +70,7 @@
           <p>日轮之花，承阴阳古术而行。<br />笑意明媚，亦有守护众人的锋芒。</p>
           <a class="ink-button" href="#profile"><span>阅览人物志</span><span aria-hidden="true">↓</span></a>
         </div>
+        <button class="kurumi-motion-toggle" type="button" aria-pressed="false" hidden>播放画中动效</button>
       </section>
 
       <section class="kurumi-profile-section" id="profile">
@@ -142,10 +144,10 @@
     <script src="./assets/vendor/gsap/gsap-3.13.0.min.js"></script>
     <script src="./ink-assets.js?v=20261008-visual"></script>
     <script src="./content-cache.js?v=20261015"></script>
-    <script src="./works-data.js?v=20261015"></script>
-    <script src="./theme.js?v=20261019-mobile-redesign"></script>
-    <script src="./kurumi.js?v=5"></script>
-    <script src="./motion-core.js?v=20261015-editorial-1"></script>
+    <script src="./works-data.js?v=20261019-perf-1"></script>
+    <script src="./theme.js?v=20261106-brush"></script>
+    <script src="./kurumi.js?v=20261105-ink"></script>
+    <script src="./motion-core.js?v=20261105-controls"></script>
     <script src="./motion-gallery.js?v=2"></script>
     <script defer src="./mobile-interactions.js?v=20261015-assets-4"></script>
   </body>

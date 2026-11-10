@@ -11,8 +11,8 @@
   .article-detail-header .mobile-peach-branch { width: 146px; top: -12px; opacity: .65; }
   .article-detail-header > :not(.mobile-peach-garden) { position: relative; z-index: 2; }
   .mobile-peach-fall { position: absolute; inset: 0; overflow: clip; pointer-events: none; }
-  .mobile-peach-petal { position: absolute; top: 0; right: 0; width: 12px; height: 14px; background: url('./assets/spring-ink/petal-1.webp') center / contain no-repeat; opacity: 0; }
-  .mobile-peach-petal:nth-child(2n) { background-image: url('./assets/spring-ink/petal-2.webp'); }
+  .mobile-peach-petal { position: absolute; top: 0; right: 0; width: 12px; height: 14px; background: url('./assets/spring-ink/small/petal-1-48.webp') center / contain no-repeat; opacity: 0; }
+  .mobile-peach-petal:nth-child(2n) { background-image: url('./assets/spring-ink/small/petal-2-48.webp'); }
   html[data-theme="dark"] .mobile-peach-branch { filter: brightness(.76) saturate(.72); }
   html[data-theme="dark"] .mobile-peach-petal { filter: brightness(.8) saturate(.8); }
   body.mobile-nav-open .mobile-peach-garden { visibility: hidden; }
