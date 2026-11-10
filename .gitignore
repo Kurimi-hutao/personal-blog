@@ -10,3 +10,9 @@ blog-source.zip
 /screenshots/issue-2/
 _deploy/
 .cloudbase-tools/
+
+# Credentials stay in Supabase Secrets, never in the public repository.
+.env
+.env.*
+!.env.example
+supabase/.temp/
