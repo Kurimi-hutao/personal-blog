@@ -4489,6 +4489,22 @@ body.home-page :where(.article-card, .home-video-card, .achievement-section, .li
   gap: 8px;
 }
 
+.article-detail-header .article-detail-meta .article-tags:has(a) {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  max-width: 100%;
+  margin: 0;
+}
+
+.article-detail-header .article-tags a {
+  padding: 4px 2px;
+  color: var(--cinnabar);
+  overflow-wrap: anywhere;
+  text-decoration: underline;
+  text-underline-offset: .22em;
+}
+
 .article-tags span {
   padding: 6px 11px;
   border: 1px solid var(--line);
@@ -4580,6 +4596,20 @@ body.home-page :where(.article-card, .home-video-card, .achievement-section, .li
   color: var(--cinnabar);
   font-size: 12px;
   letter-spacing: 0.12em;
+}
+
+.article-detail-header .article-detail-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 16px;
+  color: var(--ink-soft);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.article-detail-meta .article-tags:empty {
+  display: none;
 }
 
 .article-detail-excerpt {
@@ -9823,4 +9853,54 @@ html body.home-page .site-search-dialog .site-search-field {
   .home-page .site-header .brand-name { white-space:nowrap; }
   html body.home-page .site-header > .site-search-trigger { width:44px; margin-inline:0; justify-content:center; }
   html body.home-page .site-header > .site-search-trigger > span:nth-child(2) { display:none; }
+}
+
+
+/* article-reading.css */
+/* A small ink mark identifies the destination after a chapter jump. */
+#articleDetail .article-body :is(h1,h2,h3):target {
+  position: relative;
+}
+
+#articleDetail .article-body :is(h1,h2,h3):target::after {
+  content: "";
+  position: absolute;
+  inset-inline-start: 0;
+  inset-block-end: -.21em;
+  width: 2em;
+  height: 4px;
+  margin: 0;
+  background: var(--cinnabar);
+  border-radius: 55% 10% 60% 16%;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .reading-toc-dialog[open] {
+    animation: chapter-menu-in 220ms cubic-bezier(.22,.72,.24,1);
+  }
+
+  .reading-toc-dialog[open]::backdrop {
+    animation: chapter-backdrop-in 180ms ease-out;
+  }
+
+  #articleDetail .article-body :is(h1,h2,h3):target::after {
+    transform-origin: left center;
+    animation: chapter-mark-in 400ms cubic-bezier(.22,.72,.24,1);
+  }
+}
+
+@keyframes chapter-menu-in {
+  from { translate: 0 10px; }
+  to { translate: 0 0; }
+}
+
+@keyframes chapter-backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes chapter-mark-in {
+  from { opacity: .4; transform: scaleX(.12); }
+  to { opacity: 1; transform: scaleX(1); }
 }

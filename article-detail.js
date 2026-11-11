@@ -56,9 +56,18 @@ function renderArticle(article) {
     <p class="article-detail-excerpt"></p>`;
   header.querySelector(".eyebrow").textContent = article.category || "Jianghu Notes";
   header.querySelector("h1").textContent = article.title;
-  header.querySelector(".article-detail-meta span").textContent = (article.tags || [])
-    .map((tag) => `#${tag}`)
-    .join(" ");
+  const tags = header.querySelector(".article-tags");
+  const labels = [...new Set(article.tags || [])].filter(Boolean);
+  if (article.content_type === "video") {
+    tags.textContent = labels.map(tag => `#${tag}`).join(" ");
+  } else {
+    for (const tag of labels) {
+      const link = document.createElement("a");
+      link.href = `./articles.html?${new URLSearchParams({ tag })}`;
+      link.textContent = `#${tag}`;
+      tags.appendChild(link);
+    }
+  }
   const readingMeta = document.createElement("span");
   readingMeta.className = "reading-duration";
   const plainText = (article.content || article.excerpt || "").replace(/[#*_>`~\[\]()!-]/g, " ");
@@ -66,7 +75,7 @@ function renderArticle(article) {
   readingMeta.textContent = article.content_type === "video"
     ? "视频作品"
     : `约 ${Math.max(1, Math.ceil(characterCount / 420))} 分钟阅读`;
-  header.querySelector(".article-detail-meta").appendChild(readingMeta);
+  header.querySelector(".article-detail-meta").append(readingMeta, tags);
   if (article.content_type === "video" && article.series_name) {
     const series = document.createElement("span");
     series.className = "video-series-label";

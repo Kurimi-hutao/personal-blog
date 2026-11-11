@@ -27,3 +27,29 @@ body[data-page="articles"] .theme-filter-bar :focus-visible { outline:2px solid 
 }
 
 body[data-page="articles"] .filter-summary { z-index:40; }
+
+/* Keep the matched lettering legible while a cinnabar stroke develops below it. */
+#articleList mark {
+  color: inherit;
+  background: linear-gradient(174deg,
+    transparent 9%, color-mix(in srgb, var(--cinnabar) 32%, transparent) 18% 76%,
+    color-mix(in srgb, var(--cinnabar) 16%, transparent) 90%, transparent 98%)
+    left 92% / 100% .48em no-repeat;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+@media (prefers-reduced-motion: no-preference) {
+  #articleList mark { animation: article-match-stroke .38s cubic-bezier(.18,.68,.3,1) backwards; }
+  @keyframes article-match-stroke {
+    from { background-size: 0% .48em; }
+    to { background-size: 100% .48em; }
+  }
+}
+@media (max-width: 1080px) {
+  #articleList .article-tags:has(mark) { display: flex; }
+  #articleList .article-tags:has(mark) > span:not(:has(mark)) { display: none; }
+  #articleList .article-tags:has(mark) > span::before { content: none; }
+}
+@media (forced-colors: active) {
+  #articleList mark { text-decoration: underline double; }
+}

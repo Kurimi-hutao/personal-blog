@@ -10,7 +10,7 @@
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="alternate" type="application/rss+xml" title="虎桃不会振刀 RSS" href="./rss.xml" />
     <title>文章 | 虎桃不会振刀</title>
-    <link rel="stylesheet" href="./page-articles.bundle.css?v=d29ca3b398f6" />
+    <link rel="stylesheet" href="./page-articles.bundle.css?v=c0ba63c1b601" />
     <script defer src="./site-footer.js?v=20261007-1"></script>
       <link rel="icon" href="./assets/visual-refresh/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" sizes="32x32" href="./assets/visual-refresh/favicon-32.png" />
@@ -47,7 +47,7 @@
       <section class="article-filters" aria-label="文章筛选">
         <label>
           <span class="sr-only">搜索文章</span>
-          <input id="articleSearch" type="search" placeholder="翻阅此卷 · 搜索标题或摘要" />
+          <input id="articleSearch" type="search" placeholder="搜索标题、摘要、分类或标签" />
         </label>
         <select id="categoryFilter" aria-label="按分类筛选">
           <option value="">全部分类</option>
@@ -67,7 +67,7 @@
             <div class="keyword-panel">
               <div class="keyword-panel-heading"><label for="keywordSearch">细分关键词</label><button id="clearKeywords" class="text-button" type="button">清除关键词</button></div>
               <input id="keywordSearch" type="search" placeholder="搜索关键词" autocomplete="off" />
-              <p class="keyword-hint">关键词与当前主题共同筛选，点击已选项可取消。</p>
+              <p class="keyword-hint">篇数为该标签收录的全部文章。可与主题组合筛选。</p>
               <div class="tag-filter-list" id="tagFilters" role="group" aria-label="按关键词筛选"></div>
               <p id="keywordEmpty" role="status" hidden>没有找到这个关键词，试试其他写法。</p>
             </div>
@@ -87,12 +87,12 @@
     <script src="./content-cache.js?v=20261015"></script>
     <script src="./works-data.js?v=20261019-perf-1"></script>
     <script src="./theme.js?v=20261106-brush"></script>
-    <script src="./articles.js?v=20261101-topics"></script>
+    <script src="./articles.js?v=20261111-search-ink"></script>
     <script src="./motion-core.js?v=20261105-controls"></script>
     <script src="./motion-articles.js?v=20261101-topics"></script>
     <script defer src="./mobile-interactions.js?v=20261015-assets-4"></script>
     <script defer src="./mobile-botanicals.js?v=20261019-ink"></script>
     <script defer src="./mobile-wuxia.js?v=20261019-clarity"></script>
-    <script defer src="./article-presentation.js?v=20261019-1"></script>
+    <script defer src="./article-presentation.js?v=20261111-stagger"></script>
   </body>
 </html>

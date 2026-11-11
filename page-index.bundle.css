@@ -5075,6 +5075,54 @@ body.home-page :where(.article-card, .home-video-card, .achievement-section, .li
   will-change: transform;
 }
 
+/* The far mountains follow the scroll more slowly than the lettering and rocks. */
+@supports (animation-timeline: view()) and (animation-range: exit) {
+  @media (prefers-reduced-motion: no-preference) {
+    .home-page .hero {
+      view-timeline: --home-landscape block;
+    }
+
+    .home-page .hero :is(.hero-art, .spring-night) {
+      animation: homeMountainDepth linear both;
+      animation-timeline: --home-landscape;
+      animation-range: exit 0% exit 100%;
+    }
+  }
+}
+
+@keyframes homeMountainDepth {
+  from { translate: 0 0; }
+  to { translate: 0 16%; }
+}
+
+@media (min-width: 1081px) {
+  .home-page .hero .scroll-cue {
+    display: flex;
+    min-width: 64px;
+    bottom: 16px;
+    gap: 6px;
+    padding: 8px;
+    writing-mode: horizontal-tb;
+    font-size: 12px;
+    letter-spacing: .16em;
+    text-decoration: none;
+  }
+
+  .home-page .scroll-cue i {
+    height: 24px;
+    background: linear-gradient(currentColor, transparent);
+  }
+
+  .home-page .scroll-cue:is(:hover, :focus-visible) {
+    color: var(--cinnabar);
+  }
+
+  .home-page .scroll-cue:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+}
+
 .home-page .hero::before {
   content: "";
   position: absolute;

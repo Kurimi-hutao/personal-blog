@@ -18,7 +18,7 @@
       const animation = target.animate([
         { opacity: .15, transform: `translateY(${index ? 12 : 18}px)` },
         { opacity: 1, transform: 'translateY(0)' },
-      ], { duration: index ? 480 : 650, delay: Math.min(index * 55, 220), easing: 'cubic-bezier(.22,1,.36,1)' });
+      ], { duration: index ? 480 : 650, delay: Math.min(index * 55, 220), fill: 'backwards', easing: 'cubic-bezier(.22,1,.36,1)' });
       running.add(animation);
       animation.onfinish = animation.oncancel = () => running.delete(animation);
     });

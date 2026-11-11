@@ -20,6 +20,7 @@
     const list = document.createElement('ol');
     headings.forEach((heading, i) => {
       if (!heading.id) heading.id = `chapter-${i + 1}`;
+      if (!heading.hasAttribute('tabindex')) heading.tabIndex = -1;
       const li = document.createElement('li');
       li.className = `toc-level-${heading.tagName.slice(1)}`;
       const link = document.createElement('a');
@@ -57,10 +58,10 @@
       if (event.target === dialog) dialog.close();
       const link = event.target.closest('a');
       if (!link) return;
-      event.preventDefault(); dialog.close();
+      if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+      dialog.close();
       const target = document.getElementById(decodeURIComponent(link.hash.slice(1)));
-      target?.scrollIntoView({ behavior: motion(), block: 'start' });
-      history.replaceState(null, '', link.hash);
+      target?.focus({ preventScroll: true });
     });
     const observer = new IntersectionObserver(entries => {
       const entry = entries.filter(e => e.isIntersecting).sort((a,b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];

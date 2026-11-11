@@ -90,7 +90,23 @@ function updateFilterUrl() {
   history.replaceState(null, "", `${location.pathname}${params.size ? `?${params}` : ""}`);
 }
 
-function createListCard(article) {
+function writeSearchText(element, value, pattern) {
+  if (!pattern) {
+    element.append(value);
+    return;
+  }
+  let start = 0;
+  for (const match of value.matchAll(pattern)) {
+    element.append(value.slice(start, match.index));
+    const mark = document.createElement("mark");
+    mark.textContent = match[0];
+    element.append(mark);
+    start = match.index + match[0].length;
+  }
+  element.append(value.slice(start));
+}
+
+function createListCard(article, pattern) {
   const link = document.createElement("a");
   link.className = "article-list-card reveal";
   link.href = articleService.articleUrl(article);
@@ -118,21 +134,30 @@ function createListCard(article) {
   const meta = document.createElement("div");
   meta.className = "article-card-meta";
   const category = document.createElement("span");
-  category.textContent = article.category || "随笔";
+  writeSearchText(category, article.category || "随笔", pattern);
   const time = document.createElement("time");
   time.dateTime = article.published_at || "";
   time.textContent = article.published_at ? articleService.formatDate(article.published_at) : "未定卷期";
   meta.append(category, time);
 
   const title = document.createElement("h2");
-  title.textContent = article.title || "未题";
+  writeSearchText(title, article.title || "未题", pattern);
   const excerpt = document.createElement("p");
-  excerpt.textContent = article.excerpt || "这篇文章还没有写下引子。";
+  let summary = article.excerpt || "这篇文章还没有写下引子。";
+  if (pattern && article.excerpt) {
+    const matchIndex = summary.search(pattern);
+    if (matchIndex > 20) {
+      const context = Array.from(summary.slice(0, matchIndex)).slice(-12).join("");
+      summary = "…" + context + summary.slice(matchIndex);
+    }
+  }
+  writeSearchText(excerpt, summary, pattern);
   const tags = document.createElement("div");
   tags.className = "article-tags";
   (article.tags || []).forEach((tag) => {
     const chip = document.createElement("span");
-    chip.textContent = `# ${tag}`;
+    chip.append("# ");
+    writeSearchText(chip, tag, pattern);
     tags.appendChild(chip);
   });
   const stats = document.createElement("span");
@@ -172,11 +197,17 @@ function renderFilters() {
   const params = new URLSearchParams(location.search);
   categoryFilter.value = params.get("category") || "";
 
-  const tags = [...new Set(allArticles.flatMap((article) => article.tags || []))];
-  tags.forEach((tag) => {
+  const tagCounts = new Map();
+  for (const article of allArticles) {
+    for (const tag of new Set(article.tags || [])) {
+      if (tag) tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1);
+    }
+  }
+  const tags = [...tagCounts].sort((a, b) => b[1] - a[1]);
+  tags.forEach(([tag, count]) => {
     const button = document.createElement("button");
     button.type = "button";
-    button.textContent = `# ${tag}`;
+    button.textContent = `# ${tag} · ${count} 篇`;
     button.dataset.tag = tag;
     button.addEventListener("click", () => {
       activeTag = activeTag === tag ? "" : tag;
@@ -190,16 +221,13 @@ function renderFilters() {
   filtersReady = true;
 }
 
-function filteredArticles() {
-  const keyword = searchInput.value.trim().toLowerCase();
+function filteredArticles(pattern) {
   const category = categoryFilter.value;
   const filtered = allArticles.filter((article) => {
-    const title = article.title || "";
-    const excerpt = article.excerpt || "";
+    const fields = [article.title, article.excerpt, article.category, ...(article.tags || [])];
     const matchesKeyword =
-      !keyword ||
-      title.toLowerCase().includes(keyword) ||
-      excerpt.toLowerCase().includes(keyword);
+      !pattern ||
+      fields.some(value => value && value.search(pattern) !== -1);
     return matchesKeyword &&
       (!category || article.category === category) &&
       (!activeTag || (article.tags || []).includes(activeTag)) &&
@@ -214,7 +242,7 @@ function filteredArticles() {
   return filtered;
 }
 
-function renderArticleDom(filtered) {
+function renderArticleDom(filtered, pattern) {
   syncFilterControls();
   articleContainer.replaceChildren();
   resultCount.textContent = `共找到 ${filtered.length} 篇文章`;
@@ -226,15 +254,18 @@ function renderArticleDom(filtered) {
     else renderArticleState("未寻得合卷文章", "换一个关键词、分类或标签再试试，江湖册页还在继续整理。");
     return;
   }
-  filtered.forEach((article) => articleContainer.appendChild(createListCard(article)));
+  filtered.forEach((article) => articleContainer.appendChild(createListCard(article, pattern)));
 }
 
 function renderArticles(options = {}) {
-  const filtered = filteredArticles();
+  const query = searchInput.value.trim();
+  const literal = query.replace(/[.*+?^$(){}|[\]\\]/g, "\\$&");
+  const pattern = query ? new RegExp(literal, "giu") : null;
+  const filtered = filteredArticles(pattern);
   resultCount.textContent = `共找到 ${filtered.length} 篇文章`;
   updateFilterUrl();
   syncFilterControls();
-  const render = () => renderArticleDom(filtered);
+  const render = () => renderArticleDom(filtered, pattern);
   if (options.immediate || !filtersReady || !window.MotionCore?.animateListUpdate) {
     render();
     return;
