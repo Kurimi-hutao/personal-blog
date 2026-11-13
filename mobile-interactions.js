@@ -63,20 +63,6 @@
     });
   });
   states.observe(document.body,{ subtree: true,attributes: true,attributeFilter: ['open'] });
-  function revealArtwork() {
-    if (!enabled() || !document.body.classList.contains('home-page') || !matchMedia('(max-width:900px)').matches) return;
-    const dark = document.documentElement.dataset.theme === 'dark';
-    const artwork = document.querySelector(dark ? '.spring-night' : '.hero-art');
-    if (!artwork) return;
-    if (window.gsap) {
-      cancel(artwork);
-      const tween = gsap.fromTo(artwork,{ opacity: .25,y: 8 },{ opacity: 1,y: 0,duration: .85,ease: 'power2.out',clearProps: 'opacity,transform',onComplete: () => running.delete(artwork) });
-      running.set(artwork,{ group: 'artwork',cancel: () => { tween.kill(); gsap.set(artwork,{ clearProps: 'opacity,transform' }); } });
-    } else play(artwork,[{ opacity: .25,transform: 'translateY(8px)' },{ opacity: 1,transform: 'translateY(0)' }],{ duration: 850 },'artwork');
-  }
-  const theme = new MutationObserver(() => { stop('artwork'); revealArtwork(); });
-  theme.observe(document.documentElement,{ attributes: true,attributeFilter: ['data-theme'] });
-  Promise.resolve(window.InkLottie?.loaded).then(revealArtwork);
   const reset = () => { if (!enabled()) stop(); };
   compact.addEventListener('change',reset); reduce.addEventListener('change',reset);
   document.addEventListener('visibilitychange',reset);

@@ -87,7 +87,7 @@ test('station rapid toggling settles correctly and footer collapse restores focu
       return { cancel() {}, finished: Promise.resolve() };
     },
   };
-  const section = { classList: { toggle() {} } };
+  const section = { querySelectorAll: () => [], classList: { toggle() {} } };
   const bottom = { addEventListener(k, fn) { handlers.bottom = fn; } };
   const document = {
     querySelector: q => ({

@@ -51,7 +51,20 @@
     'assets/mobile-publication/article-cover-physics-concept.webp',
     'assets/hutao-entry-shanshui.webp',
   ];
+  function lessonNumber(article) {
+    const match = /^ai-from-zero-lesson-(\d+)$/i.exec(article.slug || '');
+    return match ? Number(match[1]) : null;
+  }
+
+  function lessonCover(number) {
+    const tones = ['#263e39', '#42352f', '#303e4a'];
+    const art = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360"><rect width="640" height="360" fill="${tones[number % tones.length]}"/><g fill="none" stroke="#e3d5b7" opacity=".5"><path d="M0 282Q132 190 242 248T530 185T680 160M0 305Q126 245 243 265T535 210T680 184M0 324Q136 290 253 291T547 237T680 208"/><path d="M94 92h452"/></g><g fill="#f4eedf" font-family="serif"><text x="96" y="76" font-size="22" letter-spacing="4">AI 从零开始</text><text x="90" y="210" font-size="108">${String(number).padStart(2,'0')}</text></g><rect x="510" y="120" width="38" height="42" rx="2" fill="#9c473c"/><text x="529" y="150" font-size="24" text-anchor="middle" fill="#fff3df">课</text></svg>`;
+    return { url: 'data:image/svg+xml,' + encodeURIComponent(art), type: 'image/svg+xml' };
+  }
+
   function fallbackCover(article) {
+    const lesson = lessonNumber(article);
+    if (lesson !== null) return lessonCover(lesson);
     // A distributed choice tied to the article: filtering and revisiting never shuffle it.
     const key = String(article.id || article.slug || article.title || 'untitled');
     let hash = 2166136261;
@@ -74,6 +87,8 @@
       .eq("published", true)
       .order("published_at", { ascending: false });
     if (limit) query = query.limit(limit);
+    if (filters.lessons) query = query.like("slug", "ai-from-zero-lesson-%");
+    if (filters.signal) query = query.abortSignal(filters.signal);
     const { data, error } = await query;
     if (error) throw error;
     return data.map((article) => ({
@@ -106,6 +121,8 @@
     }
     if (filters.tag) query = query.contains("tags", [filters.tag]);
     if (limit) query = query.limit(limit);
+    if (filters.lessons) query = query.like("slug", "ai-from-zero-lesson-%");
+    if (filters.signal) query = query.abortSignal(filters.signal);
     const { data, error } = await query;
     if (error && isSchemaMismatch(error)) return listPublishedLegacy(limit, filters);
     if (error) throw error;
@@ -130,7 +147,10 @@
   async function listPublished(limit, filters = {}) {
     let query = requireClient()
       .from("articles")
-      .select("id,title,slug,excerpt,attachments,category,tags,published_at,created_at,view_count,like_count,favorite_count,content_type,video_url,video_poster,video_path,video_name,series_name,episode_number,duration_seconds")
+      .select(filters.lessons ? "id,title,slug" : filters.home ? (filters.contentType === "video"
+        ? "id,title,slug,excerpt,attachments,category,published_at,view_count,video_url,video_poster"
+        : "id,title,slug,excerpt,attachments,category,published_at,view_count")
+        : "id,title,slug,excerpt,attachments,category,tags,published_at,created_at,view_count,like_count,favorite_count,content_type,video_url,video_poster,video_path,video_name,series_name,episode_number,duration_seconds")
       .eq("published", true)
       .is("deleted_at", null)
       .or(`scheduled_at.is.null,scheduled_at.lte.${new Date().toISOString()}`)
@@ -144,12 +164,24 @@
     }
     if (filters.tag) query = query.contains("tags", [filters.tag]);
     if (limit) query = query.limit(limit);
+    if (filters.lessons) query = query.like("slug", "ai-from-zero-lesson-%");
+    if (filters.signal) query = query.abortSignal(filters.signal);
     const { data, error } = await query;
     if (error && isSchemaMismatch(error)) {
       return listPublishedV6(limit, filters);
     }
     if (error) throw error;
     return data;
+  }
+
+  async function readPublicFeed(limit, filters, timeout = 10000) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeout);
+    try {
+      return await listPublished(limit, { ...filters, signal: controller.signal });
+    } finally {
+      clearTimeout(timer);
+    }
   }
 
   async function getPublished(slug) {
@@ -622,9 +654,11 @@
     isOwner,
     firstImage,
     articleCover,
+    lessonNumber,
     fallbackCover,
     getVisitorToken,
     listPublished,
+    readPublicFeed,
     getPublished,
     listAllArticles,
     listRelated,

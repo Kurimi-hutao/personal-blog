@@ -98,7 +98,6 @@
   .home-page .article-card + .article-card .card-visual { display: none; }
   .home-page .article-card + .article-card h3 { font-size: 19px; }
   .reading-return { width: calc(100% - 52px); margin: 0 auto 24px; padding: 16px 0; border-block: 1px solid var(--line); background: none; }
-  .reading-return:not(.has-reading-history) { display: none; }
   .reading-return h2 { font: 400 13px var(--font-body); }
   .reading-return button { padding: 0; border: 0; font: 12px var(--font-body); color: var(--ink-soft); }
   .reading-return-list { margin-top: 4px; }

@@ -94,6 +94,7 @@
     if (article.content_type === 'video') return;
     const body = document.querySelector('#articleDetail .article-body');
     const key = 'hutao-reading-positions';
+    const cover = window.articleService.articleCover(article).url;
     const positions = read(key, {});
     const saved = positions[article.id];
     let interacted = false, timer;
@@ -103,7 +104,7 @@
       const value = ratio();
       const items = read(key, {});
       if (value > .98) delete items[article.id];
-      else if (value > .03) items[article.id] = { ratio: value, title: article.title, slug: article.slug, updatedAt: Date.now() };
+      else if (value > .03) items[article.id] = { ratio: value, title: article.title, slug: article.slug, cover: cover.startsWith('data:') ? null : cover, updatedAt: Date.now() };
       else delete items[article.id];
       write(key, Object.fromEntries(Object.entries(items).sort((a,b) => b[1].updatedAt - a[1].updatedAt).slice(0,100)));
     }

@@ -1,5 +1,7 @@
 User-agent: *
 Allow: /
 Disallow: /admin.html
+Disallow: /reward.html
+Disallow: /offline.html
 
-Sitemap: https://kurimi-hutao.github.io/personal-blog/sitemap.xml
+Sitemap: https://joestarzhang.cn/sitemap.xml

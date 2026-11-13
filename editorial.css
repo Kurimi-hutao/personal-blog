@@ -309,6 +309,16 @@
 .video-card:hover img {
   filter: contrast(1.06)
 }
+.video-card-preview {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  opacity: 0;
+}
+.video-card-preview.is-playing { opacity: 1; }
 .video-no-poster {
   position: absolute;
   inset: 20px;

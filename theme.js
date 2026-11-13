@@ -22,10 +22,6 @@
     return window.articleService.listPublished();
   }
   const storageKey = "hutao-theme";
-  const saved = localStorage.getItem(storageKey);
-  const theme = saved === "dark" ? "dark" : "light";
-  document.documentElement.dataset.theme = theme;
-
   const button = document.createElement("button");
   button.type = "button";
   button.className = "theme-toggle";
@@ -40,7 +36,12 @@
   button.addEventListener("click", () => {
     const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
     document.documentElement.dataset.theme = next;
-    localStorage.setItem(storageKey, next);
+    try { localStorage.setItem(storageKey, next); } catch { /* Theme remains active in this tab. */ }
+    button.getAnimations().filter(animation => animation.id === 'theme-ink').forEach(animation => animation.cancel());
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      button.animate([{ boxShadow: '0 0 0 1px var(--ink-soft)' }, { boxShadow: '0 0 8px 9px transparent' }],
+        { id: 'theme-ink', duration: 360, easing: 'ease-out' });
+    }
     render();
   });
 
@@ -271,13 +272,20 @@
     const entries = Object.entries(positions).filter(([, item]) => item && item.ratio > .03 && item.ratio < .98)
       .sort((a, b) => b[1].updatedAt - a[1].updatedAt);
     for (const [id, item] of entries) {
-      const slug = item.slug || known.find(work => work.id === id)?.slug;
+      const record = known.find(work => String(work.id) === id || work.slug === item.slug);
+      const slug = item.slug || record?.slug;
       if (!slug) continue;
       const link = document.createElement('a');
       link.href = `./article.html?slug=${encodeURIComponent(slug)}`;
-      const title = document.createElement('strong'); title.textContent = item.title || '继续阅读';
+      const image = document.createElement('img');
+      image.width = 96; image.height = 60; image.alt = ''; image.loading = 'lazy';
+      const article = record || { id, slug };
+      image.src = item.cover || window.articleService.articleCover(article).url;
+      image.addEventListener('error', () => { image.src = window.articleService.fallbackCover(article).url; }, { once: true });
+      link.className = 'reading-return-card';
+      const title = document.createElement('strong'); title.textContent = item.title || record?.title || '继续阅读';
       const progress = document.createElement('span'); progress.textContent = `上次读到 ${Math.round(item.ratio * 100)}% · 继续阅读 →`;
-      link.append(title, progress); list.append(link);
+      link.append(image, title, progress); list.append(link);
       if (list.children.length === 3) break;
     }
     list.closest('.reading-return')?.classList.toggle('has-reading-history', Boolean(list.children.length));
@@ -492,11 +500,21 @@
   backToTop.className = "back-to-top";
   backToTop.setAttribute("aria-label", "返回顶部");
   backToTop.textContent = "↑";
+  const ring = document.createElement("span");
+  ring.className = "back-to-top-ring";
+  ring.setAttribute("aria-hidden", "true");
+  backToTop.append(ring);
+  const footerRing = ring.cloneNode(false);
   document.body.appendChild(backToTop);
   backToTop.addEventListener("click", () => window.scrollTo({ top: 0, behavior: reducedMotion ? "auto" : "smooth" }));
   let backToTopFrame = 0;
   const updateBackToTop = () => {
     backToTopFrame = 0;
+    const distance = document.documentElement.scrollHeight - window.innerHeight;
+    const ratio = distance > 0 ? Math.max(0, Math.min(1, window.scrollY / distance)) : 0;
+    const angle = `${Math.round(ratio * 360)}deg`;
+    ring.style.setProperty("--read-angle", angle);
+    footerRing.style.setProperty("--read-angle", angle);
     backToTop.classList.toggle("visible", Math.max(0, window.scrollY) > 650);
   };
   const requestBackToTopUpdate = () => {
@@ -504,6 +522,7 @@
     backToTopFrame = window.requestAnimationFrame(updateBackToTop);
   };
   window.addEventListener("scroll", requestBackToTopUpdate, { passive: true });
+  window.addEventListener("resize", requestBackToTopUpdate, { passive: true });
   updateBackToTop();
 
   const finePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
@@ -735,6 +754,7 @@
     if (homeSearch) document.addEventListener('mobile-navigation-change', placeUtilities);
     layout.addEventListener('change', placeUtilities); placeUtilities();
     const topLink = document.createElement('button'); topLink.type = 'button'; topLink.className = 'mobile-scroll-top'; topLink.textContent = '回到卷首 ↑';
+    topLink.prepend(footerRing);
     topLink.onclick = () => backToTop.click(); document.querySelector('body > footer')?.append(topLink);
   }
 

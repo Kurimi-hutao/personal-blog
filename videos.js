@@ -10,7 +10,7 @@ let videoFiltersReady = false;
 function renderVideoState(title, detail, kind = 'search') {
   if (window.InkAssets) return InkAssets.state(videoList, {
     kind, title, detail,
-    action: kind === 'error' ? '重新翻阅' : '清除筛选',
+    action: kind === 'empty' ? null : (kind === 'error' ? '重新翻阅' : '清除筛选'),
     onAction: kind === 'error' ? loadVideos : () => clearVideoFilters.click(),
   });
   videoList.replaceChildren();
@@ -24,39 +24,19 @@ function renderVideoState(title, detail, kind = 'search') {
   videoList.appendChild(state);
 }
 
-function withTimeout(promise, message) {
-  return Promise.race([
-    promise,
-    new Promise((_, reject) => window.setTimeout(() => reject(new Error(message)), 10000)),
-  ]);
-}
 
 function createVideoCard(video) {
   const link = document.createElement("a");
   link.className = "video-card reveal";
   link.href = articleService.articleUrl(video);
+  // Embedded players do not expose a lightweight media stream for previews.
+  if (video.video_url && /\.(mp4|webm)(?:[?#]|$)/i.test(video.video_url)) {
+    link.dataset.previewUrl = video.video_url;
+  }
 
   const visual = document.createElement("div");
   visual.className = "video-card-visual";
-  const poster = video.video_poster || articleService.firstImage(video)?.url;
-  const fallback = document.createElement("span");
-  fallback.className = "video-no-poster";
-  fallback.textContent = "影像未题图";
-  visual.appendChild(fallback);
-  if (poster) {
-    const image = document.createElement("img");
-    image.src = poster;
-    image.referrerPolicy = "no-referrer";
-    image.alt = "";
-    image.loading = "lazy";
-    image.addEventListener("load", () => { fallback.hidden = true; });
-    image.addEventListener("error", async () => {
-      const restored = await articleService.resolveBilibiliThumbnail(video);
-      if (restored && image.src !== restored) image.src = restored;
-      else { image.remove(); fallback.hidden = false; }
-    });
-    visual.appendChild(image);
-  }
+  window.InkAssets.videoCover(visual, video);
   const play = document.createElement("span");
   play.className = "media-play-button";
   play.setAttribute("aria-hidden", "true");
@@ -147,7 +127,7 @@ async function loadVideos() {
   try {
     window.ContentCache?.clearNotice(videoList);
     window.InkAssets?.loading(videoList, '正在整理影像……');
-    videos = await withTimeout(articleService.listPublished(null, { contentType: "video" }), "视频服务响应超时");
+    videos = await articleService.readPublicFeed(null, { contentType: "video" });
     window.ContentCache?.write('videos', videos);
     renderVideoCategories();
     renderVideos({ immediate: true });

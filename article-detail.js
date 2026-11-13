@@ -1,5 +1,5 @@
 let currentArticle = null;
-const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const reactionMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
 function setMeta(name, content, property = false) {
   let element = document.head.querySelector(`meta[${property ? "property" : "name"}="${name}"]`);
@@ -42,6 +42,14 @@ function getBilibiliEmbedUrl(rawUrl) {
 }
 
 function renderArticle(article) {
+  const section = article.content_type === "video" ? "videos" : "articles";
+  document.body.dataset.navParent = section;
+  document.querySelectorAll("#siteNav [data-nav-page]").forEach(link => {
+    const current = link.dataset.navPage === section;
+    link.classList.toggle("active", current);
+    if (current) link.setAttribute("aria-current", "location");
+    else link.removeAttribute("aria-current");
+  });
   const root = document.querySelector("#articleDetail");
   root.replaceChildren();
   const header = document.createElement("header");
@@ -171,7 +179,11 @@ function renderArticle(article) {
   setMeta("description", article.excerpt);
   setMeta("og:title", article.title, true);
   setMeta("og:description", article.excerpt, true);
-  setMeta("og:url", location.href, true);
+  const canonical = document.createElement("link");
+  canonical.rel = "canonical";
+  canonical.href = new URL(articleService.articleUrl(article), "https://joestarzhang.cn/").href;
+  document.head.append(canonical);
+  setMeta("og:url", canonical.href, true);
   const cover = articleService.firstImage(article);
   if (cover) setMeta("og:image", cover.url, true);
   createToc(body);
@@ -286,13 +298,14 @@ function renderArticleMath(root) {
 }
 
 function createLikeInkEffect(button) {
-  if (reducedMotion) return;
+  if (reactionMotion.matches) return;
   const burst = document.createElement("span");
   burst.className = "like-ink-burst";
   button.appendChild(burst);
-  const drops = Array.from({ length: 8 }, (_, index) => {
+  burst.setAttribute("aria-hidden", "true");
+  const drops = Array.from({ length: 5 }, (_, index) => {
     const drop = document.createElement("i");
-    drop.dataset.angle = String((index * 45 + Math.random() * 18 - 9) * Math.PI / 180);
+    drop.dataset.angle = String((index * 72 + Math.random() * 18 - 9) * Math.PI / 180);
     drop.dataset.distance = String(22 + Math.random() * 20);
     burst.appendChild(drop);
     return drop;

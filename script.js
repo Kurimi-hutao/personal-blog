@@ -1,8 +1,6 @@
 const homeMotionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
 let reducedMotion = homeMotionQuery.matches;
-const ambientMotions = new Set();
 const hasGsap = typeof window.gsap !== "undefined";
-const field = document.querySelector("#petalField");
 const header = document.querySelector(".site-header");
 const windToggle = document.querySelector("#windToggle");
 const windLabel = windToggle.querySelector(".wind-label");
@@ -19,42 +17,18 @@ const lowPowerDevice =
   (Number.isFinite(navigator.deviceMemory) && navigator.deviceMemory <= 4) ||
   (Number.isFinite(navigator.hardwareConcurrency) && navigator.hardwareConcurrency <= 4);
 
-let windStrength = 0;
+let lastSummonAt = -Infinity;
+let summonLevel = 0;
+let previousWindX = null;
 let ownerSession = null;
-const pieces = new Set();
 const manualPetals = new Set();
 let petalNoticeTimer;
-const pointer = { x: -1000, y: -1000 };
 let lastCursorTrailAt = 0;
 let lastTrailPoint = null;
 let cursorIdleTimer = 0;
 
 const random = (min, max) => Math.random() * (max - min) + min;
 if (hasGsap && !reducedMotion) document.documentElement.classList.add("motion-ready");
-
-function withTimeout(promise, ms = 7000) {
-  return Promise.race([
-    promise,
-    new Promise((_, reject) => window.setTimeout(() => reject(new Error("请求超时")), ms)),
-  ]);
-}
-
-function readCachedWorks(key) {
-  const current = window.ContentCache?.read(key);
-  if (current) return current.items;
-  try {
-    const cached = JSON.parse(localStorage.getItem(key) || "null");
-    if (Array.isArray(cached?.items) && Date.now() - cached.savedAt < 14 * 86400000) return cached.items;
-  } catch {}
-  return [];
-}
-
-function writeCachedWorks(key, items) {
-  if (window.ContentCache) { window.ContentCache.write(key, items); return; }
-  try {
-    localStorage.setItem(key, JSON.stringify({ savedAt: Date.now(), items }));
-  } catch {}
-}
 
 function revealInsertedCards(container) {
   container.querySelectorAll(".reveal").forEach((element) => {
@@ -134,42 +108,8 @@ async function loadSiteVisitCount() {
   }
 }
 
-async function loadHomepageArticles() {
-  const container = document.querySelector("#latestArticles");
-  if (!container || !window.articleService) return;
-
-  if (!articleService.configured) {
-    container.dataset.fallbackReason = "not-configured";
-    return;
-  }
-
-  try {
-    window.ContentCache?.clearNotice(container);
-    window.InkAssets?.loading(container, '正在翻阅新文章……', 2);
-    const articles = await withTimeout(articleService.listPublished(2, { contentType: "article" }));
-    container.removeAttribute('aria-busy');
-    container.replaceChildren();
-    if (!articles.length) {
-      window.InkAssets?.state(container, { title: '第一卷正在酝酿中', detail: '新的随笔会在这里与你相逢。' });
-      return;
-    }
-    writeCachedWorks("hutao-homepage-articles", articles);
-    articles.forEach((article, index) => container.appendChild(createHomepageArticleCard(article, index)));
-    revealInsertedCards(container);
-    setupInkHoverEffects();
-  } catch (error) {
-    container.removeAttribute('aria-busy');
-    const cached = readCachedWorks("hutao-homepage-articles");
-    if (cached.length) {
-      container.replaceChildren();
-      cached.slice(0, 2).forEach((article, index) => container.appendChild(createHomepageArticleCard(article, index)));
-      showHomeCacheNotice(container, 'hutao-homepage-articles', loadHomepageArticles);
-      revealInsertedCards(container);
-      setupInkHoverEffects();
-      return;
-    }
-    window.InkAssets?.state(container, { kind: 'error', title: '新文章暂时未能展开', detail: '连接暂时不可用，重新读取即可再试一次。', action: '重新读取', onAction: loadHomepageArticles });
-  }
+function loadHomepageArticles() {
+  return loadHomeFeed("article", "latestArticles", createHomepageArticleCard);
 }
 
 function createHomepageVideoCard(video) {
@@ -178,20 +118,7 @@ function createHomepageVideoCard(video) {
   card.href = articleService.articleUrl(video);
   const visual = document.createElement("div");
   visual.className = "home-video-visual";
-  const poster = video.video_poster || articleService.firstImage(video)?.url;
-  if (poster) {
-    const image = document.createElement("img");
-    image.referrerPolicy = "no-referrer";
-    image.src = poster;
-    image.alt = "";
-    image.loading = "lazy";
-    image.addEventListener("error", async () => {
-      const restored = await articleService.resolveBilibiliThumbnail(video);
-      if (restored && image.src !== restored) image.src = restored;
-      else image.remove();
-    });
-    visual.appendChild(image);
-  }
+  window.InkAssets.videoCover(visual, video);
   const play = document.createElement("span");
   play.className = "media-play-button";
   play.setAttribute("aria-hidden", "true");
@@ -211,42 +138,51 @@ function createHomepageVideoCard(video) {
   return card;
 }
 
-async function loadHomepageVideos() {
-  const container = document.querySelector("#latestVideos");
-  if (!container || !articleService.configured) return;
-  try {
-    window.ContentCache?.clearNotice(container);
-    window.InkAssets?.loading(container, '正在整理新影像……', 2);
-    const videos = await withTimeout(articleService.listPublished(2, { contentType: "video" }));
-    container.removeAttribute('aria-busy');
-    container.replaceChildren();
-    if (!videos.length) {
-      window.InkAssets?.state(container, { title: '第一段影像正在路上', detail: '值得留下的片刻，会在这里与你相逢。' });
-      return;
-    }
-    writeCachedWorks("hutao-homepage-videos", videos);
-    videos.forEach((video) => container.appendChild(createHomepageVideoCard(video)));
-    revealInsertedCards(container);
-    setupInkHoverEffects();
-  } catch (error) {
-    container.removeAttribute('aria-busy');
-    const cached = readCachedWorks("hutao-homepage-videos");
-    if (cached.length) {
-      container.replaceChildren();
-      cached.slice(0, 2).forEach((video) => container.appendChild(createHomepageVideoCard(video)));
-      showHomeCacheNotice(container, 'hutao-homepage-videos', loadHomepageVideos);
-      revealInsertedCards(container);
-      setupInkHoverEffects();
-      return;
-    }
-    window.InkAssets?.state(container, { kind: 'error', title: '新影像暂时未能展开', detail: '连接暂时不可用，重新读取即可再试一次。', action: '重新读取', onAction: loadHomepageVideos });
-  }
+function loadHomepageVideos() {
+  return loadHomeFeed("video", "latestVideos", createHomepageVideoCard);
 }
 
-function showHomeCacheNotice(container, key, retry) {
-  let entry = window.ContentCache?.read(key);
-  if (!entry) { try { entry = JSON.parse(localStorage.getItem(key)); } catch {} }
-  if (entry?.savedAt) window.ContentCache?.notice(container, retry, entry.savedAt);
+async function loadHomeFeed(type, id, createCard) {
+  const container = document.getElementById(id);
+  if (!container || container.dataset.refreshing) return;
+  const key = "hutao-homepage-" + type + "s";
+  const cache = window.ContentCache;
+  const snapshot = JSON.parse(document.getElementById("homeFeedSnapshot").textContent);
+  const entry = [{ savedAt: snapshot.savedAt, items: snapshot[type] }, cache?.read(key), cache?.read(type + "s"), cache?.read(key, { legacy: true })]
+    .filter(Boolean).sort((a, b) => b.savedAt - a.savedAt)[0];
+  const label = type === "article" ? "文章" : "视频";
+  function render(items) {
+    if (!items.length) {
+      window.InkAssets?.state(container, { title: "暂无已发布的" + label });
+      return;
+    }
+    container.replaceChildren(...items.slice(0, 2).map(createCard));
+    revealInsertedCards(container);
+    setupInkHoverEffects();
+  }
+
+  container.dataset.refreshing = "true";
+  const retry = () => loadHomeFeed(type, id, createCard);
+  try {
+    cache?.clearNotice(container);
+    if (entry) render(entry.items);
+    else window.InkAssets?.loading(container, "正在翻阅" + label + "……", 2);
+    const items = await articleService.readPublicFeed(2, { contentType: type, home: true }, 8000);
+    if (!entry || JSON.stringify(items) !== JSON.stringify(entry.items.slice(0, 2))) render(items);
+    cache?.write(key, items);
+  } catch (error) {
+    if (["localhost", "127.0.0.1"].includes(location.hostname)) {
+      console.debug("首页读取受阻", type, error?.code || error?.name || "network");
+    }
+    if (entry && cache) cache.notice(container, retry, entry.savedAt);
+    else window.InkAssets?.state(container, {
+      kind: 'error', title: label + "暂时未能展开", detail: "连接暂时不可用，可以重新读取。",
+      action: "重新读取", onAction: retry,
+    });
+  } finally {
+    container.removeAttribute("aria-busy");
+    delete container.dataset.refreshing;
+  }
 }
 
 function renderAchievements(result) {
@@ -484,150 +420,44 @@ function createCursorTrail(x, y) {
   });
 }
 
-function setupFlowingLandscape() {
-  if (!hasGsap || compactMotion || lowPowerDevice) return;
-  const hero = document.querySelector(".hero");
-  const far = document.querySelector(".landscape-far");
-  const near = document.querySelector(".landscape-near");
-  const mists = document.querySelectorAll(".landscape-mist");
-  if (!hero || !far || !near) return;
-
-  const motion = gsap.timeline({ repeat: -1, yoyo: true, defaults: { ease: "sine.inOut" } });
-  ambientMotions.add(motion);
-  motion
-    .to(far, { xPercent: -2.2, yPercent: 1.2, scaleX: 1.025, duration: 16 }, 0)
-    .to(near, { xPercent: 2.8, yPercent: -1.5, scaleX: 1.035, duration: 13 }, 0)
-    .to(mists, { xPercent: (index) => index ? 16 : -12, autoAlpha: (index) => index ? 0.28 : 0.5, duration: 11, stagger: 1.2 }, 0);
-
-  const visibilityObserver = new IntersectionObserver(([entry]) => {
-    if (entry.isIntersecting && !document.hidden && !reducedMotion) motion.resume();
-    else motion.pause();
-  }, { threshold: 0.05 });
-  visibilityObserver.observe(hero);
-  document.addEventListener("visibilitychange", () => {
-    if (document.hidden || reducedMotion) motion.pause();
-    else if (hero.getBoundingClientRect().bottom > 0) motion.resume();
-  });
-}
-
-
-function createPiece(options = {}) {
-  if (document.hidden || reducedMotion || compactMotion || lowPowerDevice || !hasGsap || pieces.size >= 18) return;
-
-  const piece = document.createElement("span");
-  const isPetal = options.type ? options.type === "petal" : Math.random() > 0.28;
-  piece.className = `falling-piece ${isPetal ? "petal" : "leaf"}`;
-  if (isPetal) {
-    piece.style.setProperty("--petal-image", `url("./assets/spring-ink/small/petal-${1 + Math.floor(Math.random() * 8)}-144.webp")`);
-  }
-  field.appendChild(piece);
-  pieces.add(piece);
-
-  const startX = options.x ?? random(-20, window.innerWidth + 20);
-  const duration = options.duration ?? random(8, 16);
-  const drift = random(-100, 150) + windStrength * random(0.6, 1.3);
-  const rotation = random(180, 780) * (Math.random() > 0.5 ? 1 : -1);
-
-  gsap.set(piece, {
-    x: startX,
-    y: options.y ?? -40,
-    rotation: random(0, 180),
-    scale: random(0.65, 1.3),
-    opacity: random(0.45, 0.9),
-  });
-
-  const sway = gsap.to(piece, {
-    x: `+=${drift}`,
-    duration,
-    ease: "sine.inOut",
-  });
-
-  const fall = gsap.to(piece, {
-    y: window.innerHeight + 80,
-    rotation: `+=${rotation}`,
-    duration,
-    ease: "none",
-    onComplete: () => {
-      sway.kill();
-      pieces.delete(piece);
-      piece.remove();
-    },
-  });
-
-  piece._fallTween = fall;
-  piece.addEventListener("pointerdown", (event) => {
-    event.stopPropagation();
-    burstPiece(piece);
-  });
-}
-
-function burstPiece(piece) {
-  if (!piece.isConnected) return;
-  const rect = piece.getBoundingClientRect();
-  pieces.delete(piece);
-  gsap.killTweensOf(piece);
-  piece.remove();
-
-  for (let i = 0; i < 6; i += 1) {
-    const dot = document.createElement("i");
-    dot.style.cssText = `
-      position: fixed;
-      z-index: 16;
-      left: ${rect.left + rect.width / 2}px;
-      top: ${rect.top + rect.height / 2}px;
-      width: ${random(2, 5)}px;
-      height: ${random(2, 5)}px;
-      border-radius: 50%;
-      background: ${piece.classList.contains("petal") ? "#b95c5b" : "#48513f"};
-      pointer-events: none;
-    `;
-    document.body.appendChild(dot);
-    gsap.to(dot, {
-      x: random(-48, 48),
-      y: random(-45, 40),
-      scale: 0,
-      opacity: 0,
-      duration: random(0.5, 0.9),
-      ease: "power2.out",
-      onComplete: () => dot.remove(),
-    });
-  }
-}
-
-function summonPetals() {
+function summonPetals(event) {
   if (document.hidden) return;
-  if (reducedMotion || compactMotion || lowPowerDevice || !hasGsap) {
-    showPetalNotice(reducedMotion ? '桃花已送达 · 已按你的偏好减少动态效果' : '桃花来了');
-    if (reducedMotion) return;
-    manualPetals.forEach(node => { node.getAnimations().forEach(animation => animation.cancel()); node.remove(); });
-    manualPetals.clear();
-    const count = lowPowerDevice ? 5 : 8;
-    for (let i = 0; i < count; i++) {
-      const petal = document.createElement('span'); petal.className = 'manual-petal'; petal.setAttribute('aria-hidden', 'true');
-      petal.style.backgroundImage = `url('./assets/spring-ink/small/petal-${1 + i % 8}-144.webp')`;
-      document.body.append(petal); manualPetals.add(petal);
-      const x = random(innerWidth * .12, innerWidth * .88), drift = random(-36, 36);
-      const animation = petal.animate([
-        { transform: `translate3d(${x}px,70px,0) rotate(0deg)`, opacity: 0 },
-        { opacity: .72, offset: .16 },
-        { transform: `translate3d(${x + drift}px,${Math.min(innerHeight - 96, 580)}px,0) rotate(${random(90,220)}deg)`, opacity: 0 },
-      ], { duration: 1800 + i * 80, delay: i * 65, easing: 'ease-out', fill: 'both' });
-      const remove = () => { petal.remove(); manualPetals.delete(petal); };
-      animation.finished.then(remove, remove);
-    }
+  if (reducedMotion) {
+    showPetalNotice('桃花已送达 · 已按你的偏好减少动态效果');
     return;
   }
-  for (let i = 0; i < 12; i += 1) {
-    window.setTimeout(
-      () =>
-        createPiece({
-          type: "petal",
-          x: random(window.innerWidth * 0.15, window.innerWidth * 0.85),
-          y: random(-120, -20),
-          duration: random(5, 9),
-        }),
-      i * 55,
-    );
+  const now = performance.now();
+  summonLevel = now - lastSummonAt < 1300 ? Math.min(3, summonLevel + 1) : 0;
+  lastSummonAt = now;
+  const limit = lowPowerDevice ? 5 : compactMotion ? 8 : 16;
+  const count = Math.min(limit, (compactMotion || lowPowerDevice ? 3 : 5) + summonLevel);
+  const rect = event.currentTarget.getBoundingClientRect();
+  const originX = rect.width ? rect.left + rect.width / 2 : innerWidth * .62;
+  const originY = rect.height ? Math.min(rect.top, innerHeight * .65) : innerHeight * .25;
+
+  for (let i = 0; i < count; i++) {
+    if (manualPetals.size >= limit) {
+      const oldest = manualPetals.values().next().value;
+      oldest.getAnimations().forEach(animation => animation.cancel());
+      oldest.remove();
+      manualPetals.delete(oldest);
+    }
+    const petal = document.createElement('span');
+    petal.className = 'manual-petal';
+    petal.setAttribute('aria-hidden', 'true');
+    petal.style.backgroundImage = `url('./assets/spring-ink/small/petal-${1 + Math.floor(random(0, 8))}-144.webp')`;
+    document.body.append(petal);
+    manualPetals.add(petal);
+    const x = originX + random(-16, 16);
+    const drift = random(-65, 75) * (1 + summonLevel * .12);
+    const bottom = Math.min(innerHeight - 24, originY + random(150, 300));
+    const animation = petal.animate([
+      { transform: `translate3d(${x}px,${originY}px,0) rotate(-20deg) scale(.6)`, opacity: .7 },
+      { transform: `translate3d(${x + drift * .65}px,${originY - random(22, 46)}px,0) rotate(45deg)`, opacity: .85, offset: .23 },
+      { transform: `translate3d(${x + drift}px,${bottom}px,0) rotate(${random(120, 240)}deg) scale(.7)`, opacity: 0 },
+    ], { duration: 1750 + i * 110, delay: i * 50, easing: 'ease-in-out', fill: 'both' });
+    const remove = () => { petal.remove(); manualPetals.delete(petal); };
+    animation.finished.then(remove, remove);
   }
 }
 
@@ -639,30 +469,14 @@ function showPetalNotice(message) {
 }
 
 
-function nudgeNearbyPieces() {
-  if (!hasGsap || reducedMotion) return;
-  pieces.forEach((piece) => {
-    const rect = piece.getBoundingClientRect();
-    const dx = rect.left - pointer.x;
-    const dy = rect.top - pointer.y;
-    const distance = Math.hypot(dx, dy);
-    if (distance < 90) {
-      const force = (90 - distance) / 90;
-      gsap.to(piece, {
-        x: `+=${(dx || 1) * force * 0.5}`,
-        rotation: `+=${random(-70, 70)}`,
-        duration: 0.45,
-        overwrite: "auto",
-      });
-    }
-  });
-}
-
-window.addEventListener("pointermove", (event) => {
-  pointer.x = event.clientX;
-  pointer.y = event.clientY;
-  nudgeNearbyPieces();
-});
+window.addEventListener('pointermove', event => {
+  if (!manualPetals.size || reducedMotion) { previousWindX = null; return; }
+  if (previousWindX !== null) {
+    const drift = Math.max(-22, Math.min(22, event.clientX - previousWindX));
+    manualPetals.forEach(petal => { petal.style.translate = `${drift}px 0`; });
+  }
+  previousWindX = event.clientX;
+}, { passive: true });
 
 window.addEventListener("pointerdown", (event) => {
   if (window.MotionCore?.ready) return;
@@ -761,6 +575,7 @@ document.querySelector("#messageForm").addEventListener("submit", async (event) 
   const note = document.querySelector("#formNote");
   const form = event.currentTarget;
   const button = form.querySelector("button");
+  if (button.disabled) return;
   const values = new FormData(form);
   const name = values.get("name").trim();
   button.disabled = true;
@@ -821,6 +636,14 @@ function setupLinksToggle() {
     const groups = [...panel.querySelectorAll(".friend-group")];
     favorites.replaceChildren(...groups.flatMap(group => [...group.querySelectorAll(".friend-card")].slice(0, 2).map(link => link.cloneNode(true))));
   }
+  section.querySelectorAll('.friend-logo img').forEach(image => {
+    const logo = image.parentElement;
+    const label = image.closest('.friend-card').querySelector('strong').textContent.trim();
+    logo.dataset.initial = Array.from(label)[0] || '驿';
+    logo.setAttribute('aria-hidden', 'true');
+    image.addEventListener('error', () => image.remove(), { once: true });
+    if (image.complete && !image.naturalWidth) image.remove();
+  });
   panel.querySelectorAll(".friend-group").forEach(group => {
     group.addEventListener("toggle", () => {
       const count = group.querySelectorAll(".friend-card").length;
@@ -931,16 +754,6 @@ if (hasGsap) {
     });
   }
 
-  ambientMotions.add(gsap.to(".scroll-cue i", {
-    scaleY: 0.45,
-    transformOrigin: "top",
-    repeat: -1,
-    yoyo: true,
-    duration: 1.25,
-    ease: "sine.inOut",
-  }));
-
-  // Petals are a deliberate visitor action, never a constant page-wide shower.
 
 }
 
@@ -950,6 +763,45 @@ function runWhenIdle(task, timeout = 1600) {
     return;
   }
   window.setTimeout(task, Math.min(timeout, 600));
+}
+
+async function loadCourseIndex() {
+  const list = document.querySelector('#courseList');
+  let positions = {};
+  try { positions = JSON.parse(localStorage.getItem('hutao-reading-positions')) || {}; } catch {}
+  function render(rows) {
+    const lessons = rows.filter(row => articleService.lessonNumber(row) !== null)
+      .sort((a, b) => articleService.lessonNumber(a) - articleService.lessonNumber(b));
+    list.replaceChildren();
+    for (const lesson of lessons) {
+      const link = document.createElement('a');
+      link.href = articleService.articleUrl(lesson);
+      const number = document.createElement('small');
+      number.textContent = String(articleService.lessonNumber(lesson)).padStart(2, '0');
+      const title = document.createElement('span');
+      title.textContent = lesson.title;
+      link.append(number, title);
+      const ratio = positions[lesson.id]?.ratio;
+      if (ratio > 0 && ratio <= 1) {
+        const progress = document.createElement('small');
+        progress.textContent = `已读 ${Math.round(ratio * 100)}%`;
+        link.append(progress);
+      }
+      list.append(link);
+    }
+    if (!lessons.length) list.textContent = '课程目录暂无已发布文章。';
+  }
+  const cached = window.ContentCache.read('course-index');
+  if (cached) render(cached.items);
+  window.ContentCache.clearNotice(list);
+  try {
+    const rows = await articleService.readPublicFeed(null, { lessons: true, contentType: 'article' });
+    render(rows);
+    window.ContentCache.write('course-index', rows);
+  } catch {
+    if (cached) window.ContentCache.notice(list, loadCourseIndex, cached.savedAt);
+    else window.InkAssets.state(list, { kind: 'error', title: '课程目录暂时无法读取', action: '重新读取', onAction: loadCourseIndex });
+  }
 }
 
 function runWhenNear(selector, task, rootMargin = "320px 0px") {
@@ -970,26 +822,28 @@ function runWhenNear(selector, task, rootMargin = "320px 0px") {
   observer.observe(target);
 }
 
+const courseDetails = document.querySelector('#courseIndex');
+courseDetails.addEventListener('toggle', function onOpen() {
+  if (!courseDetails.open) return;
+  courseDetails.removeEventListener('toggle', onOpen);
+  void loadCourseIndex();
+});
 runWhenIdle(loadHomepageArticles, 1200);
 runWhenNear(".home-videos-section", loadHomepageVideos);
 runWhenIdle(loadSiteVisitCount, 2400);
 runWhenNear(".message-section", initializeGuestbook, "420px 0px");
 setupAchievements();
 setupInkHoverEffects();
-setupFlowingLandscape();
 setupLinksToggle();
 
 function applyHomeMotionPreference() {
   reducedMotion = homeMotionQuery.matches;
   document.documentElement.classList.toggle("cursor-ready", hasGsap && !reducedMotion && finePointer && !lowPowerDevice);
-  ambientMotions.forEach((motion) => motion.paused(reducedMotion || document.hidden));
   if (reducedMotion || document.hidden) {
     manualPetals.forEach(node => { node.getAnimations().forEach(animation => animation.cancel()); node.remove(); });
     manualPetals.clear();
   }
   if ((!reducedMotion && !document.hidden) || !hasGsap) return;
-  pieces.forEach((piece) => { gsap.killTweensOf(piece); piece.remove(); });
-  pieces.clear();
   document.querySelectorAll(".ink-cursor-trail").forEach((trail) => {
     gsap.killTweensOf(trail);
     trail.remove();

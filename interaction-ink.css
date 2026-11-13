@@ -245,3 +245,18 @@ html body.home-page .site-search-dialog .site-search-field {
   html body.home-page .site-header > .site-search-trigger { width:44px; margin-inline:0; justify-content:center; }
   html body.home-page .site-header > .site-search-trigger > span:nth-child(2) { display:none; }
 }
+.back-to-top-ring {
+  position: absolute;
+  inset: 1px;
+  border-radius: 50%;
+  pointer-events: none;
+  background: conic-gradient(var(--cinnabar) var(--read-angle, 0deg), transparent 0);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), black 0);
+  mask: radial-gradient(farthest-side, transparent calc(100% - 2px), black 0);
+}
+.mobile-scroll-top > .back-to-top-ring {
+  position: static;
+  width: 18px;
+  height: 18px;
+  margin-inline-end: 6px;
+}

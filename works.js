@@ -127,9 +127,11 @@
       button.setAttribute("aria-label", category);
       button.classList.toggle("active", category === active);
       button.addEventListener("click", () => {
+        if (active === category) return;
         active = category;
         toolbar.querySelectorAll("button").forEach((item) => { item.classList.toggle("active", item === button); item.setAttribute("aria-pressed", String(item === button)); });
-        renderWorks();
+        if (window.MotionCore?.animateListUpdate) window.MotionCore.animateListUpdate(grid, renderWorks);
+        else renderWorks();
       });
       toolbar.appendChild(button);
     });

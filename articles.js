@@ -50,7 +50,7 @@ let filtersReady = false;
 function renderArticleState(title, detail, kind = 'search') {
   if (window.InkAssets) return InkAssets.state(articleContainer, {
     kind, title, detail,
-    action: kind === 'error' ? '重新翻阅' : '清除筛选',
+    action: kind === 'empty' ? null : (kind === 'error' ? '重新翻阅' : '清除筛选'),
     onAction: kind === 'error' ? loadArticles : () => clearFilters.click(),
   });
   articleContainer.replaceChildren();
@@ -64,12 +64,6 @@ function renderArticleState(title, detail, kind = 'search') {
   articleContainer.appendChild(state);
 }
 
-function withTimeout(promise, message) {
-  return Promise.race([
-    promise,
-    new Promise((_, reject) => window.setTimeout(() => reject(new Error(message)), 10000)),
-  ]);
-}
 
 function restoreFilterState() {
   const params = new URLSearchParams(location.search);
@@ -288,7 +282,7 @@ async function loadArticles() {
   try {
     window.ContentCache?.clearNotice(articleContainer);
     window.InkAssets?.loading(articleContainer, '正在翻阅文章……');
-    allArticles = await withTimeout(articleService.listPublished(null, { contentType: "article" }), "文章服务响应超时");
+    allArticles = await articleService.readPublicFeed(null, { contentType: "article" });
     window.ContentCache?.write('articles', allArticles);
     restoreFilterState();
     renderFilters();

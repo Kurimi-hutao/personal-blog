@@ -159,7 +159,7 @@
     const reply = document.createElement('button'); reply.type = 'button'; reply.className = 'comment-reply-button'; reply.textContent = '回复';
     reply.onclick = () => {
       if (busy) return;
-      setReply(comment); form.scrollIntoView({ behavior: reducedMotion ? 'auto' : 'smooth', block: 'center' }); form.elements.body.focus({ preventScroll: true });
+      setReply(comment); form.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center' }); form.elements.body.focus({ preventScroll: true });
     };
     const like = document.createElement('button'); like.type = 'button'; like.className = 'comment-reply-button comment-like-button';
     like.textContent = `赞 ${comment.like_count || 0}`; like.setAttribute('aria-pressed', String(articleService.hasCommentReaction(comment.id)));
