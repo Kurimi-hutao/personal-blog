@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://kurimi-hutao.github.io/personal-blog/</loc></url>
-  <url><loc>https://kurimi-hutao.github.io/personal-blog/articles.html</loc></url>
-  <url><loc>https://kurimi-hutao.github.io/personal-blog/videos.html</loc></url>
-  <url><loc>https://kurimi-hutao.github.io/personal-blog/kurumi.html</loc></url>
-  <url><loc>https://kurimi-hutao.github.io/personal-blog/pet.html</loc></url>
-  <url><loc>https://kurimi-hutao.github.io/personal-blog/zhengshen-atlas/</loc></url>
+  <url><loc>https://joestarzhang.cn/</loc></url>
+  <url><loc>https://joestarzhang.cn/articles.html</loc></url>
+  <url><loc>https://joestarzhang.cn/videos.html</loc></url>
+  <url><loc>https://joestarzhang.cn/works.html</loc></url>
+  <url><loc>https://joestarzhang.cn/kurumi.html</loc></url>
+  <url><loc>https://joestarzhang.cn/pet.html</loc></url>
+  <url><loc>https://joestarzhang.cn/next-generation-letter/</loc></url>
+  <url><loc>https://joestarzhang.cn/zhengshen-atlas/</loc></url>
 </urlset>

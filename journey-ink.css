@@ -197,3 +197,19 @@ html[data-theme="dark"] .achievement-cards article:not(.unlocked) > img { filter
   .fortune-guidance ul { font-size: 13px; }
   .achievement-section > summary { flex-wrap: wrap; gap: 4px 12px; }
 }
+.works-log-item {
+  display: grid;
+  grid-template-columns: 130px minmax(0,1fr);
+  gap: 24px;
+  padding: 22px 0;
+  border-bottom: 1px solid var(--line);
+}
+.works-log-item time { color: var(--cinnabar); font-size: 13px; }
+.about-works { list-style: none; padding: 0; margin: 24px 0 0; }
+.about-works .works-log-item {
+  grid-template-columns: max-content minmax(0,1fr);
+  gap: 1em;
+  padding: .8em 0;
+  font: 14px/1.7 var(--font-body);
+}
+.about-works a { color: inherit; text-underline-offset: .2em; }

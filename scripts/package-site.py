@@ -23,14 +23,6 @@ for name in ("assets", "next-generation-letter", "zhengshen-atlas"):
 font_css = SITE / "assets/vendor/katex/katex-0.16.22.min.css"
 font_css.write_text(re.sub(r',url\(fonts/[^)]+\.(?:woff|ttf)\) format\("(?:woff|truetype)"\)', '', font_css.read_text(encoding="utf-8")), encoding="utf-8")
 
-domain = "https://joestarzhang.cn"
-for name in ("robots.txt", "sitemap.xml", "rss.xml"):
-    path = SITE / name
-    content = path.read_text(encoding="utf-8").replace("https://kurimi-hutao.github.io/personal-blog", domain)
-    if name == "sitemap.xml":
-        content = content.replace("</urlset>", f"  <url><loc>{domain}/works.html</loc></url>\n  <url><loc>{domain}/next-generation-letter/</loc></url>\n</urlset>")
-    path.write_text(content, encoding="utf-8")
-
 # A custom 404 can be served at a nested URL: resolve its assets at the site root.
 path = SITE / "404.html"
 path.write_text(path.read_text(encoding="utf-8").replace("<head>", '<head>\n    <base href="/" />'), encoding="utf-8")

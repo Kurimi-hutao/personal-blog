@@ -35,7 +35,7 @@
   }
 
   function setupHeroParallax() {
-    if (compact) return;
+    if (compact || navigator.connection?.saveData || navigator.hardwareConcurrency <= 4 || navigator.deviceMemory <= 4) return;
     const hero = document.querySelector(".home-page .hero");
     if (!hero) return;
 

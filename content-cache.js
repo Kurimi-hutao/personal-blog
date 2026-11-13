@@ -1,11 +1,10 @@
 (function () {
   'use strict';
   const prefix = 'hutao-public-cache-';
-  const maxAge = 14 * 24 * 60 * 60 * 1000;
-  function read(name) {
+  function read(name, { legacy = false } = {}) {
     try {
-      const entry = JSON.parse(localStorage.getItem(prefix + name));
-      if (!entry || !Array.isArray(entry.items) || Date.now() - entry.savedAt > maxAge) return null;
+      const entry = JSON.parse(localStorage.getItem(legacy ? name : prefix + name));
+      if (!entry || !Array.isArray(entry.items) || !Number.isFinite(entry.savedAt) || !entry.items.every(item => item && typeof item.slug === "string")) return null;
       return entry;
     } catch { return null; }
   }

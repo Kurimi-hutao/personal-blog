@@ -151,3 +151,27 @@ body:has(#articleDetail) .article-body { background: var(--paper); line-height: 
   .site-nav [data-nav-page="videos"] { order: -2; }
   .site-nav [data-nav-page="works"] { order: -1; }
 }
+.video-no-poster.video-title-card {
+  border: 0;
+  letter-spacing: .025em;
+  justify-items: start;
+  position: absolute;
+  inset: 0;
+  display: grid;
+  align-content: center;
+  padding: 12% 10% 17%;
+  color: #f2e8d3;
+  background: repeating-linear-gradient(135deg, transparent 0 28px, #c2ba9910 29px 30px), #253a36;
+  font: 500 clamp(16px, 2vw, 30px)/1.45 var(--font-heading);
+  text-wrap: balance;
+  overflow: hidden;
+}
+.video-title-card[hidden] { display: none; }
+.home-page #links .friend-logo { position: relative; display: grid; place-items: center; padding: 2px; background: #fff; color: #3f3b37; }
+.home-page #links .friend-logo:empty::before { content: attr(data-initial); font: 600 17px/1 var(--font-heading); }
+.reading-return-list .reading-return-card { grid-template-columns: 80px minmax(0,1fr); align-content: center; align-items: center; gap: 3px 12px; }
+.reading-return-card img { width: 80px; height: 55px; object-fit: cover; grid-row: span 2; }
+.course-index summary { cursor: pointer; padding: 12px 0; color: var(--ink-soft); }
+#courseList { display: grid; gap: .45em; margin-block: .6em; }
+#courseList a { display: flex; align-items: baseline; gap: .8em; padding: .65em 0; border-bottom: 1px solid var(--line); }
+#courseList a small { flex-shrink: 0; color: var(--ink-soft); }

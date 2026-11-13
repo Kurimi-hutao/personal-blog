@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="zh-CN" data-theme="light">
   <head>
+    <link rel="canonical" href="https://joestarzhang.cn/" />
     <script id="theme-bootstrap">try{document.documentElement.dataset.theme=localStorage.getItem('hutao-theme')==='dark'?'dark':'light'}catch{}</script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -9,14 +10,14 @@
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="alternate" type="application/rss+xml" title="虎桃不会振刀 RSS" href="./rss.xml" />
     <title>虎桃不会振刀 | 一卷桃花江湖</title>
-    <link rel="stylesheet" href="./page-index.bundle.css?v=30abbbc86a52" />
+    <link rel="stylesheet" href="./page-index.bundle.css?v=752e0354ec55" />
     <script defer src="./site-footer.js?v=20261007-1"></script>
       <link rel="icon" href="./assets/visual-refresh/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" sizes="32x32" href="./assets/visual-refresh/favicon-32.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="./assets/visual-refresh/home-icon-180.png" />
   </head>
   <body class="home-page" data-page="home">
-    <script src="./lottie-core.js?v=20261105-ink"></script>
+    <script defer src="./lottie-core.js?v=20261105-ink"></script>
     <div class="paper-noise" aria-hidden="true"></div>
     <div class="ink-atmosphere" aria-hidden="true">
       <span class="ink-drift ink-drift-one"></span>
@@ -112,6 +113,13 @@
             </div>
           </article>
         </div>
+      </section>
+
+      <section class="reading-return course-index" aria-labelledby="courseTitle">
+        <h2 id="courseTitle">AI 从零开始</h2>
+        <details id="courseIndex"><summary>展开课程目录</summary>
+          <div id="courseList" aria-live="polite">正在读取已发布课程……</div>
+        </details>
       </section>
 
       <section class="section home-videos-section" id="videos">
@@ -281,7 +289,11 @@
           <p>喜欢土御门胡桃，也喜欢春桃笑。这里收藏游戏中的片刻、生活里的微光，以及一些没来得及说完的话。胜负交给下一局，故事留在这一页。</p>
           <div class="traits" aria-label="个人标签"><span>永劫无间</span><span>土御门胡桃</span><span>水墨创作</span></div>
           <blockquote>“刀未必接得住，桃花总能接住。”</blockquote>
-          <div class="journey-memory"><img src="./assets/journey-ink/e1-travel-memory-bookmark.webp" alt="" width="96" height="128" loading="lazy" /><p>胜负交给下一局，故事留在这一页。</p></div>
+          <ol class="about-works" aria-label="创作足迹">
+            <li class="works-log-item"><time datetime="2026-06">2026 · 六月</time><span><a href="./pet.html">桌宠小屋</a> · 用 Live2D 和 PixiJS 给小桃安了个家。</span></li>
+            <li class="works-log-item"><time datetime="2026-09-22">2026 · 九月</time><span><a href="./next-generation-letter/">下一代，来信了</a> · 用 GSAP 展开一封写给红岩英烈的回信。</span></li>
+            <li class="works-log-item"><time datetime="2026-09-23">2026 · 九月</time><span><a href="./zhengshen-atlas/">征神图鉴</a> · 整理魂玉、潜能和配装，方便下一局查阅。</span></li>
+          </ol>
         </div>
       </section>
 
@@ -362,6 +374,7 @@
     <script defer src="./assets/vendor/gsap/gsap-3.13.0.min.js"></script>
     <script defer src="./assets/vendor/supabase/supabase-2.108.2.js"></script>
     <script defer src="./supabase-config.js"></script>
+    <script type="application/json" id="homeFeedSnapshot">{"savedAt":1794553978874,"article":[{"id":"1805a430-8e4d-4b21-bd82-a119da5dca79","title":"第1课：波粒二象性——微观粒子为什么也像波？","slug":"quantum-mechanics-lesson-001","excerpt":"从电子双缝实验和德布罗意关系理解量子世界的波粒二象性。","category":"物理","published_at":"2026-11-13T14:56:28.289842+08:00","view_count":0},{"id":"227da608-4ecb-4e70-975c-9688e3a8bed6","title":"第27课｜RLHF 与 DPO：怎样让模型更符合人类偏好？","slug":"ai-from-zero-lesson-027","excerpt":"本课从物理模型的目标函数出发，讲解监督微调、RLHF 奖励模型与 KL 约束、DPO 直接偏好优化的机制和公式，并通过可运行的 Python 示例比较偏好损失，讨论真实性与讨好式回答之间的冲突。","category":"AI 学习","published_at":"2026-11-13T12:57:06.228014+08:00","view_count":0}],"video":[{"id":"218e74c2-4b02-45a0-af76-6a4b6d2ee92c","title":"Isaac Newton","slug":"isaac-newton-bilibili-video","excerpt":"《Isaac Newton》视频作品，由哔哩哔哩提供在线播放。","category":"视频","published_at":"2026-10-19T17:44:36.277722+08:00","view_count":8,"video_url":"https://www.bilibili.com/video/BV1V2J16ME7Z/","video_poster":"https://uhcmzlhzrgyjnvqnnpss.supabase.co/storage/v1/object/public/article-attachments/bilibili-covers/BV1V2J16ME7Z.jpg"},{"id":"7b87eeee-fb58-4bc2-9b2b-ca802bdeef22","title":"IceCube","slug":"icecube-bilibili-video","excerpt":"《IceCube》视频作品，由哔哩哔哩提供在线播放。","category":"视频","published_at":"2026-10-19T14:12:56.560489+08:00","view_count":8,"video_url":"https://www.bilibili.com/video/BV1Urp26gEky/","video_poster":"https://uhcmzlhzrgyjnvqnnpss.supabase.co/storage/v1/object/public/article-attachments/bilibili-covers/BV1Urp26gEky-canonical-20261019.jpg"}]}</script>
     <script defer src="./article-service.js?v=20261019-ink-covers"></script>
     <script defer src="./ink-assets.js?v=20261010-comments-1"></script>
     <script defer src="./content-cache.js?v=20261015"></script>

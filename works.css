@@ -207,17 +207,6 @@
   display: grid;
   gap: 0
 }
-.works-log-item {
-  display: grid;
-  grid-template-columns: 130px minmax(0,1fr);
-  gap: 24px;
-  padding: 22px 0;
-  border-bottom: 1px solid var(--line)
-}
-.works-log-item time {
-  color: var(--cinnabar);
-  font-size: 13px
-}
 .works-log-item h3 {
   font-size: 18px;
   font-weight: 500;
@@ -319,7 +308,7 @@
   .works-log {
     margin-top: 42px
   }
-  .works-log-item {
+  .works-page .works-log-item {
     grid-template-columns: 1fr;
     gap: 8px;
     padding: 20px 0

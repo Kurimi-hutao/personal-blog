@@ -439,6 +439,8 @@ html body .reward-payment .close-payment {
   text-underline-offset: .35em;
 }
 html body.pet-page .action-grid button { text-decoration: none; }
+html body.pet-page .visit-control { padding-inline: 0; }
+html body.pet-page :is(.button-label,.visit-label,.action-grid b,.journal-tabs button) { white-space: nowrap; }
 html body.pet-page .mini-toggle[aria-pressed=true] { color:var(--control-seal); text-decoration-color:currentColor; }
 html body .reward-payment .payment-presets label > span { border:0; }
 html body .reward-payment .payment-presets input:checked + span,

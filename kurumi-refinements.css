@@ -99,16 +99,54 @@
 .kurumi-page .kurumi-profile-card { border: 0; border-radius: 0; box-shadow: none; background: none; }
 .kurumi-page .source-link { color: var(--cinnabar); background: none; border: 0; border-bottom: 1px solid var(--line); }
 .kurumi-page .kurumi-facts > div { background: none; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; }
-.kurumi-page .kurumi-art-grid { gap: 40px 28px; grid-template-rows: 380px 310px 310px; }
-.kurumi-page .kurumi-art-card { display: flex; flex-direction: column; background: none; border-radius: 0; box-shadow: none; overflow: visible; }
-.kurumi-page .kurumi-art-card .gallery-image-button { flex: 1; min-height: 0; height: auto; overflow: hidden; }
-.kurumi-page .kurumi-art-card figcaption { position: static; flex-shrink: 0; padding: 12px 0; color: var(--ink-soft); background: none; backdrop-filter: none; font: 14px/1.6 var(--serif); opacity: 1; transform: none; border-bottom: 1px solid var(--line); }
-@media(max-width:620px) {
- .kurumi-page .kurumi-art-grid { display: flex; flex-direction: column; gap: 32px !important; }
- .kurumi-page .kurumi-art-card { height: auto !important; }
- .kurumi-page .kurumi-art-card .gallery-image-button { flex: none; aspect-ratio: 4/3; }
- .kurumi-page .kurumi-art-card.wide .gallery-image-button { aspect-ratio: 16/9; }
- .kurumi-page .kurumi-art-card.tall .gallery-image-button { aspect-ratio: 3/4; }
- .kurumi-page .kurumi-art-card:nth-child(even) { margin-right: 32px; }
- .kurumi-page .kurumi-art-card:nth-child(5) { margin-left: 32px; }
+.kurumi-page .kurumi-art-grid {
+  display: flex;
+  align-items: stretch;
+  max-width: 100%;
+  gap: clamp(16px, 2.5vw, 36px);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  scrollbar-color: var(--ink-soft) var(--paper);
+  padding: 6px 4px 16px;
+}
+.kurumi-page .kurumi-art-grid .kurumi-art-card {
+  flex: 0 0 min(78vw, 440px);
+  height: auto;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  scroll-snap-align: start;
+  background: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+.kurumi-page .kurumi-art-grid .gallery-image-button {
+  height: clamp(230px, 60vw, 380px);
+  width: 100%;
+  background: var(--paper-deep);
+  cursor: zoom-in;
+}
+.kurumi-page .kurumi-art-grid .gallery-image-button img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  user-select: none;
+}
+.kurumi-page .kurumi-art-card figcaption {
+  position: static;
+  padding: 12px 0;
+  color: var(--ink-soft);
+  background: none;
+  backdrop-filter: none;
+  font: 14px/1.6 var(--serif);
+  opacity: 1;
+  transform: none;
+  border-bottom: 1px solid var(--line);
+}
+.kurumi-art-grid.is-dragging { scroll-snap-type: none; user-select: none; }
+.kurumi-art-grid.is-dragging, .kurumi-art-grid.is-dragging .gallery-image-button { cursor: grabbing; }
+@media (prefers-reduced-motion: no-preference) {
+  .kurumi-profile-art:active img { transform: scale(.985) rotate(-.4deg); }
 }

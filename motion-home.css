@@ -119,3 +119,34 @@
     transition: none;
   }
 }
+
+@media (min-width: 1081px) and (prefers-reduced-motion: no-preference) {
+  .home-page .scroll-cue i {
+    transform-origin: top;
+    animation: homeScrollHint 1.25s ease-in-out infinite alternate;
+  }
+  .home-page .ink-scene-paused .scroll-cue i,
+  .ink-motion-paused .home-page .scroll-cue i { animation-play-state: paused; }
+  @keyframes homeScrollHint { to { transform: scaleY(.45); } }
+}
+html[data-theme="dark"] .home-page .spring-night::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 73% 20%, rgba(242,230,204,.28), transparent 4%),
+    radial-gradient(circle at 64% 12%, #ddd5ae 0 1px, transparent 1.4px),
+    radial-gradient(circle at 83% 18%, #c4bc9b 0 .7px, transparent 1.2px);
+}
+.home-page .manual-petal { transition: translate 360ms ease-out; }
+.home-page .hero-secondary-actions { position: relative; z-index: 3; }
+@media (prefers-reduced-motion: no-preference) {
+  .home-page #messageForm button:active { transform: translateY(1px) scale(.985); }
+  .home-page #formNote .ink-success-stamp { animation: inkStampLand 360ms both, sealBleed 1.2s ease-out both; }
+  @keyframes sealBleed {
+    0%, 20% { filter: drop-shadow(0 0 0 transparent); }
+    55% { filter: drop-shadow(0 1px 3px rgba(157,58,45,.3)); }
+    100% { opacity: 0; }
+  }
+}

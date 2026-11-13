@@ -394,10 +394,10 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 6px;
-  height: 8px;
-  border-radius: 55% 45% 60% 40%;
-  background: var(--cinnabar);
+  width: 8px;
+  height: 11px;
+  border-radius: 85% 12% 75% 28%;
+  background: linear-gradient(140deg, #f4c2bc, #bc6266);
 }
 
 .like-ink-burst.css-only {

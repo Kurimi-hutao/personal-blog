@@ -54,6 +54,35 @@
     container.replaceChildren(wrap);
   }
 
+  function videoCover(visual, video) {
+    const card = document.createElement('span');
+    card.className = 'video-no-poster video-title-card';
+    card.setAttribute('aria-hidden', 'true');
+    card.textContent = video.title || '影像手记';
+    visual.append(card);
+    const urls = [...new Set([video.video_poster, window.articleService.firstImage(video)?.url].filter(Boolean))];
+    if (!urls.length) return;
+    const image = document.createElement('img');
+    image.alt = '';
+    image.loading = 'lazy';
+    image.decoding = 'async';
+    image.referrerPolicy = 'no-referrer';
+    image.onload = () => { card.hidden = true; };
+    let attemptedRestore = false;
+    image.onerror = async () => {
+      if (urls.length) { image.src = urls.shift(); return; }
+      if (!attemptedRestore) {
+        attemptedRestore = true;
+        const restored = await window.articleService.resolveBilibiliThumbnail(video);
+        if (restored && restored !== image.src) { image.src = restored; return; }
+      }
+      card.hidden = false;
+      image.remove();
+    };
+    image.src = urls.shift();
+    visual.append(image);
+  }
+
   function stamp(target) {
     if (!target) return;
     target.querySelector('.ink-success-stamp')?.remove();
@@ -64,6 +93,7 @@
     seal.width = 42;
     seal.height = 44;
     target.append(seal);
+    window.setTimeout(() => seal.remove(), 1300);
   }
 
   function decorate() {
@@ -82,7 +112,7 @@
       });
     }
   }
-  window.InkAssets = { state, loading, stamp };
+  window.InkAssets = { state, loading, stamp, videoCover };
   if (document.readyState !== 'complete') document.addEventListener('DOMContentLoaded', decorate, { once: true });
   else decorate();
 }());
