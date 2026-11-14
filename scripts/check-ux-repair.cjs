@@ -1,7 +1,8 @@
-const {chromium}=require('C:/Users/emmmm/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
+let chromium;try { ({chromium}=require('playwright')); } catch { ({chromium}=require('C:/Users/emmmm/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright')); }
+
 const {installFixtures,records}=require('./review-fixtures.cjs');
-const fs=require('node:fs'),assert=require('node:assert/strict');process.env.REVIEW_LOCAL_FILES='1';
-(async()=>{const b=await chromium.launch({headless:true,executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe'});const results=[];
+const fs=require('node:fs'),assert=require('node:assert/strict');process.env.REVIEW_LOCAL_FILES='1';fs.mkdirSync('outputs/ux-repair',{recursive:true});
+(async()=>{const b=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH || (process.platform==='win32'?'C:/Program Files/Google/Chrome/Application/chrome.exe':undefined)});const results=[];
 try {for(const [width,height] of [[390,844],[768,1024],[1440,900]])for(const reducedMotion of ['no-preference','reduce']) {
 const c=await b.newContext({viewport:{width,height},reducedMotion,serviceWorkers:'block'});await c.route('**/*',r=>r.abort());await installFixtures(c);await c.addInitScript(()=>sessionStorage.setItem('hutao-seal-intro','seen'));
 const p=await c.newPage();let errors=[];p.on('pageerror',e=>errors.push(e.message));
@@ -19,6 +20,17 @@ if(route==='index.html'){
 }
 if(route==='works.html'){await p.evaluate(()=>window.originalWork=document.querySelector('.work-card'));await p.locator('#worksToolbar button').nth(1).click();await p.waitForTimeout(350);await p.locator('#worksToolbar button').first().click();await p.waitForTimeout(350);assert(await p.evaluate(()=>originalWork===document.querySelector('.work-card')));}
 if(route==='videos.html'){await p.waitForSelector('.video-card');await p.evaluate(()=>window.originalVideo=document.querySelector('.video-card'));await p.locator('#videoSearch').fill('not-a-result');await p.waitForTimeout(500);await p.locator('#clearVideoFilters').click();await p.waitForTimeout(500);assert(await p.evaluate(()=>originalVideo===document.querySelector('.video-card')));}
+if(route==='videos.html') {
+ const allLabel=await p.locator('#videoCategory option').first().textContent();
+ const category=await p.locator('#videoCategory option').nth(1).getAttribute('value');
+ await p.locator('#videoCategory').selectOption(category, {force:true}); await p.waitForTimeout(400);
+ await p.goBack(); await p.waitForTimeout(400);
+ assert.equal(await p.locator('#videoCategory').inputValue(),'');
+ assert.equal(await p.locator('#videoCategory + .animated-select .animated-select__value').textContent(),allLabel);
+ await p.goForward(); await p.waitForTimeout(400);
+ assert.equal(await p.locator('#videoCategory').inputValue(),category);
+ assert.equal(await p.locator('#videoCategory + .animated-select .animated-select__value').textContent(),category);
+}
 if(route==='kurumi.html'){await p.locator('[data-gallery-src]').first().click();assert(await p.locator('#imageLightbox').isVisible());await p.keyboard.press('Escape');await p.locator('#imageLightbox').waitFor({state:'hidden'});assert(!await p.evaluate(()=>document.documentElement.classList.contains('gallery-dialog-open')));}
 if(route==='index.html') {
  await p.evaluate(()=>scrollTo({top:0,behavior:'instant'})); await p.waitForTimeout(350);

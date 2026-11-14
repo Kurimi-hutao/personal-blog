@@ -1,8 +1,24 @@
-const {chromium}=require('C:/Users/emmmm/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');const {installFixtures,records}=require('./review-fixtures.cjs');const assert=require('node:assert/strict'),fs=require('node:fs');process.env.REVIEW_LOCAL_FILES='1';
-(async()=>{const b=await chromium.launch({headless:true,executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe'}),results=[];
+let chromium;try { ({chromium}=require('playwright')); } catch { ({chromium}=require('C:/Users/emmmm/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright')); }
+const {installFixtures,records}=require('./review-fixtures.cjs');const assert=require('node:assert/strict'),fs=require('node:fs');process.env.REVIEW_LOCAL_FILES='1';fs.mkdirSync('outputs/ux-repair',{recursive:true});
+(async()=>{const b=await chromium.launch({headless:true,executablePath:process.env.CHROME_PATH || (process.platform==='win32'?'C:/Program Files/Google/Chrome/Application/chrome.exe':undefined)}),results=[];
 async function context(){const c=await b.newContext({viewport:{width:390,height:844},serviceWorkers:'block'});await c.route('**/*',r=>r.abort());await installFixtures(c);return c}
 try{
 for(const name of ['articles','videos']){console.log('cache start',name);const c=await context(),p=await c.newPage();p.setDefaultTimeout(15000);await p.goto('http://localhost:8000/'+name+'.html');await p.waitForSelector(name==='articles'?'.article-list-card':'.video-card');const count=await p.locator(name==='articles'?'.article-list-card':'.video-card').count();await c.route('**/rest/v1/articles**',r=>r.abort());console.log('reload fail',name);await p.reload();await p.waitForSelector('.content-cache-notice');assert.equal(await p.locator(name==='articles'?'.article-list-card':'.video-card').count(),count);await p.waitForFunction(()=>document.querySelector('.content-cache-notice')?.textContent.includes('连接暂时受阻'));console.log('retry',name);await c.unroute('**/rest/v1/articles**');await p.locator('.content-cache-notice button').click();await p.waitForFunction(()=>!document.querySelector('.content-cache-notice'));results.push(name+' cache/failure/retry');await c.close()}
+// A stale cache must not delete a category that exists in the fresh response.
+for (const name of ['articles','videos']) {
+ const cc=await context();
+ await cc.addInitScript(({name,record})=>localStorage.setItem('hutao-public-cache-'+name,JSON.stringify({savedAt:Date.now(),items:[record]})),{name,record:records[0]});
+ let release;const gate=new Promise(resolve=>release=resolve);
+ await cc.route('**/rest/v1/articles**',async route=>{await gate;await route.fallback()});
+ const cp=await cc.newPage();await cp.goto('http://localhost:8000/'+name+'.html?category='+encodeURIComponent('随笔'));
+ await cp.waitForSelector('.content-cache-notice');
+ assert.equal(new URL(cp.url()).searchParams.get('category'),'随笔');
+ assert.equal(await cp.locator(name==='articles'?'#categoryFilter':'#videoCategory').inputValue(),'随笔');
+ release();await cp.waitForFunction(()=>!document.querySelector('.content-cache-notice'));
+ assert.equal(new URL(cp.url()).searchParams.get('category'),'随笔');
+ assert.equal(await cp.locator(name==='articles'?'.article-list-card':'.video-card').count(),2);
+ results.push(name+' stale cache preserves category deep link');await cc.close();
+}
 // No cache error is recoverable, never silently empty. Seven actual image decodes.
 const c=await context(),p=await c.newPage();await c.route('**/rest/v1/articles**',r=>r.abort());await p.goto('http://localhost:8000/videos.html');await p.waitForSelector('.ink-state--error');assert((await p.locator('#videoList').innerText()).includes('不代表'));await c.unroute('**/rest/v1/articles**');await c.route('**/rest/v1/articles**',r=>r.fulfill({json:Array.from({length:7},(_,i)=>({...records[0],id:'v'+i,slug:'v'+i,content_type:'video',video_poster:'http://localhost:8000/assets/ink-scroll.webp'}))}));await p.locator('.ink-state--error button').click();await p.waitForSelector('.video-card');for(const img of await p.locator('.video-card img').all())await img.scrollIntoViewIfNeeded();await p.waitForFunction(()=>[...document.querySelectorAll('.video-card img')].filter(i=>i.naturalWidth>0).length===7);results.push('7 covers decode + empty-cache retry');
 // Real stalled request hits the existing 10-second abort, retains retry UI.

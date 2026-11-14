@@ -215,6 +215,7 @@
         .select("*")
         .eq("slug", slug)
         .eq("published", true)
+        .abortSignal(signal)
         .single());
       if (data) {
         data.category ||= "随笔";

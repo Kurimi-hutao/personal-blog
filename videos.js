@@ -128,7 +128,14 @@ function renderVideoCategories() {
     const option = document.createElement('option'); option.value = category; option.textContent = category;
     videoCategory.append(option);
   });
-  videoCategory.value = selected || new URLSearchParams(location.search).get('category') || '';
+  const requestedCategory = selected || new URLSearchParams(location.search).get('category') || '';
+  // Keep a requested category even when the saved feed predates it.
+  if (requestedCategory && ![...videoCategory.options].some(option => option.value === requestedCategory)) {
+    const option = document.createElement('option');
+    option.value = requestedCategory; option.textContent = requestedCategory;
+    videoCategory.append(option);
+  }
+  videoCategory.value = requestedCategory;
   window.MotionCore?.setupCustomSelects?.(document.querySelector('.article-filters'));
   videoFiltersReady = true;
 }
@@ -180,6 +187,10 @@ function restoreVideoFilters() {
   videoSearch.value = params.get('q') || '';
   videoCategory.value = params.get('category') || '';
 }
-window.addEventListener('popstate', () => { restoreVideoFilters(); renderVideos({ fromHistory: true }); });
+window.addEventListener('popstate', () => {
+  restoreVideoFilters();
+  window.MotionCore?.setupCustomSelects?.(document.querySelector('.article-filters'));
+  renderVideos({ fromHistory: true });
+});
 videoSearch.value = new URLSearchParams(location.search).get('q') || '';
 loadVideos();

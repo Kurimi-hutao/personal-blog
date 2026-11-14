@@ -192,7 +192,14 @@ function renderFilters() {
   });
 
   const params = new URLSearchParams(location.search);
-  categoryFilter.value = params.get("category") || "";
+  const requestedCategory = params.get("category") || "";
+  // A cached category list may lag behind a valid deep link. Preserve the filter.
+  if (requestedCategory && ![...categoryFilter.options].some(option => option.value === requestedCategory)) {
+    const option = document.createElement('option');
+    option.value = requestedCategory; option.textContent = requestedCategory;
+    categoryFilter.append(option);
+  }
+  categoryFilter.value = requestedCategory;
 
   const tagCounts = new Map();
   for (const article of allArticles) {

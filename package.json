@@ -12,6 +12,6 @@
     "perf:mobile": "node scripts/run-lighthouse.cjs mobile",
     "perf:summary": "node scripts/summarize-lighthouse.cjs",
     "test:perf": "node --test scripts/check-lighthouse.cjs",
-    "test:regression": "node --test scripts/check-motion-lifecycle.cjs scripts/check-ink-motion.cjs scripts/check-reading-ink.cjs scripts/check-cloudbase-deploy.mjs"
+    "test:regression": "node --test scripts/check-motion-lifecycle.cjs scripts/check-ink-motion.cjs scripts/check-reading-ink.cjs scripts/check-cloudbase-deploy.mjs scripts/check-public-read-timeout.cjs"
   }
 }
