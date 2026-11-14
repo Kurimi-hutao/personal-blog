@@ -19,7 +19,7 @@
       await loadSearchModule('./article-service.js?v=20261010-p1');
     }
     if (!window.articleService?.configured) throw new Error('内容服务暂不可用');
-    return window.articleService.listPublished();
+    return window.articleService.readPublicFeed();
   }
   const storageKey = "hutao-theme";
   const button = document.createElement("button");
@@ -35,6 +35,9 @@
 
   button.addEventListener("click", () => {
     const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+    document.documentElement.classList.add('theme-washing');
+    clearTimeout(window.themeWashTimer);
+    window.themeWashTimer = setTimeout(() => document.documentElement.classList.remove('theme-washing'), 420);
     document.documentElement.dataset.theme = next;
     try { localStorage.setItem(storageKey, next); } catch { /* Theme remains active in this tab. */ }
     button.getAnimations().filter(animation => animation.id === 'theme-ink').forEach(animation => animation.cancel());
@@ -447,7 +450,7 @@
     renderSearchResults("");
     window.setTimeout(() => {
       searchDialog.classList.remove("is-opening");
-      searchInput.focus({ preventScroll: true });
+      if (searchDialog.open && !searchClosing) searchInput.focus({ preventScroll: true });
     }, reducedMotionQuery.matches ? 0 : 230);
     searchLimit = 8;
     if (searchableWorks === null) {
@@ -465,7 +468,7 @@
       searchDialog.close();
       searchClosing = false;
       searchDialog.classList.remove("is-closing");
-    }, reducedMotionQuery.matches ? 1 : 170);
+    }, reducedMotionQuery.matches ? 1 : 250);
   }
 
   searchButton.addEventListener("click", openSearch);

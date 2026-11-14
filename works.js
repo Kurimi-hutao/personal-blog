@@ -10,7 +10,9 @@
   const toolbar = document.querySelector("#worksToolbar");
   const grid = document.querySelector("#worksGrid");
   const logList = document.querySelector("#worksLogList");
-  let active = "全部";
+  const cards = new Map();
+  let active = new URLSearchParams(location.search).get("category") || "全部";
+  if (!categories.includes(active)) active = "全部";
 
   function createWorkCard(work, index) {
     const card = document.createElement("article");
@@ -114,7 +116,10 @@
       grid.appendChild(state);
       return;
     }
-    filtered.forEach((work, index) => grid.appendChild(createWorkCard(work, index)));
+    filtered.forEach((work, index) => {
+      if (!cards.has(work)) { const card = createWorkCard(work, index); card.dataset.workId = work.id || work.title; cards.set(work, card); }
+      grid.appendChild(cards.get(work));
+    });
     grid.querySelectorAll(".reveal").forEach((node) => window.MotionCore?.revealInserted(node));
   }
 
@@ -129,6 +134,9 @@
       button.addEventListener("click", () => {
         if (active === category) return;
         active = category;
+        const url = new URL(location.href);
+        if (active === '全部') url.searchParams.delete('category'); else url.searchParams.set('category', active);
+        history.pushState(null, '', url);
         toolbar.querySelectorAll("button").forEach((item) => { item.classList.toggle("active", item === button); item.setAttribute("aria-pressed", String(item === button)); });
         if (window.MotionCore?.animateListUpdate) window.MotionCore.animateListUpdate(grid, renderWorks);
         else renderWorks();
@@ -148,6 +156,11 @@
     });
   }
 
+  window.addEventListener('popstate', () => {
+    active = new URLSearchParams(location.search).get('category') || '全部';
+    if (!categories.includes(active)) active = '全部';
+    toolbar.replaceChildren(); renderToolbar(); renderWorks();
+  });
   renderToolbar();
   renderWorks();
   renderLogs();

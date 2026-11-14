@@ -429,9 +429,9 @@ function summonPetals(event) {
   const now = performance.now();
   summonLevel = now - lastSummonAt < 1300 ? Math.min(3, summonLevel + 1) : 0;
   lastSummonAt = now;
-  const limit = lowPowerDevice ? 5 : compactMotion ? 8 : 16;
-  const count = Math.min(limit, (compactMotion || lowPowerDevice ? 3 : 5) + summonLevel);
-  const rect = event.currentTarget.getBoundingClientRect();
+  const limit = lowPowerDevice ? 10 : compactMotion ? 24 : 40;
+  const count = Math.min(limit, (lowPowerDevice ? 6 : compactMotion ? 12 : 20) + summonLevel * 3);
+  const rect = (event?.currentTarget || summonButton).getBoundingClientRect();
   const originX = rect.width ? rect.left + rect.width / 2 : innerWidth * .62;
   const originY = rect.height ? Math.min(rect.top, innerHeight * .65) : innerHeight * .25;
 
@@ -444,18 +444,19 @@ function summonPetals(event) {
     }
     const petal = document.createElement('span');
     petal.className = 'manual-petal';
+    petal.style.width = petal.style.height = `${random(24, 42)}px`;
     petal.setAttribute('aria-hidden', 'true');
     petal.style.backgroundImage = `url('./assets/spring-ink/small/petal-${1 + Math.floor(random(0, 8))}-144.webp')`;
     document.body.append(petal);
     manualPetals.add(petal);
     const x = originX + random(-16, 16);
-    const drift = random(-65, 75) * (1 + summonLevel * .12);
-    const bottom = Math.min(innerHeight - 24, originY + random(150, 300));
+    const drift = random(-150, 150) * (1 + summonLevel * .12);
+    const bottom = Math.min(innerHeight - 24, originY + random(260, 480));
     const animation = petal.animate([
       { transform: `translate3d(${x}px,${originY}px,0) rotate(-20deg) scale(.6)`, opacity: .7 },
       { transform: `translate3d(${x + drift * .65}px,${originY - random(22, 46)}px,0) rotate(45deg)`, opacity: .85, offset: .23 },
       { transform: `translate3d(${x + drift}px,${bottom}px,0) rotate(${random(120, 240)}deg) scale(.7)`, opacity: 0 },
-    ], { duration: 1750 + i * 110, delay: i * 50, easing: 'ease-in-out', fill: 'both' });
+    ], { duration: 3100 + i * 70, delay: i * 28, easing: 'ease-in-out', fill: 'both' });
     const remove = () => { petal.remove(); manualPetals.delete(petal); };
     animation.finished.then(remove, remove);
   }
