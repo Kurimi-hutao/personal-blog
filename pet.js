@@ -605,7 +605,9 @@
     nextHost.style.visibility = "hidden";
     nextHost.innerHTML = '<span class="pet-canvas"></span>';
     host.after(nextHost);
-    const candidate = new HutaoRig(nextHost, { modelUrl: character.modelUrl, scale: character.scale, y: character.y });
+    const candidate = new HutaoRig(nextHost, { modelUrl: character.modelUrl, scale: character.scale, y: character.y,
+      onProgress: message => { if (!candidate.disposed) status.querySelector('span').textContent = character.name + ' · ' + message; },
+    });
     $("#petRoom").classList.add("is-switching-character");
     status.classList.remove("is-ready", "is-error");
     $("#retryModel").hidden = true;

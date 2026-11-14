@@ -7,6 +7,7 @@ const sortArticles = document.querySelector("#sortArticles");
 const resultCount = document.querySelector("#articleResultCount");
 
 let allArticles = [];
+const articleCards = new Map();
 let activeTag = "";
 let activeTopic = "";
 const topicFilters = document.querySelector('#topicFilters');
@@ -81,7 +82,8 @@ function updateFilterUrl() {
   if (activeTag) params.set("tag", activeTag);
   if (activeTopic) params.set("topic", activeTopic);
   if (sortArticles.value !== "newest") params.set("sort", sortArticles.value);
-  history.replaceState(null, "", `${location.pathname}${params.size ? `?${params}` : ""}`);
+  const next = `${location.pathname}${params.size ? `?${params}` : ""}`;
+  if (next !== location.pathname + location.search) history.pushState(null, "", next);
 }
 
 function writeSearchText(element, value, pattern) {
@@ -100,7 +102,7 @@ function writeSearchText(element, value, pattern) {
   element.append(value.slice(start));
 }
 
-function createListCard(article, pattern) {
+function createListCard(article, pattern, copyOnly = false) {
   const link = document.createElement("a");
   link.className = "article-list-card reveal";
   link.href = articleService.articleUrl(article);
@@ -108,11 +110,12 @@ function createListCard(article, pattern) {
   const cover = articleService.articleCover(article);
   const visual = document.createElement("div");
   visual.className = `article-list-cover ${cover ? "" : "placeholder-cover"}`;
-  if (cover) {
+  if (cover && !copyOnly) {
     const image = document.createElement("img");
     image.src = cover.url;
     image.alt = "";
     image.loading = "lazy";
+    image.width = 640; image.height = 360; image.decoding = "async";
     image.addEventListener('error', () => { image.src = articleService.fallbackCover(article).url; }, { once: true });
     visual.appendChild(image);
   } else {
@@ -189,7 +192,14 @@ function renderFilters() {
   });
 
   const params = new URLSearchParams(location.search);
-  categoryFilter.value = params.get("category") || "";
+  const requestedCategory = params.get("category") || "";
+  // A cached category list may lag behind a valid deep link. Preserve the filter.
+  if (requestedCategory && ![...categoryFilter.options].some(option => option.value === requestedCategory)) {
+    const option = document.createElement('option');
+    option.value = requestedCategory; option.textContent = requestedCategory;
+    categoryFilter.append(option);
+  }
+  categoryFilter.value = requestedCategory;
 
   const tagCounts = new Map();
   for (const article of allArticles) {
@@ -248,7 +258,21 @@ function renderArticleDom(filtered, pattern) {
     else renderArticleState("未寻得合卷文章", "换一个关键词、分类或标签再试试，江湖册页还在继续整理。");
     return;
   }
-  filtered.forEach((article) => articleContainer.appendChild(createListCard(article, pattern)));
+  filtered.forEach((article, index) => {
+    const key = article.id || article.slug, signature = JSON.stringify(article);
+    let cached = articleCards.get(key);
+    if (!cached || cached.signature !== signature) {
+      cached = { signature, node: createListCard(article, pattern), pattern: pattern?.source };
+      articleCards.set(key, cached);
+    } else if (cached.pattern !== pattern?.source) {
+      const fresh = createListCard(article, pattern, true);
+      cached.node.querySelector('.article-list-copy').replaceWith(fresh.querySelector('.article-list-copy'));
+      cached.pattern = pattern?.source;
+    }
+    cached.node.dataset.articleId = key;
+    const img = cached.node.querySelector('img'); if (img && index < 2) img.loading = 'eager';
+    articleContainer.appendChild(cached.node);
+  });
 }
 
 function renderArticles(options = {}) {
@@ -273,6 +297,12 @@ function scheduleRenderArticles(delay = 150) {
 }
 
 async function loadArticles() {
+  if (articleContainer.dataset.refreshing) return;
+  articleContainer.dataset.refreshing = 'true';
+  try { return await loadArticlesRequest(); }
+  finally { delete articleContainer.dataset.refreshing; }
+}
+async function loadArticlesRequest() {
   if (!articleService.configured) {
     resultCount.textContent = "文章服务待配置";
     renderArticleState("文章卷宗暂未开启", "文章服务暂不可用，请稍后再来。", 'error');
@@ -281,14 +311,17 @@ async function loadArticles() {
 
   try {
     window.ContentCache?.clearNotice(articleContainer);
-    window.InkAssets?.loading(articleContainer, '正在翻阅文章……');
+    const saved = window.ContentCache?.read('articles');
+    if (saved) { allArticles = saved.items; renderFilters(); restoreFilterState(); renderArticles({ immediate: true }); window.ContentCache.notice(articleContainer, loadArticles, saved.savedAt, true); }
+    if (!saved && !allArticles.length) window.InkAssets?.loading(articleContainer, '正在翻阅文章……');
     allArticles = await articleService.readPublicFeed(null, { contentType: "article" });
+    window.ContentCache?.clearNotice(articleContainer);
     window.ContentCache?.write('articles', allArticles);
     restoreFilterState();
     renderFilters();
     renderArticles({ immediate: true });
   } catch (error) {
-    const cached = window.ContentCache?.read('articles');
+    const cached = window.ContentCache?.read('articles') || (allArticles.length ? { items: allArticles, savedAt: Date.now() } : null);
     if (cached) {
       allArticles = cached.items;
       renderFilters(); restoreFilterState(); renderArticles({ immediate: true });

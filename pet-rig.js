@@ -51,11 +51,24 @@
       });
 
       const Live2DModel = PIXI.live2d.Live2DModel;
-      this.model = await Live2DModel.from(this.modelUrl, {
-        autoInteract: false,
-        // Use the application's ticker only, so a paused room also stops Live2D.
-        autoUpdate: false,
-      });
+      this.options.onProgress?.('正在读取模型与纹理');
+      let timer;
+      try {
+        this.model = await new Promise((resolve, reject) => {
+          timer = setTimeout(() => reject(new Error('角色资源读取超时')), 25000);
+          const pending = Live2DModel.fromSync(this.modelUrl, {
+            onLoad: () => { if (this.disposed) { if (!pending.destroyed) pending.destroy(); } else resolve(pending); },
+            onError: reject,
+            autoInteract: false,
+            // Use the application's ticker only, so a paused room also stops Live2D.
+            autoUpdate: false,
+          });
+          pending.on('settingsLoaded', () => this.options.onProgress?.('模型目录已到，正在读取纹理'));
+          pending.on('modelLoaded', () => this.options.onProgress?.('模型已就绪，正在准备画面'));
+          pending.on('textureLoaded', () => this.options.onProgress?.('纹理已到，正在合成角色'));
+          this.pendingModel = pending;
+        });
+      } finally { clearTimeout(timer); }
       this.model.anchor.set(0.5, 0.5);
       this.app.stage.addChild(this.model);
       this.fit();
@@ -371,6 +384,13 @@
     }
 
     destroy() {
+      if (this.disposed) return;
+      this.disposed = true;
+      if (this.pendingModel && this.pendingModel !== this.model) {
+        // The vendor destroy() assumes internalModel exists; failed JSON loads do not have one.
+        if (this.pendingModel.internalModel) this.pendingModel.destroy();
+        else this.pendingModel.emit('destroy');
+      }
       this.resizeObserver?.disconnect();
       this.app?.ticker.remove(this.tick);
       this.model?.internalModel?.off("beforeModelUpdate", this.applyParameters);

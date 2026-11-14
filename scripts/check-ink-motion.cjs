@@ -99,7 +99,7 @@ async function rigHarness() {
   const model = {
     width: 100, height: 200, rotation: 0,
     anchor: { set() {} }, scale: { set() {} }, position: { set() {} },
-    internalModel: { on() {}, off() {} }, update() { updates++; },
+    on() {}, destroy() {}, internalModel: { on() {}, off() {} }, update() { updates++; },
   };
   class Application {
     constructor() {
@@ -111,14 +111,14 @@ async function rigHarness() {
     stop() { stops++; }
     destroy() {}
   }
-  const PIXI = { Application, live2d: { Live2DModel: { async from(url, options) { modelOptions = options; return model; } } } };
+  const PIXI = { Application, live2d: { Live2DModel: { fromSync(url, options) { modelOptions = options; queueMicrotask(() => options.onLoad()); return model; } } } };
   const host = {
     clientWidth: 300, clientHeight: 500, dataset: {}, classList: classes(),
     querySelector() { return null; }, replaceChildren() {}, dispatchEvent() {},
   };
   const window = { PIXI, devicePixelRatio: 1 };
   vm.runInNewContext(read('pet-rig.js'), {
-    window, PIXI,
+    window, PIXI, setTimeout, clearTimeout,
     document: { hidden: false, createElement: () => ({ setAttribute() {} }) },
     ResizeObserver: class { observe() {} disconnect() {} }, CustomEvent: class {},
   });

@@ -576,6 +576,7 @@
     return Promise.allSettled(exitAnimations.map((animation) => animation.finished))
       .then(() => {
         if (controller.signal.aborted) return;
+        exitAnimations.forEach(animation => animation.cancel());
         renderCallback();
         const newItems = Array.from(container.children);
         newItems.forEach((item, index) => {

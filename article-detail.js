@@ -136,7 +136,7 @@ function renderArticle(article) {
   } else {
     body.innerHTML = window.blogMarkdown.renderArticle(article.content, article.title);
   }
-  renderArticleMath(body);
+  const mathReady = renderArticleMath(body);
 
   const attachments = article.attachments || [];
   const images = attachments.filter((file) => file.role !== "cover" && file.type?.startsWith("image/"));
@@ -161,7 +161,15 @@ function renderArticle(article) {
     files.forEach((file) => box.appendChild(createAttachmentLink(file)));
     body.appendChild(box);
   }
-  root.append(header, body);
+  const explicitCover = article.content_type !== 'video' && attachments.find(file => file.role === 'cover' && file.type?.startsWith('image/'));
+  root.append(header);
+  if (explicitCover) {
+    const figure = document.createElement('figure'); figure.className = 'article-lead-cover';
+    const image = document.createElement('img'); image.src = explicitCover.url; image.alt = '';
+    image.width = 1280; image.height = 720; image.decoding = 'async';
+    image.onerror = () => figure.remove(); figure.append(image); root.append(figure);
+  }
+  root.append(body);
   window.dispatchEvent(new CustomEvent("article:rendered", { detail: { root } }));
   if (article.content_type !== "video") {
     const ending = document.createElement("img");
@@ -186,7 +194,7 @@ function renderArticle(article) {
   setMeta("og:url", canonical.href, true);
   const cover = articleService.firstImage(article);
   if (cover) setMeta("og:image", cover.url, true);
-  createToc(body);
+  mathReady.then(() => { if (body.isConnected) createToc(body); });
   setupReadingTools(article);
   window.ArticleReading.setupResume(article);
 }
@@ -279,7 +287,16 @@ function setupVideoExperience(player, article) {
   });
 }
 
-function renderArticleMath(root) {
+async function renderArticleMath(root) {
+  if (root.dataset.mathState === 'ready') return;
+  root.style.visibility = 'hidden';
+  root.setAttribute('aria-busy', 'true');
+  const deadline = performance.now() + 5000;
+  try {
+    while (typeof window.renderMathInElement !== 'function' && performance.now() < deadline) {
+      await new Promise(resolve => setTimeout(resolve, 50));
+    }
+
   const render = () => {
     if (typeof window.renderMathInElement !== "function") return false;
     window.renderMathInElement(root, {
@@ -294,7 +311,38 @@ function renderArticleMath(root) {
     });
     return true;
   };
-  if (!render()) window.addEventListener("load", render, { once: true });
+    if (!render()) throw new Error('公式排版组件暂不可用');
+    root.dataset.mathState = 'ready';
+  } catch {
+    root.dataset.mathState = 'fallback';
+    const notice = document.createElement('p');
+    notice.className = 'content-cache-notice';
+    notice.textContent = '公式排版暂不可用，已保留原文。';
+    const retry = document.createElement('button');
+    retry.textContent = '重试排版'; retry.type = 'button';
+    retry.onclick = async () => {
+      retry.disabled = true;
+      try {
+        for (const [ready, src] of [
+          [() => window.katex, './assets/vendor/katex/katex-0.16.22.min.js'],
+          [() => window.renderMathInElement, './assets/vendor/katex/auto-render-0.16.22.min.js'],
+        ]) {
+          if (ready()) continue;
+          await new Promise((resolve, reject) => {
+            const script = document.createElement('script'); script.src = src;
+            const timer = setTimeout(() => { script.remove(); reject(new Error('timeout')); }, 5000);
+            script.onload = () => { clearTimeout(timer); resolve(); };
+            script.onerror = () => { clearTimeout(timer); script.remove(); reject(new Error('load')); };
+            document.head.append(script);
+          });
+        }
+        notice.remove(); await renderArticleMath(root);
+      } catch { retry.disabled = false; }
+    };
+    notice.append(retry); root.before(notice);
+  } finally {
+    root.style.visibility = ''; root.removeAttribute('aria-busy');
+  }
 }
 
 function createLikeInkEffect(button) {

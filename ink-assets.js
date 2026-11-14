@@ -64,10 +64,13 @@
     if (!urls.length) return;
     const image = document.createElement('img');
     image.alt = '';
-    image.loading = 'lazy';
+    image.loading = visual.closest('[data-priority]') ? 'eager' : 'lazy';
+    image.width = 640; image.height = 360;
+    image.style.opacity = '0';
+    image.style.transition = matchMedia('(prefers-reduced-motion: reduce)').matches ? 'none' : 'opacity 240ms ease';
     image.decoding = 'async';
     image.referrerPolicy = 'no-referrer';
-    image.onload = () => { card.hidden = true; };
+    image.onload = () => { card.hidden = true; image.style.opacity = '1'; };
     let attemptedRestore = false;
     image.onerror = async () => {
       if (urls.length) { image.src = urls.shift(); return; }

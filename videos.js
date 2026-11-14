@@ -4,6 +4,7 @@ const videoCategory = document.querySelector("#videoCategory");
 const clearVideoFilters = document.querySelector("#clearVideoFilters");
 
 let videos = [];
+const videoCards = new Map();
 let videoFilterTimer = null;
 let videoFiltersReady = false;
 
@@ -88,10 +89,24 @@ function renderVideoDom(filtered) {
     else renderVideoState("未寻得合卷视频", "换一个关键词或分类再试试，新的影像会在这里归档。");
     return;
   }
-  filtered.forEach((video) => videoList.appendChild(createVideoCard(video)));
+  filtered.forEach((video, index) => {
+    const key = video.id || video.slug;
+    const signature = JSON.stringify(video);
+    if (videoCards.get(key)?.signature !== signature) videoCards.set(key, { signature, node: createVideoCard(video) });
+    const node = videoCards.get(key).node; node.dataset.videoId = key;
+    if (index < 2) { const img = node.querySelector('img'); if (img) img.loading = 'eager'; }
+    videoList.appendChild(node);
+  });
 }
 
 function renderVideos(options = {}) {
+  if (!options.fromHistory) {
+    const url = new URL(location.href);
+    for (const [key, value] of [['q', videoSearch.value.trim()], ['category', videoCategory.value]]) {
+      if (value) url.searchParams.set(key, value); else url.searchParams.delete(key);
+    }
+    if (url.href !== location.href) history.pushState(null, '', url);
+  }
   const filtered = filteredVideos();
   const render = () => renderVideoDom(filtered);
   if (options.immediate || !videoFiltersReady || !window.MotionCore?.animateListUpdate) {
@@ -113,12 +128,25 @@ function renderVideoCategories() {
     const option = document.createElement('option'); option.value = category; option.textContent = category;
     videoCategory.append(option);
   });
-  videoCategory.value = selected;
+  const requestedCategory = selected || new URLSearchParams(location.search).get('category') || '';
+  // Keep a requested category even when the saved feed predates it.
+  if (requestedCategory && ![...videoCategory.options].some(option => option.value === requestedCategory)) {
+    const option = document.createElement('option');
+    option.value = requestedCategory; option.textContent = requestedCategory;
+    videoCategory.append(option);
+  }
+  videoCategory.value = requestedCategory;
   window.MotionCore?.setupCustomSelects?.(document.querySelector('.article-filters'));
   videoFiltersReady = true;
 }
 
 async function loadVideos() {
+  if (videoList.dataset.refreshing) return;
+  videoList.dataset.refreshing = 'true';
+  try { return await loadVideosRequest(); }
+  finally { delete videoList.dataset.refreshing; }
+}
+async function loadVideosRequest() {
   if (!articleService.configured) {
     renderVideoState("视频卷宗暂未开启", "视频服务暂不可用，请稍后再来。", 'error');
     return;
@@ -126,13 +154,16 @@ async function loadVideos() {
 
   try {
     window.ContentCache?.clearNotice(videoList);
-    window.InkAssets?.loading(videoList, '正在整理影像……');
+    const saved = window.ContentCache?.read('videos');
+    if (saved) { videos = saved.items; renderVideoCategories(); renderVideos({ immediate: true }); window.ContentCache.notice(videoList, loadVideos, saved.savedAt, true); }
+    if (!saved && !videos.length) window.InkAssets?.loading(videoList, '正在整理影像……');
     videos = await articleService.readPublicFeed(null, { contentType: "video" });
+    window.ContentCache?.clearNotice(videoList);
     window.ContentCache?.write('videos', videos);
     renderVideoCategories();
     renderVideos({ immediate: true });
   } catch (error) {
-    const cached = window.ContentCache?.read('videos');
+    const cached = window.ContentCache?.read('videos') || (videos.length ? { items: videos, savedAt: Date.now() } : null);
     if (cached) {
       videos = cached.items; renderVideoCategories(); renderVideos({ immediate: true });
       window.ContentCache.notice(videoList, loadVideos, cached.savedAt);
@@ -147,8 +178,19 @@ videoCategory.addEventListener("change", () => renderVideos());
 clearVideoFilters.addEventListener("click", () => {
   videoSearch.value = "";
   videoCategory.value = "";
-  videoCategory.dispatchEvent(new Event("change", { bubbles: true }));
+  window.MotionCore?.setupCustomSelects?.(document.querySelector(".article-filters"));
   renderVideos();
 });
 
+function restoreVideoFilters() {
+  const params = new URLSearchParams(location.search);
+  videoSearch.value = params.get('q') || '';
+  videoCategory.value = params.get('category') || '';
+}
+window.addEventListener('popstate', () => {
+  restoreVideoFilters();
+  window.MotionCore?.setupCustomSelects?.(document.querySelector('.article-filters'));
+  renderVideos({ fromHistory: true });
+});
+videoSearch.value = new URLSearchParams(location.search).get('q') || '';
 loadVideos();

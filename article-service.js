@@ -80,7 +80,7 @@
   }
 
   async function listPublishedLegacy(limit, filters = {}) {
-    if (filters.contentType === "video") return [];
+    if (filters.contentType === "video") throw new Error("当前接口无法读取视频字段，请稍后重试");
     let query = requireClient()
       .from("articles")
       .select("id,title,slug,excerpt,attachments,published_at,created_at")
@@ -174,7 +174,16 @@
     return data;
   }
 
-  async function readPublicFeed(limit, filters, timeout = 10000) {
+  const pendingFeeds = new Map();
+  function readPublicFeed(limit, filters = {}, timeout = 10000) {
+    const key = JSON.stringify([limit, filters, timeout]);
+    if (!pendingFeeds.has(key)) {
+      const pending = requestPublicFeed(limit, filters, timeout).finally(() => pendingFeeds.delete(key));
+      pendingFeeds.set(key, pending);
+    }
+    return pendingFeeds.get(key);
+  }
+  async function requestPublicFeed(limit, filters, timeout) {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeout);
     try {
@@ -185,6 +194,13 @@
   }
 
   async function getPublished(slug) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 10000);
+    try { return await getPublishedRequest(slug, controller.signal); }
+    finally { clearTimeout(timer); }
+  }
+
+  async function getPublishedRequest(slug, signal) {
     let { data, error } = await requireClient()
       .from("articles")
       .select("*")
@@ -192,13 +208,14 @@
       .eq("published", true)
       .is("deleted_at", null)
       .or(`scheduled_at.is.null,scheduled_at.lte.${new Date().toISOString()}`)
-      .single();
+      .abortSignal(signal).single();
     if (error && isSchemaMismatch(error)) {
       ({ data, error } = await requireClient()
         .from("articles")
         .select("*")
         .eq("slug", slug)
         .eq("published", true)
+        .abortSignal(signal)
         .single());
       if (data) {
         data.category ||= "随笔";

@@ -94,14 +94,30 @@
 
   document.querySelectorAll('[data-gallery-src]').forEach(button => {
     button.addEventListener('click', () => {
+      lightboxImage.style.opacity = '0';
+      lightboxImage.onload = () => { lightboxImage.style.opacity = '1'; };
+      lightboxImage.onerror = () => { lightboxImage.style.opacity = '1'; };
       lightboxImage.src = button.dataset.gallerySrc;
       lightboxImage.alt = button.dataset.galleryAlt;
       lightbox.showModal();
+      document.documentElement.classList.add('gallery-dialog-open');
+      if (lightboxImage.complete) lightboxImage.style.opacity = '1';
       refresh();
     });
   });
-  lightbox.querySelector('.lightbox-close').addEventListener('click', () => lightbox.close());
-  lightbox.addEventListener('click', event => { if (event.target === lightbox) lightbox.close(); });
+  let closing = false;
+  function closeGallery() {
+    if (closing || !lightbox.open) return;
+    closing = true;
+    const animation = reduced.matches ? null : lightbox.animate([{ opacity: 1 }, { opacity: 0, transform: 'translateY(8px)' }], { duration: 180, fill: 'forwards' });
+    Promise.resolve(animation?.finished).catch(() => {}).then(() => {
+      lightbox.close(); animation?.cancel(); closing = false;
+      document.documentElement.classList.remove('gallery-dialog-open');
+    });
+  }
+  lightbox.addEventListener('cancel', event => { event.preventDefault(); closeGallery(); });
+  lightbox.querySelector('.lightbox-close').addEventListener('click', closeGallery);
+  lightbox.addEventListener('click', event => { if (event.target === lightbox) closeGallery(); });
   lightbox.addEventListener('close', refresh);
 
   // MotionCore owns gallery reveals; avoid competing observers and hidden text.
