@@ -1,3 +1,4 @@
+import { buildSEO, fetchPublished } from './build-seo.mjs';
 import { cp, mkdir, readdir, readFile, stat, writeFile, appendFile, access } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -6,7 +7,8 @@ import { createRequire } from 'node:module';
 createRequire(import.meta.url)('./build-page-styles.cjs').buildPageStyles({ check: true });
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const output = path.join(root, process.env.LHCI_BUILD === '1' ? '.lighthouseci-site' : '_deploy');
+const output = path.resolve(root, process.env.SEO_OUTPUT || (process.env.LHCI_BUILD === '1' ? '.lighthouseci-site' : '_deploy'));
+if (!output.startsWith(root + path.sep)) throw new Error('Output must stay within workspace');
 const runtimeDirectories = ['assets', 'next-generation-letter', 'zhengshen-atlas'];
 const runtimeFile = /\.(html|css|js|webmanifest|xml|txt|ico|svg)$/i;
 const forbidden = new Set(['node_modules', 'sources', 'outputs', 'screenshots', 'docs', 'scripts']);
@@ -71,6 +73,21 @@ for (const file of files.sort()) {
   await mkdir(path.dirname(destination), { recursive: true });
   await cp(path.join(root, file), destination);
   bytes += (await stat(destination)).size;
+}
+if (process.env.LHCI_BUILD !== '1') {
+  if (process.env.CI && process.env.SEO_CONTENT_FILE) throw new Error('CI must fetch fresh public content');
+  const rows = process.env.SEO_CONTENT_FILE ? JSON.parse(await readFile(process.env.SEO_CONTENT_FILE, 'utf8')) : await fetchPublished(root);
+  let previous = [];
+  if (!process.env.SEO_CONTENT_FILE) {
+    const response = await fetch('https://joestarzhang.cn/seo-manifest.json', { signal: AbortSignal.timeout(20000), headers: { 'cache-control': 'no-cache' } });
+    if (response.ok && response.headers.get('content-type')?.includes('json')) {
+      previous = await response.json();
+      if (!Array.isArray(previous)) throw new Error('Invalid previous SEO manifest');
+    } else if (response.status !== 404 && !(response.ok && response.headers.get('content-type')?.includes('text/html'))) {
+      throw new Error(`Cannot check previous public pages: HTTP ${response.status}`);
+    }
+  }
+  await buildSEO({ root, output, rows, previous });
 }
 const revision = process.env.GITHUB_SHA || 'local-preview';
 await writeFile(path.join(output, 'deployment.json'), JSON.stringify({ revision, files: files.length, bytes }, null, 2) + '\n');

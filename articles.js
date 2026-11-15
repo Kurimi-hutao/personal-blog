@@ -6,7 +6,7 @@ const clearFilters = document.querySelector("#clearFilters");
 const sortArticles = document.querySelector("#sortArticles");
 const resultCount = document.querySelector("#articleResultCount");
 
-let allArticles = [];
+let allArticles = (window.SEO_FEED || []).filter(a => a.content_type === "article");
 const articleCards = new Map();
 let activeTag = "";
 let activeTopic = "";

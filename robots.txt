@@ -1,7 +1,4 @@
 User-agent: *
 Allow: /
-Disallow: /admin.html
-Disallow: /reward.html
-Disallow: /offline.html
 
 Sitemap: https://joestarzhang.cn/sitemap.xml

@@ -1,4 +1,4 @@
-.article-reward { position:relative; isolation:isolate; margin:54px 0 20px; padding:32px 20px 34px; border-block:1px solid var(--line); color:var(--ink); text-align:center; scroll-margin-top:100px; }
+.article-reward { content-visibility:auto; contain-intrinsic-size:auto 280px; position:relative; isolation:isolate; margin:54px 0 20px; padding:32px 20px 34px; border-block:1px solid var(--line); color:var(--ink); text-align:center; scroll-margin-top:100px; }
 .article-reward::before { content:"";position:absolute;z-index:-1;inset:0;background:url('./assets/reward/xuan-paper.webp') center / 620px;opacity:.34;pointer-events:none; }
 [data-theme="dark"] .article-reward::before { opacity:.06; }
 .reward-ending { display:flex;align-items:center;justify-content:center;gap:16px;font-size:11px;color:var(--ink-soft);letter-spacing:.24em; }

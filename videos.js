@@ -3,7 +3,7 @@ const videoSearch = document.querySelector("#videoSearch");
 const videoCategory = document.querySelector("#videoCategory");
 const clearVideoFilters = document.querySelector("#clearVideoFilters");
 
-let videos = [];
+let videos = (window.SEO_FEED || []).filter(a => a.content_type === "video");
 const videoCards = new Map();
 let videoFilterTimer = null;
 let videoFiltersReady = false;

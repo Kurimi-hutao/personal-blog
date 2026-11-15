@@ -792,7 +792,7 @@ async function loadCourseIndex() {
     }
     if (!lessons.length) list.textContent = '课程目录暂无已发布文章。';
   }
-  const cached = window.ContentCache.read('course-index');
+  const cached = window.ContentCache.read('course-index') || (window.SEO_FEED ? { items: window.SEO_FEED.filter(a => a.slug.startsWith('ai-from-zero-lesson-')), savedAt: Date.now() } : null);
   if (cached) render(cached.items);
   window.ContentCache.clearNotice(list);
   try {

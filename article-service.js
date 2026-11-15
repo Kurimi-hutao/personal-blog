@@ -27,7 +27,7 @@
   }
 
   function articleUrl(article) {
-    return `./article.html?slug=${encodeURIComponent(article.slug)}`;
+    return window.SEO_URLS?.[article.slug] || `./article.html?slug=${encodeURIComponent(article.slug)}`;
   }
 
   function contentLabel(item) {

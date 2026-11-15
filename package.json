@@ -1,8 +1,12 @@
 {
   "name": "ink-blog-quality-tools",
   "private": true,
-  "engines": { "node": ">=22" },
-  "devDependencies": { "@lhci/cli": "0.15.1" },
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "@lhci/cli": "0.15.1"
+  },
   "scripts": {
     "assets:styles": "node scripts/build-page-styles.cjs",
     "build": "node scripts/prepare-cloudbase.mjs",
@@ -12,6 +16,7 @@
     "perf:mobile": "node scripts/run-lighthouse.cjs mobile",
     "perf:summary": "node scripts/summarize-lighthouse.cjs",
     "test:perf": "node --test scripts/check-lighthouse.cjs",
-    "test:regression": "node --test scripts/check-motion-lifecycle.cjs scripts/check-ink-motion.cjs scripts/check-reading-ink.cjs scripts/check-cloudbase-deploy.mjs scripts/check-public-read-timeout.cjs"
+    "test:regression": "node --test scripts/check-motion-lifecycle.cjs scripts/check-ink-motion.cjs scripts/check-reading-ink.cjs scripts/check-cloudbase-deploy.mjs scripts/check-public-read-timeout.cjs",
+    "test:seo": "node --test scripts/check-seo.mjs scripts/check-cloudbase-deploy.mjs"
   }
 }

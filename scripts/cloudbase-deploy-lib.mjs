@@ -30,7 +30,7 @@ export function partition(local, remote) {
 }
 
 function isEntry(key) {
-  return key.endsWith('.html') || key === 'service-worker.js' || key === 'deployment.json';
+  return key.endsWith('.html') || key === 'sitemap.xml' || key === 'seo-manifest.json' || key === 'service-worker.js' || key === 'deployment.json';
 }
 
 export function verify(local, remote) {

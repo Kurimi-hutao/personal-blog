@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - main
+  schedule:
+    - cron: '17 * * * *'
+  repository_dispatch:
+    types: [content-published]
   workflow_dispatch:
 
 concurrency:
@@ -23,6 +27,9 @@ jobs:
       TCB_ENV_ID: ${{ secrets.TCB_ENV_ID }}
       TCB_SECRET_ID: ${{ secrets.TCB_SECRET_ID }}
       TCB_SECRET_KEY: ${{ secrets.TCB_SECRET_KEY }}
+      INDEXNOW_KEY: ${{ secrets.INDEXNOW_KEY }}
+      BAIDU_PUSH_TOKEN: ${{ secrets.BAIDU_PUSH_TOKEN }}
+      PLAUSIBLE_SCRIPT_URL: ${{ vars.PLAUSIBLE_SCRIPT_URL }}
       COS_SDK_KEEPALIVE: "false"
       COS_UPLOAD_SERIAL: "true"
 
@@ -44,7 +51,7 @@ jobs:
           node-version: "22"
 
       - name: Check deployment ordering and verification
-        run: node --test scripts/check-cloudbase-deploy.mjs
+        run: node --test scripts/check-seo.mjs scripts/check-cloudbase-deploy.mjs
 
       - name: Validate existing comment service without migration
         run: node scripts/check-comment-service.cjs
@@ -57,3 +64,20 @@ jobs:
 
       - name: Deploy to CloudBase static hosting
         run: node scripts/deploy-cloudbase.mjs
+
+      - name: Restore search submission receipts
+        uses: actions/cache/restore@v4
+        with:
+          path: .seo-submit
+          key: search-submit-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: search-submit-
+
+      - name: Submit verified public URLs
+        run: node scripts/submit-search.mjs
+
+      - name: Save received URL hashes
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: .seo-submit
+          key: search-submit-${{ github.run_id }}-${{ github.run_attempt }}

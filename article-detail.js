@@ -187,7 +187,7 @@ function renderArticle(article) {
   setMeta("description", article.excerpt);
   setMeta("og:title", article.title, true);
   setMeta("og:description", article.excerpt, true);
-  const canonical = document.createElement("link");
+  const canonical = document.querySelector('link[rel="canonical"]') || document.createElement("link");
   canonical.rel = "canonical";
   canonical.href = new URL(articleService.articleUrl(article), "https://joestarzhang.cn/").href;
   document.head.append(canonical);
@@ -478,14 +478,14 @@ function neighborLink(article, label, direction) {
 }
 
 async function loadArticle() {
-  const slug = new URLSearchParams(location.search).get("slug");
+  const slug = document.querySelector("#articleDetail")?.dataset.staticSlug || new URLSearchParams(location.search).get("slug");
   const root = document.querySelector("#articleDetail");
   if (!slug || !articleService.configured) {
     window.InkAssets?.state(root, { title: '没有找到要展开的文章', detail: '回到文章目录，再挑一卷读读。', action: '返回文章目录', onAction: () => { location.href = './articles.html'; } });
     return;
   }
   try {
-    window.InkAssets?.loading(root, '正在展开此卷……', 1);
+    if (!root.dataset.staticSlug) window.InkAssets?.loading(root, '正在展开此卷……', 1);
     currentArticle = await articleService.getPublished(slug);
     if (!currentArticle) throw new Error('Article not found');
     // Exact-version local errata are read-only and never overwrite the source.
@@ -495,6 +495,7 @@ async function loadArticle() {
     setupComments(currentArticle);
     await Promise.allSettled([loadComments(currentArticle.id), setupArticleExtras(currentArticle)]);
   } catch {
+    if (root.dataset.staticSlug) return;
     window.InkAssets?.state(root, { kind: 'error', title: '此卷暂时未能展开', detail: '文章可能尚未发布，或暂时无法连接。', action: '重新翻阅', onAction: loadArticle });
   }
 }

@@ -9,14 +9,17 @@ mobile-qa*.js
 mobile-qa*.spec.js
 .download/
 blog-source.zip
-
-# Raw browser captures; review-sized comparisons live in docs/issue-2/.
-/screenshots/issue-2/
 _deploy/
 .cloudbase-tools/
 
-# Credentials stay in Supabase Secrets, never in the public repository.
+# Raw browser captures; review-sized comparisons live in docs/issue-2/.
+/screenshots/issue-2/
+
+# Mail credentials are supplied through Supabase Secrets; never commit local env files.
 .env
 .env.*
 !.env.example
 supabase/.temp/
+
+# CI search submission receipts
+.seo-submit/
