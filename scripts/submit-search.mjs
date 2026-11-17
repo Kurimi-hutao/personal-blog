@@ -50,7 +50,14 @@ for (const provider of ['indexnow','baidu']) {
       // Keep the credential server-side and reject redirects in post().
       r=await post(`http://data.zz.baidu.com/urls?site=${encodeURIComponent(origin)}&token=${encodeURIComponent(key)}`,{method:'POST',headers:{'content-type':'text/plain'},body:batch.map(a=>a.url).join('\n')});
       const result=await r.json();
-      if(!r.ok || result.error || result.success!==batch.length) throw new Error('Baidu batch incomplete; inspect platform quota and retry');
+      const message = typeof result.message === 'string'
+        ? result.message.replaceAll(key, '[REDACTED]').replace(/token=[^&\s"'<>]+/gi, 'token=[REDACTED]').slice(0, 200) : undefined;
+      const count = value => Number.isInteger(value) ? value : null;
+      const feedback = { http: r.status, requested: batch.length, success: count(result.success), remain: count(result.remain), error: count(result.error), message,
+        not_same_site: Array.isArray(result.not_same_site) ? result.not_same_site.length : 0,
+        not_valid: Array.isArray(result.not_valid) ? result.not_valid.length : 0 };
+      console.log(`baidu: response ${JSON.stringify(feedback)}`);
+      if(!r.ok || result.error || result.success!==batch.length) throw new Error('Baidu batch incomplete; see sanitized response above; no receipt recorded');
     }
     state[provider] ||= {}; for(const a of batch) state[provider][a.url]=a.hash;
     await writeFile(statePath,JSON.stringify(state));
