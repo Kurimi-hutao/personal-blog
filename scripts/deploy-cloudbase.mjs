@@ -1,5 +1,6 @@
+import { encodeAsset } from './compress-deploy.mjs';
 import { createHash } from 'node:crypto';
-import { readdir, readFile, appendFile } from 'node:fs/promises';
+import { readdir, readFile, appendFile, mkdir, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -31,9 +32,15 @@ async function walk(relative = '') {
     const key = path.posix.join(relative, entry.name);
     if (entry.isDirectory()) await walk(key);
     else if (entry.isFile()) {
-      const filePath = path.join(root, '_deploy', key);
-      const bytes = await readFile(filePath);
-      files.push({ key, path: filePath, size: bytes.length, md5: createHash('md5').update(bytes).digest('hex') });
+      let filePath = path.join(root, '_deploy', key);
+      const encoded = encodeAsset(key, await readFile(filePath));
+      const bytes = encoded.bytes;
+      if (encoded.contentEncoding) {
+        filePath = path.join(root, '.cloudbase-tools', 'compressed', key);
+        await mkdir(path.dirname(filePath), { recursive:true });
+        await writeFile(filePath, bytes);
+      }
+      files.push({ key, path: filePath, contentEncoding: encoded.contentEncoding, size: bytes.length, md5: createHash('md5').update(bytes).digest('hex') });
     } else throw new Error(`Unexpected deployment entry: ${key}`);
   }
 }
@@ -135,3 +142,15 @@ for (const [label, domain] of [['hosting', website.CdnDomain], ['custom', 'joest
     console.log(`Public ${label} comment service: check unavailable (${error.name})`);
   }
 }
+
+// Report gateway status separately: a successful upload cannot prove HTTP 404.
+try {
+  const missing = await fetch('https://joestarzhang.cn/__missing-check-' + Date.now() + '.html', {redirect:'manual', signal:AbortSignal.timeout(15000)});
+  const result = `Public missing-page HTTP status: ${missing.status}`;
+  console.log(result);
+  if (missing.status === 200) {
+    const warning = 'Soft 404 remains: configure the CloudBase domain error response to HTTP 404 (shared storage must be configured by the platform, never by changing a shared bucket).';
+    console.log('::warning::' + warning);
+    if (process.env.GITHUB_STEP_SUMMARY) await appendFile(process.env.GITHUB_STEP_SUMMARY, result + '\n' + warning + '\n');
+  }
+} catch { console.log('Public missing-page probe unavailable'); }

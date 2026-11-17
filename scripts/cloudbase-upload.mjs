@@ -38,7 +38,7 @@ export function createUploader({ COS, mime, config, credentials, toPhysicalKey, 
           }, (error, response) => error ? reject(error) : resolve(response)));
           const response = await request(Url, {
             method, body: data, signal: AbortSignal.timeout(120000), redirect: 'error',
-            headers: { 'content-type': type, connection: 'close' },
+            headers: { 'content-type': type, connection: 'close', ...(file.contentEncoding && method === 'PUT' && !query ? { 'content-encoding': file.contentEncoding } : {}) },
           });
           const payload = await response.text();
           if (!response.ok || /<Error>/.test(payload)) {

@@ -48,7 +48,7 @@ export async function publish(local, hosting, report = console.log) {
       const batch = files.slice(start, start + 10);
       report(`${phase}: ${start + 1}-${start + batch.length}/${files.length}`);
       await hosting.uploadFiles({
-        files: batch.map(file => ({ localPath: file.path, cloudPath: file.key })),
+        files: batch.map(file => ({ localPath: file.path, cloudPath: file.key, contentEncoding: file.contentEncoding })),
         parallel: 1, retryCount: 3, retryInterval: 2000,
       });
     }

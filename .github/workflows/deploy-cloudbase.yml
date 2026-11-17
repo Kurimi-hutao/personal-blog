@@ -50,8 +50,11 @@ jobs:
         with:
           node-version: "22"
 
+      - name: Install locked build dependencies
+        run: npm ci --ignore-scripts
+
       - name: Check deployment ordering and verification
-        run: node --test scripts/check-seo.mjs scripts/check-cloudbase-deploy.mjs
+        run: node --test scripts/check-compress-deploy.mjs scripts/check-html-slots.mjs scripts/check-seo.mjs scripts/check-cloudbase-deploy.mjs
 
       - name: Validate existing comment service without migration
         run: node scripts/check-comment-service.cjs

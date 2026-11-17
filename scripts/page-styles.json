@@ -82,6 +82,9 @@
     },
     {
       "file": "interaction-ink.css"
+    },
+    {
+      "file": "quick-controls.css"
     }
   ],
   "articles.html": [
@@ -167,6 +170,9 @@
     },
     {
       "file": "interaction-ink.css"
+    },
+    {
+      "file": "quick-controls.css"
     }
   ],
   "article.html": [
@@ -255,6 +261,9 @@
     },
     {
       "file": "article-reading.css"
+    },
+    {
+      "file": "quick-controls.css"
     }
   ],
   "videos.html": [
@@ -325,6 +334,9 @@
     },
     {
       "file": "interaction-ink.css"
+    },
+    {
+      "file": "quick-controls.css"
     }
   ],
   "works.html": [
@@ -404,6 +416,9 @@
     },
     {
       "file": "interaction-ink.css"
+    },
+    {
+      "file": "quick-controls.css"
     }
   ]
 }

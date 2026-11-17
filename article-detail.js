@@ -109,13 +109,13 @@ function renderArticle(article) {
       const info = document.createElement("div");
       info.className = "video-playback-info";
       const note = document.createElement("span");
-      note.textContent = "视频由哔哩哔哩直接播放，本站不代理视频流；站内不统计此播放器的完播进度。";
+      note.textContent = "";
       const origin = document.createElement("a");
       origin.href = article.video_url;
       origin.target = "_blank";
       origin.rel = "noopener noreferrer";
       origin.textContent = "前往哔哩哔哩观看";
-      info.append(note, origin);
+      info.append(origin);
       body.appendChild(info);
     } else {
       const player = document.createElement("video");

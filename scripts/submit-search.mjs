@@ -16,7 +16,7 @@ async function post(url,options) {
   throw new Error('Search submission retry budget exhausted');
 }
 for (const provider of ['indexnow','baidu']) {
-  const key = process.env[provider==='indexnow'?'INDEXNOW_KEY':'BAIDU_PUSH_TOKEN'];
+  const key = process.env[provider==='indexnow'?'INDEXNOW_KEY':'BAIDU_PUSH_TOKEN'] || (provider==='indexnow' ? (await readFile('.github/indexnow-key.txt','utf8').catch(() => '')).trim() : '');
   if (!key) { console.log(`${provider}: not configured; skipped`); continue; }
   const changed = manifest.filter(a=>state[provider]?.[a.url]!==a.hash);
   for (let i=0;i<changed.length;i+=100) {

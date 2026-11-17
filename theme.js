@@ -87,7 +87,7 @@
     navigation.append(primary, secondary);
     const inertBeforeMenu = new Map();
     navigation.classList.add("site-nav");
-    const mobileNavigation = matchMedia('(max-width:1080px)');
+    const mobileNavigation = matchMedia('(max-width:900px)');
     navigation.inert = mobileNavigation.matches;
     if (!navigation.id) navigation.id = "siteNav";
 
@@ -243,8 +243,8 @@
       updateSearchStatus('');
     } catch {
       const cached = window.ContentCache?.read('search');
-      searchableWorks = cached?.items || null;
-      updateSearchStatus(cached ? '连接暂时受阻，文章与视频显示上次保存的内容。' : '文章与视频暂时无法读取，仍可搜索站内作品。', true);
+      searchableWorks = cached?.items || window.SEO_FEED || null;
+      updateSearchStatus(searchableWorks ? '暂时连不上，先翻翻已存的篇章。' : '文章与视频暂时无法读取，仍可搜索站内作品。', true);
     } finally {
       clearTimeout(timer); searchPending = false;
       if (searchDialog.open) renderSearchResults(searchInput.value);
@@ -271,7 +271,7 @@
     let positions = {}, bookmarks = [];
     try { positions = JSON.parse(localStorage.getItem('hutao-reading-positions') || '{}'); } catch {}
     try { bookmarks = JSON.parse(localStorage.getItem('hutao-bookmarked-articles') || '[]'); } catch {}
-    const known = [...bookmarks, ...(window.ContentCache?.read('search')?.items || []), ...(window.ContentCache?.read('articles')?.items || [])];
+    const known = [...(window.SEO_FEED || []), ...bookmarks, ...(window.ContentCache?.read('search')?.items || []), ...(window.ContentCache?.read('articles')?.items || [])];
     const entries = Object.entries(positions).filter(([, item]) => item && item.ratio > .03 && item.ratio < .98)
       .sort((a, b) => b[1].updatedAt - a[1].updatedAt);
     for (const [id, item] of entries) {
@@ -294,7 +294,10 @@
     list.closest('.reading-return')?.classList.toggle('has-reading-history', Boolean(list.children.length));
     if (!list.children.length) {
       const link = document.createElement('a'); link.href = './articles.html';
-      link.textContent = '翻开一篇文章，下次回来可从这里接着读 →'; list.append(link);
+      link.className = 'reading-empty-link';
+      link.textContent = '挑一卷读读 →';
+      const note = document.createElement('p'); note.className = 'reading-empty-note'; note.textContent = '还没有未读完的篇章。读到一半的文字，会在这里等你。';
+      list.append(note, link);
     }
   }
   renderReadingReturn();
@@ -454,7 +457,8 @@
     }, reducedMotionQuery.matches ? 0 : 230);
     searchLimit = 8;
     if (searchableWorks === null) {
-      searchableWorks = window.ContentCache?.read('search')?.items || null;
+      searchableWorks = window.ContentCache?.read('search')?.items || window.SEO_FEED || null;
+      renderSearchResults(searchInput.value);
       void loadSearchContent();
     }
   }
@@ -733,7 +737,7 @@
     windToggle: document.querySelector(".wind-toggle"),
     backToTop,
   });
-  setupFloatingControls();
+  // Controls remain discoverable; the dock owns layout at every viewport.
   if (navigation) {
     const utilities = document.createElement('div'); utilities.className = 'nav-utilities';
     const savedButton = document.createElement('button'); savedButton.type = 'button'; savedButton.textContent = '收藏';
@@ -745,7 +749,7 @@
       summon.onclick = () => { closeMobileNavigation(); petals.click(); }; utilities.append(summon);
     }
     navigation.append(utilities);
-    const layout = matchMedia('(max-width:1080px)');
+    const layout = matchMedia('(max-width:900px)');
     const placeUtilities = () => {
       if (layout.matches) {
         utilities.prepend(button);

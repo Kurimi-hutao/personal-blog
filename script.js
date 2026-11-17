@@ -147,9 +147,10 @@ async function loadHomeFeed(type, id, createCard) {
   if (!container || container.dataset.refreshing) return;
   const key = "hutao-homepage-" + type + "s";
   const cache = window.ContentCache;
-  const snapshot = JSON.parse(document.getElementById("homeFeedSnapshot").textContent);
+  let snapshot = {};
+  try { snapshot = JSON.parse(document.getElementById("homeFeedSnapshot")?.textContent || "{}"); } catch {}
   const entry = [{ savedAt: snapshot.savedAt, items: snapshot[type] }, cache?.read(key), cache?.read(type + "s"), cache?.read(key, { legacy: true })]
-    .filter(Boolean).sort((a, b) => b.savedAt - a.savedAt)[0];
+    .filter(entry => Array.isArray(entry?.items)).sort((a, b) => b.savedAt - a.savedAt)[0];
   const label = type === "article" ? "文章" : "视频";
   function render(items) {
     if (!items.length) {
@@ -165,17 +166,18 @@ async function loadHomeFeed(type, id, createCard) {
   const retry = () => loadHomeFeed(type, id, createCard);
   try {
     cache?.clearNotice(container);
-    if (entry) render(entry.items);
-    else window.InkAssets?.loading(container, "正在翻阅" + label + "……", 2);
+    if (entry && !container.dataset.prerendered) render(entry.items);
+    else if (!entry && !container.dataset.prerendered) window.InkAssets?.loading(container, "正在翻阅" + label + "……", 2);
     const items = await articleService.readPublicFeed(2, { contentType: type, home: true }, 8000);
-    if (!entry || JSON.stringify(items) !== JSON.stringify(entry.items.slice(0, 2))) render(items);
+    const signature = rows => JSON.stringify(rows.map(({slug,title,excerpt,attachments,video_poster}) => ({slug,title,excerpt,attachments:attachments || [],video_poster:video_poster || null})));
+    if (!entry || signature(items) !== signature(entry.items.slice(0, 2))) render(items);
     cache?.write(key, items);
   } catch (error) {
     if (["localhost", "127.0.0.1"].includes(location.hostname)) {
       console.debug("首页读取受阻", type, error?.code || error?.name || "network");
     }
     if (entry && cache) cache.notice(container, retry, entry.savedAt);
-    else window.InkAssets?.state(container, {
+    else if (!container.dataset.prerendered) window.InkAssets?.state(container, {
       kind: 'error', title: label + "暂时未能展开", detail: "连接暂时不可用，可以重新读取。",
       action: "重新读取", onAction: retry,
     });

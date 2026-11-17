@@ -25,4 +25,7 @@ test('SSG emits crawlable titles, bodies, links and consistent metadata',async()
  assert.equal(schema.headline,rows[0].title); assert.equal(schema.url,entry.url);
  for(const f of ['index.html','articles.html']) assert((await readFile(path.join(output,f),'utf8')).includes(entry.file));
  assert((await readFile(path.join(output,'sitemap.xml'),'utf8')).includes(entry.url));
+ const home = await readFile(path.join(output,'index.html'),'utf8');
+ assert(!home.includes('文章正在路上') && !home.includes('去文章页继续阅读'), 'No template cards survive SSG');
+ assert(!home.includes('视频正在整理中'), 'Video feed is also prerendered');
 });

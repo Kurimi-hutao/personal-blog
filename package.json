@@ -5,7 +5,8 @@
     "node": ">=22"
   },
   "devDependencies": {
-    "@lhci/cli": "0.15.1"
+    "@lhci/cli": "0.15.1",
+    "parse5": "7.3.0"
   },
   "scripts": {
     "assets:styles": "node scripts/build-page-styles.cjs",

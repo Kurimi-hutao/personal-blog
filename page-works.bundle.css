@@ -5890,7 +5890,7 @@ body:has(#articleDetail) .article-body { background: var(--paper); line-height: 
   src: url('./assets/fonts/blog-mobile-serif.woff2') format('woff2');
   font-style: normal;
   font-weight: 400;
-  font-display: swap;
+  font-display: optional;
 }
 .nav-primary, .nav-secondary { display: contents; }
 .nav-utilities, .mobile-reading-bar, .mobile-scroll-top { display: none; }
@@ -7996,3 +7996,32 @@ html body.home-page .site-search-dialog .site-search-field {
   height: 18px;
   margin-inline-end: 6px;
 }
+
+
+/* quick-controls.css */
+/* One dock owns position; individual controls never overlap or slide offscreen. */
+@media (min-width:901px) {
+  html body .mobile-control-dock {
+    display:flex !important; position:fixed; inset:auto max(18px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) auto;
+    flex-direction:column; gap:12px; align-items:center; width:48px;
+    z-index:90; opacity:1; visibility:visible; transform:none; pointer-events:none;
+  }
+  html body .mobile-control-dock > :is(.theme-toggle,.wind-toggle,.back-to-top) {
+    position:relative; inset:auto; margin:0; width:48px; height:48px; min-width:48px; min-height:48px;
+    display:grid; place-items:center; padding:0; transform:none; translate:none;
+    opacity:1; visibility:visible; pointer-events:auto; background:var(--paper); color:var(--ink);
+  }
+  html body .mobile-control-dock .wind-label { display:none; }
+  html body .mobile-control-dock > .back-to-top:not(.visible) { visibility:hidden; pointer-events:none; }
+}
+@media (max-width:900px) {
+  /* Phones use the existing navigation utilities and footer return action. */
+  html body .mobile-control-dock { display:none !important; }
+  html body .nav-utilities > button { min-width:44px; min-height:44px; touch-action:manipulation; }
+  html body .mobile-scroll-top { min-height:44px; }
+}
+html:is(.search-open,.mobile-nav-open,.gallery-dialog-open) .mobile-control-dock,
+html body:has(dialog[open]) .mobile-control-dock { visibility:hidden; pointer-events:none; }
+html body:has(dialog[open]) .mobile-control-dock > button { visibility:hidden; pointer-events:none; }
+.reading-empty-note { margin:0; color:var(--ink-soft); line-height:1.8; }
+.reading-empty-link { display:inline-flex; align-items:center; min-height:44px; color:var(--cinnabar); }
