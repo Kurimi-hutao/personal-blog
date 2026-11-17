@@ -34,7 +34,11 @@ for (const provider of ['indexnow','baidu']) {
       const verification=await fetch(`${origin}/${key}.txt`,{signal:AbortSignal.timeout(15000)});
       if(!verification.ok || (await verification.text()).trim()!==key) throw new Error('IndexNow verification file unavailable');
       r=await post('https://api.indexnow.org/indexnow',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({host:'joestarzhang.cn',key,keyLocation:`${origin}/${key}.txt`,urlList:batch.map(a=>a.url)})});
-      if(r.status!==200) throw new Error(`IndexNow HTTP ${r.status}; pending verification/failed batches remain retryable`);
+      if(r.status===202) {
+        console.log('IndexNow: HTTP 202; ownership verification pending, no receipt recorded; retry on next scheduled deployment');
+        continue;
+      }
+      if(r.status!==200) throw new Error(`IndexNow HTTP ${r.status}; failed batch remains retryable`);
     } else {
       r=await post(`https://data.zz.baidu.com/urls?site=${encodeURIComponent(origin)}&token=${encodeURIComponent(key)}`,{method:'POST',headers:{'content-type':'text/plain'},body:batch.map(a=>a.url).join('\n')});
       const result=await r.json();

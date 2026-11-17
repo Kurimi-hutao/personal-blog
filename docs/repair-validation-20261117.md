@@ -13,3 +13,12 @@ IndexNow 新增独立随机所有权验证键，放在 `.github/indexnow-key.txt
 未冒充解决的项目：百度缺少 BAIDU_PUSH_TOKEN/站点认证，无法代为取得；软 404 必须由 CloudBase 域名网关正确返回状态码。SDK 5.9.0 明确禁止修改共享存储桶的静态网站配置，部署增加真实缺页状态检查与 Actions 警告，不绕过共享桶保护。上一轮 SEO 已成功发布（CloudBase #53），本次继续走同一部署流程。
 
 本地证据：outputs/repair/local-checks.json、lighthouse-mobile.json。后续线上复测结果以 live-checks.json 和 GitHub Actions 日志为准。
+
+
+## 线上验收补充
+
+2026-11-17 提交 0b56ed6 已完成 CloudBase 上传及校验，线上 deployment.json 与提交一致。生产构建为 48 个公开详情、30 节 AI 课程。1440/1024/390px 线上控件、搜索、代码块检查通过，虚假占位为 0，Frontend interaction regressions 通过。
+
+首次真实 IndexNow 请求返回 HTTP 202（所有权验证待完成），不是收录确认。后续处理保留批次待重试，不将平台正常的 202 状态误报为部署失败；只有 200 才记录接收凭据。百度依然未配置。
+
+真实缺页 HTTP 仍为 200。CloudBase DIRECT 网关没有向客户端透传 gzip Content-Encoding，因此本地压缩性能数字不可当作公网性能提升；需要在域名网关/CDN 开启响应压缩，或由平台修复透传。存储端已经压缩并正确标注元数据，但无法用静态文件强制网关响应头。以上两项仍待平台配置，不宣称已修复。
