@@ -8,8 +8,14 @@ await mkdir('.seo-submit',{recursive:true});
 async function post(url,options) {
   for (let n=0;n<3;n++) {
     let response;
-    try { response = await fetch(url,{...options,signal:AbortSignal.timeout(30000)}); }
-    catch { if(n===2) throw new Error('Search submission network failure'); }
+    try { response = await fetch(url,{...options,redirect:'error',signal:AbortSignal.timeout(30000)}); }
+    catch (error) {
+      if(n===2) {
+        const code = error.cause?.code || error.name;
+        const safeCode = /^[A-Z_a-z0-9]+$/.test(code || '') ? code : 'UNKNOWN';
+        throw new Error(`Search submission network failure (${new URL(url).hostname}: ${safeCode})`);
+      }
+    }
     if (response && response.status!==429 && response.status<500) return response;
     if(n<2) await new Promise(r=>setTimeout(r,2000*2**n));
   }
@@ -40,7 +46,9 @@ for (const provider of ['indexnow','baidu']) {
       }
       if(r.status!==200) throw new Error(`IndexNow HTTP ${r.status}; failed batch remains retryable`);
     } else {
-      r=await post(`https://data.zz.baidu.com/urls?site=${encodeURIComponent(origin)}&token=${encodeURIComponent(key)}`,{method:'POST',headers:{'content-type':'text/plain'},body:batch.map(a=>a.url).join('\n')});
+      // Baidu's documented endpoint is HTTP; HTTPS fails hostname verification.
+      // Keep the credential server-side and reject redirects in post().
+      r=await post(`http://data.zz.baidu.com/urls?site=${encodeURIComponent(origin)}&token=${encodeURIComponent(key)}`,{method:'POST',headers:{'content-type':'text/plain'},body:batch.map(a=>a.url).join('\n')});
       const result=await r.json();
       if(!r.ok || result.error || result.success!==batch.length) throw new Error('Baidu batch incomplete; inspect platform quota and retry');
     }
