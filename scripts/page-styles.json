@@ -85,6 +85,9 @@
     },
     {
       "file": "quick-controls.css"
+    },
+    {
+      "file": "ink-typography.css"
     }
   ],
   "articles.html": [
@@ -173,6 +176,9 @@
     },
     {
       "file": "quick-controls.css"
+    },
+    {
+      "file": "ink-typography.css"
     }
   ],
   "article.html": [
@@ -264,6 +270,9 @@
     },
     {
       "file": "quick-controls.css"
+    },
+    {
+      "file": "ink-typography.css"
     }
   ],
   "videos.html": [
@@ -337,6 +346,9 @@
     },
     {
       "file": "quick-controls.css"
+    },
+    {
+      "file": "ink-typography.css"
     }
   ],
   "works.html": [
@@ -419,6 +431,9 @@
     },
     {
       "file": "quick-controls.css"
+    },
+    {
+      "file": "ink-typography.css"
     }
   ]
 }

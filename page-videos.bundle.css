@@ -9665,3 +9665,74 @@ html body:has(dialog[open]) .mobile-control-dock { visibility:hidden; pointer-ev
 html body:has(dialog[open]) .mobile-control-dock > button { visibility:hidden; pointer-events:none; }
 .reading-empty-note { margin:0; color:var(--ink-soft); line-height:1.8; }
 .reading-empty-link { display:inline-flex; align-items:center; min-height:44px; color:var(--cinnabar); }
+
+
+/* ink-typography.css */
+/* Short inscriptions use brush lettering; long titles and prose use Song type. */
+@font-face {
+  font-family: "Ink Song";
+  src: local("Songti SC"), local("Noto Serif CJK SC"), local("Source Han Serif SC"),
+       local("SimSun"), url("./assets/fonts/blog-mobile-serif.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --ink-reading: "Ink Song", "Songti SC", "Noto Serif CJK SC", SimSun, serif;
+  --ink-inscription: "Blog Brush", "Kaiti SC", KaiTi, var(--ink-reading);
+  --ink-title-tracking: .065em;
+}
+
+.site-header .brand-name,
+body .hero-copy h1,
+body .hero-copy h1 > span,
+body[data-page] .scene-banner h1,
+body .kurumi-page-hero-copy h1 > span,
+body .section-heading h2 {
+  font-family: var(--ink-inscription);
+  font-weight: 400;
+  letter-spacing: var(--ink-title-tracking);
+}
+
+body .hero-copy .hero-verse {
+  font-family: var(--ink-reading);
+  font-size: clamp(1rem, 1.4vw, 1.25rem);
+  line-height: 1.85;
+  letter-spacing: .055em;
+}
+
+body .site-header .site-nav a[data-nav-page] {
+  font-family: var(--ink-reading) !important;
+}
+
+body :is(.card-content, .article-list-copy, .video-card-copy, .work-copy, .home-video-card) :is(h2, h3),
+body .article-detail-header h1,
+#articleDetail .article-body :is(h1, h2, h3) {
+  font-family: var(--ink-reading);
+  letter-spacing: .025em;
+  line-height: 1.48;
+  text-wrap: pretty;
+}
+
+body :is(.card-content, .article-list-copy, .video-card-copy, .work-copy, .home-video-card, .scene-banner) > p:not(.eyebrow),
+body .article-detail-header .article-detail-excerpt,
+#articleDetail .article-body {
+  font-family: var(--ink-reading);
+}
+
+#articleDetail .article-body {
+  font-size: calc(1.125rem * var(--article-font-scale, 1));
+  line-height: 1.95;
+}
+
+#articleDetail .article-body :is(p, li) { line-height: inherit; }
+
+@media (max-width: 700px) {
+  :root { --ink-title-tracking: .035em; }
+  body .hero-copy .hero-verse { letter-spacing: .025em; }
+  #articleDetail .article-body {
+    font-size: calc(1.0625rem * var(--article-font-scale, 1));
+    line-height: 1.88;
+  }
+}
