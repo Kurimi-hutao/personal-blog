@@ -48,7 +48,8 @@ for (const provider of ['indexnow','baidu']) {
     } else {
       // Baidu's documented endpoint is HTTP; HTTPS fails hostname verification.
       // Keep the credential server-side and reject redirects in post().
-      r=await post(`http://data.zz.baidu.com/urls?site=${encodeURIComponent(origin)}&token=${encodeURIComponent(key)}`,{method:'POST',headers:{'content-type':'text/plain'},body:batch.map(a=>a.url).join('\n')});
+      // Baidu expects the literal scheme and slashes of the fixed site origin.
+      r=await post(`http://data.zz.baidu.com/urls?site=${origin}&token=${encodeURIComponent(key)}`,{method:'POST',headers:{'content-type':'text/plain'},body:batch.map(a=>a.url).join('\n')});
       const result=await r.json();
       const message = typeof result.message === 'string'
         ? result.message.replaceAll(key, '[REDACTED]').replace(/token=[^&\s"'<>]+/gi, 'token=[REDACTED]').slice(0, 200) : undefined;
