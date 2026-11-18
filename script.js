@@ -25,7 +25,6 @@ const manualPetals = new Set();
 let petalNoticeTimer;
 let lastCursorTrailAt = 0;
 let lastTrailPoint = null;
-let cursorIdleTimer = 0;
 
 const random = (min, max) => Math.random() * (max - min) + min;
 if (hasGsap && !reducedMotion) document.documentElement.classList.add("motion-ready");
@@ -711,53 +710,42 @@ function setupLinksToggle() {
   document.querySelector("#linksCollapseBottom")?.addEventListener("click", () => setExpanded(false, true));
 }
 
-if (hasGsap) {
-  if (finePointer && !lowPowerDevice) {
+if (hasGsap && finePointer && !lowPowerDevice && cursor) {
+  const cursorX = gsap.quickSetter(cursor, "x", "px");
+  const cursorY = gsap.quickSetter(cursor, "y", "px");
+  const resetCursor = () => {
+    document.documentElement.classList.remove("cursor-ready");
+    lastTrailPoint = null;
+  };
+
+  window.addEventListener("pointermove", (event) => {
+    if (reducedMotion || document.hidden || event.pointerType !== "mouse") return;
+    cursorX(event.clientX);
+    cursorY(event.clientY);
     document.documentElement.classList.add("cursor-ready");
-    const cursorX = gsap.quickTo(cursor, "x", { duration: 0.12, ease: "power3.out" });
-    const cursorY = gsap.quickTo(cursor, "y", { duration: 0.12, ease: "power3.out" });
+    createCursorTrail(event.clientX, event.clientY);
+  }, { passive: true });
 
-    window.addEventListener("pointermove", (event) => {
-      if (reducedMotion) return;
-      cursorX(event.clientX);
-      cursorY(event.clientY);
-      createCursorTrail(event.clientX, event.clientY);
-      cursor.classList.remove("is-idle");
-      gsap.to(cursor, { autoAlpha: 1, duration: 0.15, overwrite: "auto" });
-      window.clearTimeout(cursorIdleTimer);
-      cursorIdleTimer = window.setTimeout(() => {
-        if (event.target.closest?.("a, button, input, textarea, select, summary, [role=button], [role=option]")) return;
-        cursor.classList.add("is-idle");
-        gsap.to(cursor, { autoAlpha: 0, duration: 0.45, overwrite: "auto" });
-      }, 1200);
+  document.addEventListener("pointerover", (event) => {
+    if (reducedMotion || event.pointerType !== "mouse") return;
+    const interactive = event.target.closest("a, button, input, textarea, .falling-piece");
+    gsap.to(cursorRing, {
+      scale: interactive ? 1.55 : 1,
+      rotation: interactive ? 18 : 0,
+      borderColor: interactive ? "var(--cinnabar)" : "var(--ink)",
+      duration: 0.25,
+      overwrite: "auto",
     });
-
-    document.addEventListener("pointerover", (event) => {
-      if (reducedMotion) return;
-      const interactive = event.target.closest("a, button, input, textarea, .falling-piece");
-      gsap.to(cursorRing, {
-        scale: interactive ? 1.55 : 1,
-        rotation: interactive ? 18 : 0,
-        borderColor: interactive ? "var(--cinnabar)" : "var(--ink)",
-        duration: 0.25,
-        overwrite: "auto",
-      });
-      gsap.to(cursorDot, {
-        scale: interactive ? 0.72 : 1,
-        backgroundColor: interactive ? "var(--cinnabar)" : "var(--ink)",
-        duration: 0.2,
-        overwrite: "auto",
-      });
+    gsap.to(cursorDot, {
+      scale: interactive ? 0.72 : 1,
+      backgroundColor: interactive ? "var(--cinnabar)" : "var(--ink)",
+      duration: 0.2,
+      overwrite: "auto",
     });
+  });
 
-    document.documentElement.addEventListener("mouseleave", () => {
-      if (reducedMotion) return;
-      lastTrailPoint = null;
-      gsap.to(cursor, { autoAlpha: 0, duration: 0.2 });
-    });
-  }
-
-
+  document.documentElement.addEventListener("mouseleave", resetCursor);
+  window.addEventListener("blur", resetCursor);
 }
 
 function runWhenIdle(task, timeout = 1600) {
@@ -841,8 +829,8 @@ setupLinksToggle();
 
 function applyHomeMotionPreference() {
   reducedMotion = homeMotionQuery.matches;
-  document.documentElement.classList.toggle("cursor-ready", hasGsap && !reducedMotion && finePointer && !lowPowerDevice);
   if (reducedMotion || document.hidden) {
+    document.documentElement.classList.remove("cursor-ready");
     manualPetals.forEach(node => { node.getAnimations().forEach(animation => animation.cancel()); node.remove(); });
     manualPetals.clear();
   }
@@ -851,9 +839,7 @@ function applyHomeMotionPreference() {
     gsap.killTweensOf(trail);
     trail.remove();
   });
-  window.clearTimeout(cursorIdleTimer);
-  gsap.killTweensOf([cursor, cursorRing, cursorDot, ".wind-icon"]);
-  gsap.set(cursor, { autoAlpha: 0 });
+  gsap.killTweensOf([cursorRing, cursorDot, ".wind-icon"]);
   lastTrailPoint = null;
 }
 homeMotionQuery.addEventListener("change", applyHomeMotionPreference);

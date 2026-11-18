@@ -536,9 +536,7 @@
   let reducedMotion = reducedMotionQuery.matches;
   reducedMotionQuery.addEventListener("change", (event) => {
     reducedMotion = event.matches;
-    if (!document.body.classList.contains("home-page")) {
-      document.documentElement.classList.toggle("cursor-ready", finePointer && !reducedMotion);
-    }
+    if (reducedMotion) document.documentElement.classList.remove("cursor-ready");
     document.querySelectorAll(".ink-cursor-trail").forEach((trail) => {
       trail.getAnimations().forEach((animation) => animation.cancel());
       trail.remove();
@@ -792,14 +790,13 @@
     cursor.setAttribute("aria-hidden", "true");
     cursor.innerHTML = '<span class="ink-cursor-ring"></span><span class="ink-cursor-dot"></span>';
     document.body.appendChild(cursor);
-    document.documentElement.classList.toggle("cursor-ready", !reducedMotion);
-
+    const resetCursor = () => document.documentElement.classList.remove("cursor-ready");
     let trailAt = 0;
 
     window.addEventListener("pointermove", (event) => {
-      if (reducedMotion) return;
+      if (reducedMotion || document.hidden || event.pointerType !== "mouse") return;
       cursor.style.transform = `translate3d(${event.clientX}px, ${event.clientY}px, 0)`;
-      cursor.style.opacity = "1";
+      document.documentElement.classList.add("cursor-ready");
 
       const now = performance.now();
       if (now - trailAt < 42 || window.innerWidth <= 840) return;
@@ -819,22 +816,21 @@
         ],
         { duration: 580, easing: "ease-out" },
       ).onfinish = () => trail.remove();
-    });
+    }, { passive: true });
 
     document.addEventListener("pointerover", (event) => {
+      if (event.pointerType !== "mouse") return;
       cursor.classList.toggle(
         "is-interactive",
         Boolean(event.target.closest("a, button, input, textarea, select")),
       );
     });
 
-    document.documentElement.addEventListener("mouseleave", () => {
-      cursor.style.opacity = "0";
+    document.documentElement.addEventListener("mouseleave", resetCursor);
+    window.addEventListener("blur", resetCursor);
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) resetCursor();
     });
-    document.documentElement.addEventListener("mouseenter", () => {
-      cursor.style.opacity = "1";
-    });
-
   }
 
   if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {

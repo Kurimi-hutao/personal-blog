@@ -65,7 +65,7 @@ test('ink loading appears once per tab, and never animates for reduced motion', 
 test('station rapid toggling settles correctly and footer collapse restores focus', async () => {
   const source = read('script.js');
   const begin = source.indexOf('function setupLinksToggle() {');
-  const end = source.indexOf('\nif (hasGsap) {', begin);
+  const end = source.indexOf('\nif (hasGsap && finePointer', begin);
   assert(begin >= 0 && end > begin);
   const handlers = {};
   const attributes = {};

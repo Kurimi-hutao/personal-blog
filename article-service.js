@@ -43,6 +43,24 @@
   }
 
   const coverBase = new URL('.', document.currentScript.src);
+  const videoCoverStorage = 'https://uhcmzlhzrgyjnvqnnpss.supabase.co/storage/v1/object/public/article-attachments/';
+  // Use a site-hosted copy only while the published poster still matches its original.
+  const videoCoverCopies = {
+    'isaac-newton-bilibili-video': 'bilibili-covers/BV1V2J16ME7Z.jpg',
+    'icecube-bilibili-video': 'bilibili-covers/BV1Urp26gEky-canonical-20261019.jpg',
+    wave: '35bd70b7-54c4-4238-b583-e4fbcd2fea52/fc59c410-2224-4f5c-8051-616e30a765f5-cover.jpg',
+    multipleintegrals: '35bd70b7-54c4-4238-b583-e4fbcd2fea52/94a2ff90-f8d7-43c9-8796-e6b04019a3f6-cover.jpg',
+    shuangqu: '35bd70b7-54c4-4238-b583-e4fbcd2fea52/45ba16b7-df10-41d4-b040-b4a2cb38217b-cover.jpg',
+    trianglefunction: '35bd70b7-54c4-4238-b583-e4fbcd2fea52/d939cfc4-8f71-42c8-bd85-64019c3d11fa-cover.jpg',
+    einsteintheoryintro: '35bd70b7-54c4-4238-b583-e4fbcd2fea52/e42e6687-4f8b-4e3a-b91b-524347ac0952-cover.jpg',
+  };
+
+  function videoCoverCopy(video) {
+    if (!Object.hasOwn(videoCoverCopies, video.slug)) return null;
+    if (video.video_poster !== videoCoverStorage + videoCoverCopies[video.slug]) return null;
+    return new URL('assets/video-covers/' + video.slug + '.webp', coverBase).href;
+  }
+
   const defaultCovers = [
     'assets/article-covers/mist-river.webp',
     'assets/article-covers/bamboo-bridge.webp',
@@ -671,6 +689,7 @@
     isOwner,
     firstImage,
     articleCover,
+    videoCoverCopy,
     lessonNumber,
     fallbackCover,
     getVisitorToken,

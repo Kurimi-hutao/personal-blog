@@ -124,7 +124,8 @@ function renderArticle(article) {
       player.preload = "metadata";
       player.playsInline = true;
       player.src = article.video_url;
-      if (article.video_poster) player.poster = article.video_poster;
+      const poster = articleService.videoCoverCopy?.(article) || article.video_poster;
+      if (poster) player.poster = poster;
       player.setAttribute("aria-label", article.title);
       body.appendChild(player);
       setupVideoExperience(player, article);

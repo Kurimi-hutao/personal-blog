@@ -29,3 +29,32 @@ test('SSG emits crawlable titles, bodies, links and consistent metadata',async()
  assert(!home.includes('文章正在路上') && !home.includes('去文章页继续阅读'), 'No template cards survive SSG');
  assert(!home.includes('视频正在整理中'), 'Video feed is also prerendered');
 });
+
+test('prerendered video cards and metadata use the matching site-hosted cover', async () => {
+  const root = process.cwd();
+  const output = await mkdtemp(path.join(root, 'outputs/seo-test-'));
+  for (const file of ['index.html', 'articles.html', 'videos.html', 'article-service.js']) {
+    await copyFile(path.join(root, file), path.join(output, file));
+  }
+  const row = {
+    id: 'newton', slug: 'isaac-newton-bilibili-video', title: 'Isaac Newton',
+    content_type: 'video', published: true, published_at: '2026-10-19T09:00:00Z',
+    video_url: 'https://www.bilibili.com/video/BV1V2J16ME7Z/',
+    video_poster: 'https://uhcmzlhzrgyjnvqnnpss.supabase.co/storage/v1/object/public/article-attachments/bilibili-covers/BV1V2J16ME7Z.jpg',
+  };
+  const image = source => 'src="' + source + '"';
+  const local = 'https://joestarzhang.cn/assets/video-covers/isaac-newton-bilibili-video.webp';
+  const [entry] = await buildSEO({ root, output, rows: [row] });
+  for (const file of ['index.html', 'videos.html']) {
+    assert((await readFile(path.join(output, file), 'utf8')).includes(image(local)));
+  }
+  const detail = await readFile(path.join(output, entry.file), 'utf8');
+  assert(detail.includes('property="og:image" content="' + local + '"'));
+  const alternate = 'https://cdn.example.org/replacement.jpg';
+  await buildSEO({ root, output, rows: [{ ...row, video_poster: alternate }] });
+  for (const file of ['index.html', 'videos.html']) {
+    const html = await readFile(path.join(output, file), 'utf8');
+    assert(html.includes(image(alternate)));
+    assert(!html.includes(image(local)));
+  }
+});

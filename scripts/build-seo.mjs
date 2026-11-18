@@ -54,10 +54,11 @@ export async function buildSEO({root,output,rows,previous=[]}) {
   for (const a of rows) {
     const url = `${origin}/${filename(a.slug)}`;
     const description = (a.excerpt || `${a.title}：${a.content || ''}`).replace(/\s+/g,' ').slice(0,160);
-    const image = (a.attachments || []).find(f=>f.role==='cover' && /^https:\/\//.test(f.url))?.url || a.video_poster || `${origin}/assets/ink-hero.webp`;
+    const localPoster = a.content_type==='video' ? ctx.window.articleService.videoCoverCopy(a) : null;
+    const image = localPoster || (a.attachments || []).find(f=>f.role==='cover' && /^https:\/\//.test(f.url))?.url || a.video_poster || `${origin}/assets/ink-hero.webp`;
     const related = rows.filter(b=>b.slug!==a.slug && (a.slug.startsWith('ai-from-zero-lesson-') ? b.slug.startsWith('ai-from-zero-lesson-') : b.category===a.category)).sort((a,b)=>a.slug.localeCompare(b.slug));
     const safeFiles = (a.attachments || []).filter(f => /^https?:\/\//.test(f.url));
-    const attachments = safeFiles.map(f => f.type?.startsWith('image/') ? `<figure><img src="${escape(f.url)}" alt="${escape(f.name)}" loading="lazy" style="max-width:100%;height:auto"></figure>` : `<p><a href="${escape(f.url)}">${escape(f.name || '附件')}</a></p>`).join('');
+    const attachments = safeFiles.map(f => f.type?.startsWith('image/') ? `<figure><img src="${escape(f.url===a.video_poster && localPoster ? localPoster : f.url)}" alt="${escape(f.name)}" loading="lazy" style="max-width:100%;height:auto"></figure>` : `<p><a href="${escape(f.url)}">${escape(f.name || '附件')}</a></p>`).join('');
     const video = a.content_type==='video' && /^https?:\/\//.test(a.video_url || '') ? `<p><a href="${escape(a.video_url)}">观看：${escape(a.title)}</a></p>` : '';
     const body = `<header class="article-detail-header"><p class="eyebrow">${escape(a.category)}</p><h1>${escape(a.title)}</h1><time datetime="${escape(a.published_at)}">${escape(a.published_at?.slice(0,10))}</time><p class="article-detail-excerpt">${escape(a.excerpt)}</p></header><div class="article-body">${video}${ctx.window.blogMarkdown.renderArticle(a.content || a.excerpt,a.title)}${attachments}</div>`;
     const schema = {'@context':'https://schema.org','@type':'Article',headline:a.title,description,url,mainEntityOfPage:url,author:{'@type':'Person',name:'虎桃不会振刀',url:origin+'/'},datePublished:a.published_at,dateModified:a.updated_at || a.published_at,image};
@@ -71,7 +72,8 @@ export async function buildSEO({root,output,rows,previous=[]}) {
     let html = await readFile(path.join(output,file),'utf8');
     const cards = items.map(a=> {
       const cover = ctx.window.articleService.articleCover(a).url;
-      const img = `<img src="${escape(a.content_type==='video' ? a.video_poster || cover : cover)}" alt="" loading="lazy" decoding="async" width="640" height="360">`;
+      const poster = a.content_type==='video' ? ctx.window.articleService.videoCoverCopy(a) || a.video_poster : null;
+      const img = `<img src="${escape(poster || cover)}" alt="" loading="lazy" decoding="async" width="640" height="360">`;
       if (id==='latestArticles') return `<article class="article-card"><div class="card-visual">${img}</div><div class="card-content"><div class="article-meta"><span>${escape(a.category)}</span><time>${escape(a.published_at?.slice(0,10))}</time></div><h3>${escape(a.title)}</h3><p>${escape(a.excerpt)}</p><a href="${escape(routes[a.slug])}">展开此卷 <span>→</span></a></div></article>`;
       if (id==='latestVideos') return `<a class="home-video-card" href="${escape(routes[a.slug])}"><div class="home-video-visual">${img}</div><div><small>${escape(a.category)}</small><h3>${escape(a.title)}</h3><p>${escape(a.excerpt)}</p></div></a>`;
       return `<a class="article-list-card" href="${escape(routes[a.slug])}"><div class="article-list-cover">${img}</div><div class="article-list-copy"><h2>${escape(a.title)}</h2><p>${escape(a.excerpt)}</p></div></a>`;

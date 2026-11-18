@@ -60,7 +60,13 @@
     card.setAttribute('aria-hidden', 'true');
     card.textContent = video.title || '影像手记';
     visual.append(card);
-    const urls = [...new Set([video.video_poster, window.articleService.firstImage(video)?.url].filter(Boolean))];
+    const service = window.articleService;
+    const urls = [...new Set([
+      service.videoCoverCopy?.(video),
+      video.video_poster,
+      (video.attachments || []).find(file => file.role === 'cover' && file.type?.startsWith('image/'))?.url,
+      service.firstImage(video)?.url,
+    ].filter(Boolean))];
     if (!urls.length) return;
     const image = document.createElement('img');
     image.alt = '';
