@@ -25,8 +25,9 @@ for (const provider of ['indexnow','baidu']) {
   const key = process.env[provider==='indexnow'?'INDEXNOW_KEY':'BAIDU_PUSH_TOKEN'] || (provider==='indexnow' ? (await readFile('.github/indexnow-key.txt','utf8').catch(() => '')).trim() : '');
   if (!key) { console.log(`${provider}: not configured; skipped`); continue; }
   const changed = manifest.filter(a=>state[provider]?.[a.url]!==a.hash);
-  for (let i=0;i<changed.length;i+=100) {
-    const batch=changed.slice(i,i+100);
+  let limit = provider === 'baidu' ? 1 : 100;
+  for (let i=0;i<changed.length;) {
+    const batch=changed.slice(i,i+limit);
     for (const a of batch) {
       if(new URL(a.url).origin!==origin || !/^article--[a-zA-Z0-9_-]+\.html$/.test(a.file)) throw new Error('Invalid submission URL');
       const r=await fetch(a.url,{redirect:'manual',signal:AbortSignal.timeout(20000),headers:{'cache-control':'no-cache'}});
@@ -42,6 +43,7 @@ for (const provider of ['indexnow','baidu']) {
       r=await post('https://api.indexnow.org/indexnow',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({host:'joestarzhang.cn',key,keyLocation:`${origin}/${key}.txt`,urlList:batch.map(a=>a.url)})});
       if(r.status===202) {
         console.log('IndexNow: HTTP 202; ownership verification pending, no receipt recorded; retry on next scheduled deployment');
+        i += batch.length;
         continue;
       }
       if(r.status!==200) throw new Error(`IndexNow HTTP ${r.status}; failed batch remains retryable`);
@@ -58,10 +60,21 @@ for (const provider of ['indexnow','baidu']) {
         not_same_site: Array.isArray(result.not_same_site) ? result.not_same_site.length : 0,
         not_valid: Array.isArray(result.not_valid) ? result.not_valid.length : 0 };
       console.log(`baidu: response ${JSON.stringify(feedback)}`);
+      if (r.status === 400 && result.message === 'over quota' && !result.success) {
+        if (batch.length > 1) { limit = 1; continue; }
+        console.log(`::warning::Baidu quota exhausted; ${changed.length-i} URLs remain pending`);
+        break;
+      }
       if(!r.ok || result.error || result.success!==batch.length) throw new Error('Baidu batch incomplete; see sanitized response above; no receipt recorded');
+      limit = Number.isInteger(result.remain) && result.remain >= 0 ? Math.min(100, result.remain) : 1;
     }
     state[provider] ||= {}; for(const a of batch) state[provider][a.url]=a.hash;
     await writeFile(statePath,JSON.stringify(state));
     console.log(`${provider}: received ${batch.length} URLs (not proof of indexing)`);
+    i += batch.length;
+    if (limit === 0 && i < changed.length) {
+      console.log(`::warning::Baidu quota exhausted; ${changed.length-i} URLs remain pending`);
+      break;
+    }
   }
 }
