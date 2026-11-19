@@ -162,7 +162,7 @@ function renderArticle(article) {
     files.forEach((file) => box.appendChild(createAttachmentLink(file)));
     body.appendChild(box);
   }
-  const explicitCover = article.content_type !== 'video' && attachments.find(file => file.role === 'cover' && file.type?.startsWith('image/'));
+  const explicitCover = article.content_type !== 'video' && articleService.designatedCover(article);
   root.append(header);
   if (explicitCover) {
     const figure = document.createElement('figure'); figure.className = 'article-lead-cover';

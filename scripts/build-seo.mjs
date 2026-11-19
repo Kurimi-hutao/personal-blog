@@ -55,12 +55,16 @@ export async function buildSEO({root,output,rows,previous=[]}) {
     const url = `${origin}/${filename(a.slug)}`;
     const description = (a.excerpt || `${a.title}：${a.content || ''}`).replace(/\s+/g,' ').slice(0,160);
     const localPoster = a.content_type==='video' ? ctx.window.articleService.videoCoverCopy(a) : null;
-    const image = localPoster || (a.attachments || []).find(f=>f.role==='cover' && /^https:\/\//.test(f.url))?.url || a.video_poster || `${origin}/assets/ink-hero.webp`;
+    const cover = ctx.window.articleService.designatedCover(a);
+    const image = localPoster || cover?.url || a.video_poster || `${origin}/assets/ink-hero.webp`;
+    const lead = a.content_type !== 'video' && cover && !(a.attachments || []).some(file => file.url === cover.url)
+      ? `<figure class="article-lead-cover"><img src="${escape(cover.url)}" alt="" width="1600" height="900" decoding="async"></figure>`
+      : '';
     const related = rows.filter(b=>b.slug!==a.slug && (a.slug.startsWith('ai-from-zero-lesson-') ? b.slug.startsWith('ai-from-zero-lesson-') : b.category===a.category)).sort((a,b)=>a.slug.localeCompare(b.slug));
     const safeFiles = (a.attachments || []).filter(f => /^https?:\/\//.test(f.url));
     const attachments = safeFiles.map(f => f.type?.startsWith('image/') ? `<figure><img src="${escape(f.url===a.video_poster && localPoster ? localPoster : f.url)}" alt="${escape(f.name)}" loading="lazy" style="max-width:100%;height:auto"></figure>` : `<p><a href="${escape(f.url)}">${escape(f.name || '附件')}</a></p>`).join('');
     const video = a.content_type==='video' && /^https?:\/\//.test(a.video_url || '') ? `<p><a href="${escape(a.video_url)}">观看：${escape(a.title)}</a></p>` : '';
-    const body = `<header class="article-detail-header"><p class="eyebrow">${escape(a.category)}</p><h1>${escape(a.title)}</h1><time datetime="${escape(a.published_at)}">${escape(a.published_at?.slice(0,10))}</time><p class="article-detail-excerpt">${escape(a.excerpt)}</p></header><div class="article-body">${video}${ctx.window.blogMarkdown.renderArticle(a.content || a.excerpt,a.title)}${attachments}</div>`;
+    const body = `<header class="article-detail-header"><p class="eyebrow">${escape(a.category)}</p><h1>${escape(a.title)}</h1><time datetime="${escape(a.published_at)}">${escape(a.published_at?.slice(0,10))}</time><p class="article-detail-excerpt">${escape(a.excerpt)}</p></header>${lead}<div class="article-body">${video}${ctx.window.blogMarkdown.renderArticle(a.content || a.excerpt,a.title)}${attachments}</div>`;
     const schema = {'@context':'https://schema.org','@type':'Article',headline:a.title,description,url,mainEntityOfPage:url,author:{'@type':'Person',name:'虎桃不会振刀',url:origin+'/'},datePublished:a.published_at,dateModified:a.updated_at || a.published_at,image};
     let html = template.replace(/<noscript>[\s\S]*?<\/noscript>/g,'').replace(/<meta property="og:type"[^>]*>/g,'').replace(/<script src=/g,'<script defer src=').replace(/<title>[\s\S]*?<\/title>/,`<title>${escape(a.title)} | 虎桃不会振刀</title>`).replace(/<meta name="description"[^>]*>/,`<meta name="description" content="${escape(description)}">`);
     html = html.replace('</head>',`<link rel="canonical" href="${url}"><meta property="og:type" content="article"><meta property="og:title" content="${escape(a.title)}"><meta property="og:description" content="${escape(description)}"><meta property="og:url" content="${url}"><meta property="og:image" content="${escape(image)}"><script type="application/ld+json">${json(schema)}</script></head>`);

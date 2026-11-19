@@ -19,7 +19,8 @@ body .hero-copy h1,
 body .hero-copy h1 > span,
 body[data-page] .scene-banner h1,
 body .kurumi-page-hero-copy h1 > span,
-body .section-heading h2 {
+body .section-heading h2,
+.home-page #articles .section-heading h2 {
   font-family: var(--ink-inscription);
   font-weight: 400;
   letter-spacing: var(--ink-title-tracking);

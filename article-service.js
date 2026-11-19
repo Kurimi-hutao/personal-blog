@@ -89,8 +89,17 @@
     for (const char of key) hash = Math.imul(hash ^ char.codePointAt(0), 16777619) >>> 0;
     return { url: new URL(defaultCovers[hash % defaultCovers.length], coverBase).href, type: 'image/webp' };
   }
+  function designatedCover(article) {
+    const uploaded = (article.attachments || []).find(file => file.role === 'cover' && file.type?.startsWith('image/'));
+    if (uploaded) return uploaded;
+    if (article.slug === 'quantum-mechanics-lesson-007') {
+      return { url: new URL('assets/article-covers/stationary-waves.webp', coverBase).href, type: 'image/webp' };
+    }
+    return null;
+  }
+
   function articleCover(article) {
-    return (article.attachments || []).find(file => file.role === 'cover' && file.type?.startsWith('image/')) || firstImage(article) || fallbackCover(article);
+    return designatedCover(article) || firstImage(article) || fallbackCover(article);
   }
 
   function isSchemaMismatch(error) {
@@ -689,6 +698,7 @@
     isOwner,
     firstImage,
     articleCover,
+    designatedCover,
     videoCoverCopy,
     lessonNumber,
     fallbackCover,

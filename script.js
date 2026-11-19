@@ -38,7 +38,7 @@ function revealInsertedCards(container) {
 function createHomepageArticleCard(article, index) {
   const card = document.createElement("article");
   const cover = articleService.articleCover(article);
-  card.className = `article-card ${index === 0 ? "featured" : ""} reveal`;
+  card.className = "article-card reveal";
 
   const visual = document.createElement("div");
   visual.className = `card-visual ${cover ? "article-cover" : index === 0 ? "peach-mountain" : "moon-lake"}`;

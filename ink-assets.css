@@ -40,7 +40,7 @@ html[data-theme="dark"] [data-page="videos"] .scene-banner { --scene-art: url('.
 html[data-theme="dark"] .works-page .scene-banner { --scene-art: url('./assets/visual-refresh/works-maker-study-night.webp'); --scene-mobile: url('./assets/visual-refresh/works-maker-study-night-mobile.webp'); }
 html[data-theme="dark"] :is([data-page="articles"], [data-page="videos"], .works-page) .scene-banner {
   color: #eee7dc;
-  background: #202e37;
+  background: transparent;
   overflow: hidden;
   border-radius: 3px;
 }
@@ -49,7 +49,9 @@ html[data-theme="dark"] :is([data-page="articles"], [data-page="videos"], .works
   background-image: linear-gradient(90deg, rgba(15,26,33,.2), transparent 65%), var(--scene-art);
   background-size: cover;
   background-position: center top;
-  mask-image: none;
+  mask-image: linear-gradient(to right, transparent, #000 9%, #000 91%, transparent),
+              linear-gradient(to bottom, transparent, #000 14%, #000 80%, transparent);
+  mask-composite: intersect;
 }
 html[data-theme="dark"] :is([data-page="articles"], [data-page="videos"], .works-page) .scene-banner :is(h1,p) { color: #eee7dc; }
 html[data-theme="dark"] :is([data-page="articles"], [data-page="videos"], .works-page) .scene-banner p { opacity: .85; }
@@ -63,7 +65,7 @@ html[data-theme="dark"] :is([data-page="articles"], [data-page="videos"], .works
     background-image: var(--scene-mobile);
     background-size: cover;
     background-position: center bottom;
-    mask-image: none;
+    mask-image: linear-gradient(to bottom, transparent, #000 18%, #000 74%, transparent);
   }
   .ink-loading__cards { grid-template-columns: 1fr; }
   .ink-loading__card:not(:first-child) { display: none; }
