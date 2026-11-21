@@ -1,0 +1,130 @@
+/* UI redesign pass, 2026-11-21.
+   Additive overrides, loaded after every other stylesheet. No markup or script changes.
+
+   1. Pet room: the three setting chips share one frame. State is shown by a dot,
+      so an "off" chip no longer loses its frame and reads as loose text.
+   2. Desktop dock: the petal button shows a flower (the glyph the phone menu already
+      uses for the same action) instead of a wavy dash.
+   3. Article list on phones: the topic chip row fades out at its edges instead of
+      being cut through the middle of a character.
+   4. Article tags on phones: an invisible hit area brings the target to 44px
+      without moving anything.
+   5. Reward panel: one continuous underline; the arrow no longer carries a
+      detached underline of its own.
+   6. Return-to-top on phones: the progress ring is the single icon.
+*/
+
+/* ---------- 1. Pet room setting chips ---------- */
+html body.pet-page .switch-row .mini-toggle {
+  position: relative;
+  border: 1px solid var(--hud-line, var(--control-line, currentColor));
+  border-radius: 6px;
+  background: transparent;
+  text-decoration: none;
+}
+html body.pet-page .switch-row .mini-toggle:is(.is-on, [aria-pressed="true"]) {
+  border-color: color-mix(in srgb, var(--hud-red, var(--control-seal, currentColor)) 45%, transparent);
+  background: color-mix(in srgb, var(--hud-red, var(--control-seal, currentColor)) 7%, transparent);
+}
+/* Status dot: hollow when off, filled when on. */
+html body.pet-page .switch-row .mini-toggle::after {
+  content: "";
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 6px;
+  height: 6px;
+  box-sizing: border-box;
+  border: 1px solid color-mix(in srgb, currentColor 55%, transparent);
+  border-radius: 50%;
+  pointer-events: none;
+}
+html body.pet-page .switch-row .mini-toggle:is(.is-on, [aria-pressed="true"])::after {
+  border-color: transparent;
+  background: var(--hud-red, var(--control-seal, currentColor));
+}
+/* The scene chip cycles through scenes rather than switching on or off: a chevron, not a dot. */
+html body.pet-page .switch-row #sceneToggle::after {
+  top: 50%;
+  right: 8px;
+  width: auto;
+  height: auto;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  content: "\203A";
+  font-size: 16px;
+  line-height: 1;
+  opacity: .7;
+  transform: translateY(-54%);
+}
+
+/* ---------- 2. Desktop dock: petal button ---------- */
+@media (min-width: 901px) {
+  html body .mobile-control-dock > .wind-toggle .wind-icon {
+    display: block;
+    width: 22px;
+    height: 22px;
+    font-size: 0;
+    color: transparent;
+    background: var(--cinnabar, currentColor);
+    -webkit-mask: url("./assets/mobile-ui/flower.svg") center / contain no-repeat;
+    mask: url("./assets/mobile-ui/flower.svg") center / contain no-repeat;
+  }
+}
+
+/* ---------- 3. Phones: topic chip row fades instead of clipping ---------- */
+@property --chip-fade-start {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+@keyframes chip-fade-start {
+  to { --chip-fade-start: 28px; }
+}
+@media (max-width: 900px) {
+  html body .tag-filter-list.topic-filter-list {
+    padding-inline-end: 32px;
+    scroll-padding-inline: 36px;
+    scrollbar-width: none;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 var(--chip-fade-start), #000 calc(100% - 32px), transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0, #000 var(--chip-fade-start), #000 calc(100% - 32px), transparent 100%);
+  }
+  html body .tag-filter-list.topic-filter-list::-webkit-scrollbar { display: none; }
+}
+/* Where scroll-driven animation exists, the leading edge only fades in once the row has been scrolled. */
+@supports (animation-timeline: scroll()) {
+  @media (max-width: 900px) {
+    html body .tag-filter-list.topic-filter-list {
+      animation: chip-fade-start linear both;
+      animation-timeline: scroll(self inline);
+      animation-range: 0 48px;
+    }
+  }
+}
+
+/* ---------- 4. Phones: article tag hit area ---------- */
+@media (max-width: 900px) {
+  html body .article-tags a { position: relative; }
+  html body .article-tags a::after {
+    content: "";
+    position: absolute;
+    inset: -9px -6px;
+  }
+}
+
+/* ---------- 5. Reward panel: single underline ---------- */
+html body .reward-payment .close-payment span {
+  display: inline-block;
+  margin-inline-start: .4em;
+  padding-left: 0;
+  text-decoration: none;
+}
+
+/* ---------- 6. Phones: return-to-top drops the redundant glyph ---------- */
+/* The ring already marks reading progress and the label ends in an arrow, so the
+   extra mask icon is removed. !important is needed because mobile-controls.css
+   attaches that icon through an :is() list that contains ID selectors. */
+@media (max-width: 900px) {
+  html body .mobile-scroll-top::before { display: none !important; }
+}

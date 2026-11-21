@@ -88,6 +88,9 @@
     },
     {
       "file": "ink-typography.css"
+    },
+    {
+      "file": "ui-redesign.css"
     }
   ],
   "articles.html": [
@@ -179,6 +182,9 @@
     },
     {
       "file": "ink-typography.css"
+    },
+    {
+      "file": "ui-redesign.css"
     }
   ],
   "article.html": [
@@ -273,6 +279,9 @@
     },
     {
       "file": "ink-typography.css"
+    },
+    {
+      "file": "ui-redesign.css"
     }
   ],
   "videos.html": [
@@ -349,6 +358,9 @@
     },
     {
       "file": "ink-typography.css"
+    },
+    {
+      "file": "ui-redesign.css"
     }
   ],
   "works.html": [
@@ -434,6 +446,9 @@
     },
     {
       "file": "ink-typography.css"
+    },
+    {
+      "file": "ui-redesign.css"
     }
   ]
 }
