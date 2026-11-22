@@ -8674,7 +8674,11 @@ body[data-page="articles"] #tagFilters { display:flex; flex-wrap:wrap; gap:8px; 
 body[data-page="articles"] #tagFilters button[hidden] { display:none; }
 body[data-page="articles"] #articleResultCount { font-size:12px; margin:2px 0 12px; color:var(--ink-soft); }
 body[data-page="articles"] .theme-filter-bar :focus-visible { outline:2px solid var(--cinnabar); outline-offset:2px; }
+body[data-page="articles"] .topic-swipe-hint { display:none; }
 @media(max-width:600px) {
+ body[data-page="articles"] .filter-summary:has(#topicFilters button) .topic-swipe-hint {
+   display:block; margin:0 0 2px; color:var(--ink-soft); font-size:12px;
+ }
  body[data-page="articles"] .theme-filter-bar { gap:10px; }
  body[data-page="articles"] .keyword-panel { padding:16px; }
  body[data-page="articles"] .topic-filter-list { gap:6px; }

@@ -26,15 +26,24 @@ const topicDefinitions = [
 function syncFilterControls() {
   topicFilters.querySelectorAll('button').forEach(button => {
     const selected = button.dataset.topic === activeTopic;
+    if (selected && button.getAttribute('aria-pressed') !== 'true') {
+      const list = topicFilters.getBoundingClientRect();
+      const item = button.getBoundingClientRect();
+      const inset = parseFloat(getComputedStyle(topicFilters).scrollPaddingInlineStart) || 0;
+      if (item.left < list.left + inset || item.right > list.right - inset) {
+        topicFilters.scrollLeft += (item.left + item.right - list.left - list.right) / 2;
+      }
+    }
     button.classList.toggle('active', selected);
     button.setAttribute('aria-pressed', String(selected));
   });
+  searchInput.placeholder = activeTopic ? `在「${activeTopic}」主题中搜索` : '搜索标题、摘要、分类或标签';
   tagFilters.querySelectorAll('button').forEach(button => {
     const selected = button.dataset.tag === activeTag;
     button.classList.toggle('active', selected);
     button.setAttribute('aria-pressed', String(selected));
   });
-  document.querySelector('#moreFiltersToggle').textContent = activeTag ? `更多筛选 · ${activeTag}` : '更多筛选';
+  document.querySelector('#moreFiltersToggle').textContent = activeTag ? `关键词 · ${activeTag}` : '关键词';
 }
 function searchKeywords() {
   const query = keywordSearch.value.trim().toLowerCase();

@@ -22,7 +22,7 @@ async function main() {
       });
       const page = await context.newPage();
       await page.goto('http://localhost:8000/index.html');
-      assert(await page.locator('#readingReturnList a').isVisible());
+      assert(await page.locator('#readingReturn').isHidden());
       await page.evaluate(record => localStorage.setItem('hutao-reading-positions', JSON.stringify({ [record.id]: {...record, ratio:.44, updatedAt:Date.now()} })), lesson);
       await page.reload();
       await page.locator('#readingReturnList img').evaluate(img => img.decode());

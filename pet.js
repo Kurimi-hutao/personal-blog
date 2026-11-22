@@ -173,6 +173,10 @@
   }
 
   function getWelcomeVoice(role) {
+    if (role === 'hutao' && matchMedia('(pointer: coarse)').matches) {
+      const greeting = voiceLibrary.hutao?.actions?.wave?.[1];
+      return { text: (greeting?.text || '嗨！') + '轻触小桃试试？', audio: greeting?.audio };
+    }
     return voiceLibrary?.[role]?.welcome || characters[role]?.welcome;
   }
 

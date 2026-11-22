@@ -251,6 +251,7 @@
     }
   }
   let searchClosing = false;
+  let searchReturnFocus = null;
   let searchResultAnimation = null;
   let bookmarksMode = false;
   const bookmarksButton = searchDialog.querySelector('[data-search-bookmarks]');
@@ -262,7 +263,7 @@
     renderSearchResults(searchInput.value);
   }
   document.querySelector('#homeBookmarks')?.addEventListener('click', () => {
-    void openSearch(); showBookmarks();
+    openSearch(document.querySelector('#homeBookmarks')); showBookmarks();
   });
   function renderReadingReturn() {
     const list = document.querySelector('#readingReturnList');
@@ -291,14 +292,9 @@
       link.append(image, title, progress); list.append(link);
       if (list.children.length === 3) break;
     }
-    list.closest('.reading-return')?.classList.toggle('has-reading-history', Boolean(list.children.length));
-    if (!list.children.length) {
-      const link = document.createElement('a'); link.href = './articles.html';
-      link.className = 'reading-empty-link';
-      link.textContent = '挑一卷读读 →';
-      const note = document.createElement('p'); note.className = 'reading-empty-note'; note.textContent = '还没有未读完的篇章。读到一半的文字，会在这里等你。';
-      list.append(note, link);
-    }
+    const section = list.closest('.reading-return');
+    section.hidden = list.children.length === 0;
+    section.classList.toggle('has-reading-history', !section.hidden);
   }
   renderReadingReturn();
   window.addEventListener('pageshow', renderReadingReturn);
@@ -437,8 +433,11 @@
     }
   }
 
-  async function openSearch() {
-    if (searchClosing) return;
+  function openSearch(trigger = document.activeElement) {
+    if (searchClosing || searchDialog.open) return;
+    searchReturnFocus = navigation?.classList.contains('open')
+      ? (document.querySelector('.mobile-reading-bar .reading-more') || menuToggle)
+      : trigger;
     closeMobileNavigation();
     mobileChromeController?.forceVisible();
     if (!searchDialog.open) searchDialog.showModal();
@@ -475,13 +474,23 @@
     }, reducedMotionQuery.matches ? 1 : 250);
   }
 
-  searchButton.addEventListener("click", openSearch);
+  searchButton.addEventListener("click", () => openSearch(searchButton));
   searchDialog.querySelector("[data-search-close]").addEventListener("click", closeSearchAnimated);
   searchDialog.addEventListener("close", () => {
     document.documentElement.classList.remove("search-dialog-open");
     document.body.classList.remove("search-dialog-open");
     mobileChromeController?.forceVisible();
     mobileChromeController?.reset();
+    const candidates = [searchReturnFocus, searchButton, document.querySelector('.reading-more'), menuToggle];
+    const target = candidates.find(el => el && el !== document.body && el.getClientRects().length && !el.closest('[inert]'));
+    target?.focus({ preventScroll: true });
+    searchReturnFocus = null;
+  });
+  searchDialog.addEventListener("keydown", event => {
+    if (event.key !== 'Escape' || event.isComposing) return;
+    event.preventDefault();
+    event.stopPropagation();
+    closeSearchAnimated();
   });
   searchDialog.addEventListener("cancel", (event) => {
     event.preventDefault();
@@ -739,7 +748,7 @@
   if (navigation) {
     const utilities = document.createElement('div'); utilities.className = 'nav-utilities';
     const savedButton = document.createElement('button'); savedButton.type = 'button'; savedButton.textContent = '收藏';
-    savedButton.onclick = () => { closeMobileNavigation(); void openSearch(); showBookmarks(); };
+    savedButton.onclick = () => { openSearch(savedButton); showBookmarks(); };
     utilities.append(savedButton);
     const petals = document.querySelector('#summonPetals');
     if (petals) {

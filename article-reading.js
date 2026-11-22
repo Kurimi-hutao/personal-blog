@@ -63,27 +63,41 @@
       const target = document.getElementById(decodeURIComponent(link.hash.slice(1)));
       target?.focus({ preventScroll: true });
     });
-    const observer = new IntersectionObserver(entries => {
-      const entry = entries.filter(e => e.isIntersecting).sort((a,b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
-      if (!entry) return;
-      [toc, dialog].forEach(root => {
-        const previous = root.querySelector('a.active');
-        const links = root.querySelectorAll('a');
-        let current;
-        links.forEach(link => {
-          const active = link.hash === `#${entry.target.id}`;
-          link.classList.toggle('active', active);
-          if (active) {
-            current = link;
-            link.setAttribute('aria-current', 'location');
-          } else link.removeAttribute('aria-current');
-        });
-        if (!previous || !current || previous === current || !current.getClientRects().length || motion() === 'auto') return;
-        const distance = previous.getBoundingClientRect().top - current.getBoundingClientRect().top;
-        current.style.setProperty('--toc-distance', Math.max(-56, Math.min(56, distance)) + 'px');
-      });
-    }, { rootMargin: '-15% 0px -65% 0px' });
-    headings.forEach(heading => observer.observe(heading));
+    // Both lists follow document order, including headings with non-ASCII IDs.
+    const linkLists = [list, dialog.querySelector('ol')].map(el => el.querySelectorAll('a'));
+    let activeIndex = -1;
+    function syncChapter() {
+      const readingLine = Math.max(readingInset(), innerHeight * 0.3);
+      let low = 0, high = headings.length;
+      while (low < high) {
+        const middle = Math.floor((low + high) / 2);
+        if (headings[middle].getBoundingClientRect().top <= readingLine) low = middle + 1;
+        else high = middle;
+      }
+      const next = Math.max(0, low - 1);
+      if (next === activeIndex) return;
+      for (const links of linkLists) {
+        const previous = links[activeIndex], current = links[next];
+        if (previous && current.getClientRects().length && motion() !== 'auto') {
+          const distance = previous.getBoundingClientRect().top - current.getBoundingClientRect().top;
+          current.style.setProperty('--toc-distance', Math.max(-56, Math.min(56, distance)) + 'px');
+        }
+        previous?.classList.remove('active');
+        previous?.removeAttribute('aria-current');
+        current.classList.add('active');
+        current.setAttribute('aria-current', 'location');
+      }
+      activeIndex = next;
+    }
+    let frame = 0;
+    function scheduleChapter() {
+      if (frame) return;
+      frame = requestAnimationFrame(() => { frame = 0; syncChapter(); });
+    }
+    window.addEventListener('scroll', scheduleChapter, { passive: true });
+    window.addEventListener('resize', scheduleChapter);
+    new ResizeObserver(scheduleChapter).observe(body);
+    syncChapter();
   }
 
   function readingInset() {
