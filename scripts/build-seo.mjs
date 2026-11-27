@@ -37,7 +37,7 @@ export async function buildSEO({root,output,rows,previous=[]}) {
   rows = publicRows(rows).sort((a,b) => String(b.published_at).localeCompare(String(a.published_at)));
   const ctx = {window:{},crypto:webcrypto,TextEncoder,URL,document:{currentScript:{src:origin+'/article-service.js'}}}; vm.createContext(ctx);
   for (const file of ['markdown.js','article-content-repairs.js','article-service.js']) vm.runInContext(await readFile(path.join(root,file),'utf8'),ctx);
-  rows = await Promise.all(rows.map(a => ctx.window.ArticleContentRepairs.prepare(a)));
+  rows = await Promise.all(rows.map(a => ctx.window.ArticleContentRepairs.prepare(ctx.window.articleService.publicVideoCopy(a))));
   const template = await readFile(path.join(root,'article.html'),'utf8');
   await mkdir(output,{recursive:true});
   const feed = rows.map(({content, ...a}) => a);
@@ -85,6 +85,8 @@ export async function buildSEO({root,output,rows,previous=[]}) {
     html = replaceSlot(html,id,cards).replace(`id="${id}"`, `id="${id}" data-prerendered="true"`);
     if (file==='index.html') {
       html = replaceSlot(html,'homeFeedSnapshot',json({savedAt:Date.now(),article:feed.filter(a=>a.content_type!=='video').slice(0,2),video:feed.filter(a=>a.content_type==='video').slice(0,2)}));
+    }
+    if (file==='articles.html') {
       html = replaceSlot(html,'courseList',rows.filter(a=>a.slug.startsWith('ai-from-zero-lesson-')).sort((a,b)=>a.slug.localeCompare(b.slug)).map(a=>`<p>${link(a)}</p>`).join(''));
     }
     await writeFile(path.join(output,file),html);

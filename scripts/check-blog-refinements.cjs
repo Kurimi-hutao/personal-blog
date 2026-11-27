@@ -29,11 +29,6 @@ const out = path.resolve('outputs/blog-refinements'); fs.mkdirSync(out, { recurs
         assert.deepEqual(errors, [], `${file} script errors`);
         if (file === 'index.html') {
           assert.equal(await page.locator('.hero-actions .ink-button').getAttribute('href'), './articles.html');
-          assert.match(await page.locator('#readingReturnList').innerText(), /42%/);
-          await page.locator('#homeBookmarks').click();
-          assert.equal(await page.locator('[data-search-bookmarks]').getAttribute('aria-pressed'), 'true');
-          await page.locator('[data-search-close]').click();
-          await page.waitForFunction(() => !document.querySelector('.site-search-dialog').open);
           if (!(await page.locator('.site-search-trigger').isVisible())) await page.locator('.reading-more:visible, .menu-toggle:visible').first().click();await page.locator('.site-search-trigger').click();
           await page.locator('.site-search-field input').fill('图鉴');
           await page.waitForFunction(() => document.querySelector('.site-search-results').textContent.includes('永劫无间征神图鉴'));
@@ -51,6 +46,13 @@ const out = path.resolve('outputs/blog-refinements'); fs.mkdirSync(out, { recurs
           const resources = await page.evaluate(() => performance.getEntriesByType('resource'));
           assert(!resources.some(item => item.name.endsWith('/brand-tigerhat.png') || item.name.includes('/blog-serif/')));
           results.push({ width, bytes: resources.reduce((total, item) => total + item.transferSize, 0), fontRequests: resources.filter(item => item.name.includes('.woff')).length });
+        }
+        if (file === 'articles.html') {
+          assert.match(await page.locator('#readingReturnList').innerText(), /42%/);
+          await page.locator('#homeBookmarks').click();
+          assert.equal(await page.locator('[data-search-bookmarks]').getAttribute('aria-pressed'), 'true');
+          await page.locator('[data-search-close]').click();
+          await page.waitForFunction(() => !document.querySelector('.site-search-dialog').open);
         }
         if (file === 'works.html') {
           await page.locator('.work-notes summary').first().click();

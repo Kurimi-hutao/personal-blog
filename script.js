@@ -17,16 +17,9 @@ const lowPowerDevice =
   (Number.isFinite(navigator.deviceMemory) && navigator.deviceMemory <= 4) ||
   (Number.isFinite(navigator.hardwareConcurrency) && navigator.hardwareConcurrency <= 4);
 
-let lastSummonAt = -Infinity;
-let summonLevel = 0;
-let previousWindX = null;
 let ownerSession = null;
-const manualPetals = new Set();
 let petalNoticeTimer;
-let lastCursorTrailAt = 0;
-let lastTrailPoint = null;
 
-const random = (min, max) => Math.random() * (max - min) + min;
 if (hasGsap && !reducedMotion) document.documentElement.classList.add("motion-ready");
 
 function revealInsertedCards(container) {
@@ -132,7 +125,8 @@ function createHomepageVideoCard(video) {
   title.textContent = video.title;
   const excerpt = document.createElement("p");
   excerpt.textContent = video.excerpt;
-  copy.append(meta, title, excerpt);
+  copy.append(meta, title);
+  if (video.excerpt) copy.append(excerpt);
   card.append(visual, copy);
   return card;
 }
@@ -156,7 +150,7 @@ async function loadHomeFeed(type, id, createCard) {
       window.InkAssets?.state(container, { title: "暂无已发布的" + label });
       return;
     }
-    container.replaceChildren(...items.slice(0, 2).map(createCard));
+    container.replaceChildren(...items.slice(0, 2).map(articleService.publicVideoCopy).map(createCard));
     revealInsertedCards(container);
     setupInkHoverEffects();
   }
@@ -379,88 +373,13 @@ function createClickEffect(x, y, source) {
   window.setTimeout(() => ripple.remove(), 460);
 }
 
-function createCursorTrail(x, y) {
-  if (reducedMotion) return;
-  const now = performance.now();
-  if (now - lastCursorTrailAt < 34) return;
-  lastCursorTrailAt = now;
-
-  const previous = lastTrailPoint || { x, y };
-  const dx = x - previous.x;
-  const dy = y - previous.y;
-  const distance = Math.hypot(dx, dy);
-  const angle = Math.atan2(dy, dx) * 180 / Math.PI;
-  lastTrailPoint = { x, y };
-  if (distance < 2) return;
-
-  const trail = document.createElement("i");
-  trail.className = "ink-cursor-trail";
-  trail.style.setProperty("--trail-length", `${Math.min(34, Math.max(12, distance * 0.82))}px`);
-  trail.style.setProperty("--trail-width", `${Math.min(6, Math.max(3, 3 + distance * 0.05))}px`);
-  document.body.appendChild(trail);
-
-  gsap.set(trail, {
-    x: previous.x + random(-1.5, 1.5),
-    y: previous.y + random(-1.5, 1.5),
-    xPercent: 0,
-    yPercent: -50,
-    rotation: angle + random(-4, 4),
-    scaleX: 0.45,
-    scaleY: random(0.82, 1.16),
-    opacity: 0.48,
-  });
-  gsap.to(trail, {
-    x: previous.x - dx * 0.12,
-    y: previous.y - dy * 0.12 + random(2, 6),
-    scaleX: 1,
-    scaleY: 0.3,
-    opacity: 0,
-    duration: 0.66,
-    ease: "power2.out",
-    onComplete: () => trail.remove(),
-  });
-}
-
-function summonPetals(event) {
+function summonPetals() {
   if (document.hidden) return;
-  if (reducedMotion) {
+  if (reducedMotion || saveData) {
     showPetalNotice('桃花已送达 · 已按你的偏好减少动态效果');
     return;
   }
-  const now = performance.now();
-  summonLevel = now - lastSummonAt < 1300 ? Math.min(3, summonLevel + 1) : 0;
-  lastSummonAt = now;
-  const limit = lowPowerDevice ? 10 : compactMotion ? 24 : 40;
-  const count = Math.min(limit, (lowPowerDevice ? 6 : compactMotion ? 12 : 20) + summonLevel * 3);
-  const rect = (event?.currentTarget || summonButton).getBoundingClientRect();
-  const originX = rect.width ? rect.left + rect.width / 2 : innerWidth * .62;
-  const originY = rect.height ? Math.min(rect.top, innerHeight * .65) : innerHeight * .25;
-
-  for (let i = 0; i < count; i++) {
-    if (manualPetals.size >= limit) {
-      const oldest = manualPetals.values().next().value;
-      oldest.getAnimations().forEach(animation => animation.cancel());
-      oldest.remove();
-      manualPetals.delete(oldest);
-    }
-    const petal = document.createElement('span');
-    petal.className = 'manual-petal';
-    petal.style.width = petal.style.height = `${random(24, 42)}px`;
-    petal.setAttribute('aria-hidden', 'true');
-    petal.style.backgroundImage = `url('./assets/spring-ink/small/petal-${1 + Math.floor(random(0, 8))}-144.webp')`;
-    document.body.append(petal);
-    manualPetals.add(petal);
-    const x = originX + random(-16, 16);
-    const drift = random(-150, 150) * (1 + summonLevel * .12);
-    const bottom = Math.min(innerHeight - 24, originY + random(260, 480));
-    const animation = petal.animate([
-      { transform: `translate3d(${x}px,${originY}px,0) rotate(-20deg) scale(.6)`, opacity: .7 },
-      { transform: `translate3d(${x + drift * .65}px,${originY - random(22, 46)}px,0) rotate(45deg)`, opacity: .85, offset: .23 },
-      { transform: `translate3d(${x + drift}px,${bottom}px,0) rotate(${random(120, 240)}deg) scale(.7)`, opacity: 0 },
-    ], { duration: 3100 + i * 70, delay: i * 28, easing: 'ease-in-out', fill: 'both' });
-    const remove = () => { petal.remove(); manualPetals.delete(petal); };
-    animation.finished.then(remove, remove);
-  }
+  window.InkBlossoms?.summon();
 }
 
 function showPetalNotice(message) {
@@ -470,15 +389,6 @@ function showPetalNotice(message) {
   clearTimeout(petalNoticeTimer); petalNoticeTimer = setTimeout(() => { notice.hidden = true; }, 2200);
 }
 
-
-window.addEventListener('pointermove', event => {
-  if (!manualPetals.size || reducedMotion) { previousWindX = null; return; }
-  if (previousWindX !== null) {
-    const drift = Math.max(-22, Math.min(22, event.clientX - previousWindX));
-    manualPetals.forEach(petal => { petal.style.translate = `${drift}px 0`; });
-  }
-  previousWindX = event.clientX;
-}, { passive: true });
 
 window.addEventListener("pointerdown", (event) => {
   if (window.MotionCore?.ready) return;
@@ -715,7 +625,6 @@ if (hasGsap && finePointer && !lowPowerDevice && cursor) {
   const cursorY = gsap.quickSetter(cursor, "y", "px");
   const resetCursor = () => {
     document.documentElement.classList.remove("cursor-ready");
-    lastTrailPoint = null;
   };
 
   window.addEventListener("pointermove", (event) => {
@@ -723,7 +632,6 @@ if (hasGsap && finePointer && !lowPowerDevice && cursor) {
     cursorX(event.clientX);
     cursorY(event.clientY);
     document.documentElement.classList.add("cursor-ready");
-    createCursorTrail(event.clientX, event.clientY);
   }, { passive: true });
 
   document.addEventListener("pointerover", (event) => {
@@ -756,45 +664,6 @@ function runWhenIdle(task, timeout = 1600) {
   window.setTimeout(task, Math.min(timeout, 600));
 }
 
-async function loadCourseIndex() {
-  const list = document.querySelector('#courseList');
-  let positions = {};
-  try { positions = JSON.parse(localStorage.getItem('hutao-reading-positions')) || {}; } catch {}
-  function render(rows) {
-    const lessons = rows.filter(row => articleService.lessonNumber(row) !== null)
-      .sort((a, b) => articleService.lessonNumber(a) - articleService.lessonNumber(b));
-    list.replaceChildren();
-    for (const lesson of lessons) {
-      const link = document.createElement('a');
-      link.href = articleService.articleUrl(lesson);
-      const number = document.createElement('small');
-      number.textContent = String(articleService.lessonNumber(lesson)).padStart(2, '0');
-      const title = document.createElement('span');
-      title.textContent = lesson.title;
-      link.append(number, title);
-      const ratio = positions[lesson.id]?.ratio;
-      if (ratio > 0 && ratio <= 1) {
-        const progress = document.createElement('small');
-        progress.textContent = `已读 ${Math.round(ratio * 100)}%`;
-        link.append(progress);
-      }
-      list.append(link);
-    }
-    if (!lessons.length) list.textContent = '课程目录暂无已发布文章。';
-  }
-  const cached = window.ContentCache.read('course-index') || (window.SEO_FEED ? { items: window.SEO_FEED.filter(a => a.slug.startsWith('ai-from-zero-lesson-')), savedAt: Date.now() } : null);
-  if (cached) render(cached.items);
-  window.ContentCache.clearNotice(list);
-  try {
-    const rows = await articleService.readPublicFeed(null, { lessons: true, contentType: 'article' });
-    render(rows);
-    window.ContentCache.write('course-index', rows);
-  } catch {
-    if (cached) window.ContentCache.notice(list, loadCourseIndex, cached.savedAt);
-    else window.InkAssets.state(list, { kind: 'error', title: '课程目录暂时无法读取', action: '重新读取', onAction: loadCourseIndex });
-  }
-}
-
 function runWhenNear(selector, task, rootMargin = "320px 0px") {
   const target = document.querySelector(selector);
   if (!target || !("IntersectionObserver" in window)) {
@@ -813,12 +682,6 @@ function runWhenNear(selector, task, rootMargin = "320px 0px") {
   observer.observe(target);
 }
 
-const courseDetails = document.querySelector('#courseIndex');
-courseDetails.addEventListener('toggle', function onOpen() {
-  if (!courseDetails.open) return;
-  courseDetails.removeEventListener('toggle', onOpen);
-  void loadCourseIndex();
-});
 runWhenIdle(loadHomepageArticles, 1200);
 runWhenNear(".home-videos-section", loadHomepageVideos);
 runWhenIdle(loadSiteVisitCount, 2400);
@@ -831,8 +694,6 @@ function applyHomeMotionPreference() {
   reducedMotion = homeMotionQuery.matches;
   if (reducedMotion || document.hidden) {
     document.documentElement.classList.remove("cursor-ready");
-    manualPetals.forEach(node => { node.getAnimations().forEach(animation => animation.cancel()); node.remove(); });
-    manualPetals.clear();
   }
   if ((!reducedMotion && !document.hidden) || !hasGsap) return;
   document.querySelectorAll(".ink-cursor-trail").forEach((trail) => {
@@ -840,7 +701,6 @@ function applyHomeMotionPreference() {
     trail.remove();
   });
   gsap.killTweensOf([cursorRing, cursorDot, ".wind-icon"]);
-  lastTrailPoint = null;
 }
 homeMotionQuery.addEventListener("change", applyHomeMotionPreference);
 document.addEventListener("visibilitychange", applyHomeMotionPreference);

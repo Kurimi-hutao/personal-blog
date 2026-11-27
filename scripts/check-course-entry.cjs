@@ -25,11 +25,14 @@ async function main() {
       assert(await page.locator('#readingReturn').isHidden());
       await page.evaluate(record => localStorage.setItem('hutao-reading-positions', JSON.stringify({ [record.id]: {...record, ratio:.44, updatedAt:Date.now()} })), lesson);
       await page.reload();
+      assert.equal(await page.locator('#readingReturn, #courseIndex').count(), 0);
+      await page.goto('http://localhost:8000/articles.html');
       await page.locator('#readingReturnList img').evaluate(img => img.decode());
       assert.match(await page.locator('#readingReturnList').innerText(), /44%/);
       await page.locator('#courseIndex summary').click();
       await page.locator('#courseList a').waitFor();
       assert.match(await page.locator('#courseList a').innerText(), /18[\s\S]+44%/);
+      await page.goto('http://localhost:8000/index.html');
       await page.locator('#linksToggle').scrollIntoViewIfNeeded();
       for (const icon of await page.locator('#stationFavorites img').all()) await icon.evaluate(img => img.decode());
       await page.locator('#stationFavorites img').first().evaluate(img => { img.src = '/missing-logo.png'; });

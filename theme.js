@@ -808,7 +808,7 @@
       document.documentElement.classList.add("cursor-ready");
 
       const now = performance.now();
-      if (now - trailAt < 42 || window.innerWidth <= 840) return;
+      if (document.documentElement.classList.contains('has-ink-particles') || now - trailAt < 42 || window.innerWidth <= 840) return;
       trailAt = now;
 
       const trail = document.createElement("i");

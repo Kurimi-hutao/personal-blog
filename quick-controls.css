@@ -1,4 +1,9 @@
 /* One dock owns position; individual controls never overlap or slide offscreen. */
+.back-to-top, .mobile-scroll-top { --dock-art:url('./assets/ink-dock/up.webp'); }
+.wind-toggle, .nav-summon-petals { --dock-art:url('./assets/ink-dock/flower.webp'); }
+.theme-toggle { --dock-art:url('./assets/ink-dock/moon.webp'); }
+html[data-theme="dark"] .theme-toggle { --dock-art:url('./assets/ink-dock/sun.webp'); }
+
 @media (min-width:901px) {
   html body .mobile-control-dock {
     display:flex !important; position:fixed; inset:auto max(18px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) auto;
@@ -12,8 +17,30 @@
   }
   html body .mobile-control-dock .wind-label { display:none; }
   html body .mobile-control-dock > .back-to-top:not(.visible) { visibility:hidden; pointer-events:none; }
+
+  html[data-theme] body .mobile-control-dock > :is(.theme-toggle,.wind-toggle,.back-to-top) {
+    border:0; border-radius:50%; background:transparent; box-shadow:none; font-size:0;
+  }
+  html[data-theme] body .mobile-control-dock > button:is(.theme-toggle,.wind-toggle,.back-to-top)::before {
+    content:''; position:static; grid-area:1/1; width:38px; height:38px;
+    background:var(--dock-art) center / contain no-repeat; mask:none; pointer-events:none;
+  }
+  html[data-theme="dark"] body .mobile-control-dock > .back-to-top::before { filter:brightness(1.45); }
+  html[data-theme] body .mobile-control-dock > .wind-toggle > span { display:none; }
+  html[data-theme] body .mobile-control-dock .back-to-top-ring {
+    inset:1px; opacity:.33;
+    mask:radial-gradient(farthest-side, transparent calc(100% - 1px),black 0);
+  }
+  html[data-theme] body .mobile-control-dock > button:focus-visible { outline:2px solid var(--cinnabar); outline-offset:4px; }
+  @media (hover:hover) and (prefers-reduced-motion:no-preference) {
+    html[data-theme] body .mobile-control-dock > button { transition:translate .22s ease,box-shadow .22s ease; }
+    html[data-theme] body .mobile-control-dock > button:hover { translate:0 -2px; }
+  }
 }
 @media (max-width:900px) {
+  html[data-theme] body :is(.nav-utilities > .theme-toggle,.nav-utilities > .nav-summon-petals,.mobile-scroll-top)::before {
+    background:var(--dock-art) center / contain no-repeat; mask:none;
+  }
   /* Phones use the existing navigation utilities and footer return action. */
   html body .mobile-control-dock { display:none !important; }
   html body .nav-utilities > button { min-width:44px; min-height:44px; touch-action:manipulation; }

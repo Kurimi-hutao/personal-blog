@@ -63,7 +63,9 @@ function createVideoCard(video) {
     : "";
   stats.textContent = `${video.view_count || 0} 次播放 · ${video.like_count || 0} 人点赞${duration}`;
 
-  copy.append(title, meta, excerpt, stats);
+  copy.append(title, meta);
+  if (video.excerpt || video.slug !== "isaac-newton-bilibili-video") copy.append(excerpt);
+  copy.append(stats);
   link.append(visual, copy);
   return link;
 }
@@ -165,7 +167,7 @@ async function loadVideosRequest() {
   } catch (error) {
     const cached = window.ContentCache?.read('videos') || (videos.length ? { items: videos, savedAt: Date.now() } : null);
     if (cached) {
-      videos = cached.items; renderVideoCategories(); renderVideos({ immediate: true });
+      videos = cached.items.map(articleService.publicVideoCopy); renderVideoCategories(); renderVideos({ immediate: true });
       window.ContentCache.notice(videoList, loadVideos, cached.savedAt);
       return;
     }

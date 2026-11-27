@@ -102,6 +102,16 @@
     return designatedCover(article) || firstImage(article) || fallbackCover(article);
   }
 
+  function publicVideoCopy(article) {
+    if (article?.slug !== 'isaac-newton-bilibili-video') return article;
+    const cleaned = { ...article };
+    if (cleaned.excerpt?.trim() === '《Isaac Newton》视频作品，由哔哩哔哩提供在线播放。') cleaned.excerpt = '';
+    if (typeof cleaned.content === 'string') {
+      cleaned.content = cleaned.content.replace('《Isaac Newton》现已发布于哔哩哔哩。可在本页直接观看；如播放器加载失败，可打开 B站原始视频页面。', '').trim();
+    }
+    return cleaned;
+  }
+
   function isSchemaMismatch(error) {
     return /column .* does not exist|schema cache|could not find|deleted_at|pinned|series_name|duration_seconds/i.test(error?.message || "");
   }
@@ -214,7 +224,7 @@
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeout);
     try {
-      return await listPublished(limit, { ...filters, signal: controller.signal });
+      return (await listPublished(limit, { ...filters, signal: controller.signal })).map(publicVideoCopy);
     } finally {
       clearTimeout(timer);
     }
@@ -223,7 +233,7 @@
   async function getPublished(slug) {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 10000);
-    try { return await getPublishedRequest(slug, controller.signal); }
+    try { return publicVideoCopy(await getPublishedRequest(slug, controller.signal)); }
     finally { clearTimeout(timer); }
   }
 
@@ -703,6 +713,7 @@
     lessonNumber,
     fallbackCover,
     getVisitorToken,
+    publicVideoCopy,
     listPublished,
     readPublicFeed,
     getPublished,

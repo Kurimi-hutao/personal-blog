@@ -1,7 +1,7 @@
 /* Shared material system. Layout remains in each page's own stylesheet. */
 html:root {
-  --paper: #f4f0e6;
-  --paper-deep: #e9e3d6;
+  --paper: #fdfcf9;
+  --paper-deep: #f1efe9;
   --ink: #252c28;
   --ink-soft: #5f685f;
   --cinnabar: #a43b32;

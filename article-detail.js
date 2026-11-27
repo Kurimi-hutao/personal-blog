@@ -90,7 +90,9 @@ function renderArticle(article) {
     series.textContent = `${article.series_name}${article.episode_number ? ` · 第 ${article.episode_number} 集` : ""}`;
     header.querySelector(".article-detail-meta").appendChild(series);
   }
-  header.querySelector(".article-detail-excerpt").textContent = article.excerpt;
+  const excerpt = header.querySelector(".article-detail-excerpt");
+  if (article.excerpt) excerpt.textContent = article.excerpt;
+  else excerpt.remove();
 
   const body = document.createElement("div");
   body.className = "article-body";
@@ -133,7 +135,7 @@ function renderArticle(article) {
     const description = document.createElement("div");
     description.className = "video-description";
     description.innerHTML = window.blogMarkdown.renderArticle(article.content || article.excerpt, article.title);
-    body.appendChild(description);
+    if (article.content || article.excerpt) body.appendChild(description);
   } else {
     body.innerHTML = window.blogMarkdown.renderArticle(article.content, article.title);
   }

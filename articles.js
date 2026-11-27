@@ -384,3 +384,49 @@ moreFilters.addEventListener('keydown', event => {
   }
 });
 loadArticles();
+
+async function loadCourseIndex() {
+  const list = document.querySelector('#courseList');
+  let positions = {};
+  try { positions = JSON.parse(localStorage.getItem('hutao-reading-positions')) || {}; } catch {}
+  function render(rows) {
+    const lessons = rows.filter(row => articleService.lessonNumber(row) !== null)
+      .sort((a, b) => articleService.lessonNumber(a) - articleService.lessonNumber(b));
+    list.replaceChildren();
+    for (const lesson of lessons) {
+      const link = document.createElement('a');
+      link.href = articleService.articleUrl(lesson);
+      const number = document.createElement('small');
+      number.textContent = String(articleService.lessonNumber(lesson)).padStart(2, '0');
+      const title = document.createElement('span');
+      title.textContent = lesson.title;
+      link.append(number, title);
+      const ratio = positions[lesson.id]?.ratio;
+      if (ratio > 0 && ratio <= 1) {
+        const progress = document.createElement('small');
+        progress.textContent = `已读 ${Math.round(ratio * 100)}%`;
+        link.append(progress);
+      }
+      list.append(link);
+    }
+    if (!lessons.length) list.textContent = '课程目录暂无已发布文章。';
+  }
+  const cached = window.ContentCache.read('course-index') || (window.SEO_FEED ? { items: window.SEO_FEED.filter(a => a.slug.startsWith('ai-from-zero-lesson-')), savedAt: Date.now() } : null);
+  if (cached) render(cached.items);
+  window.ContentCache.clearNotice(list);
+  try {
+    const rows = await articleService.readPublicFeed(null, { lessons: true, contentType: 'article' });
+    render(rows);
+    window.ContentCache.write('course-index', rows);
+  } catch {
+    if (cached) window.ContentCache.notice(list, loadCourseIndex, cached.savedAt);
+    else window.InkAssets.state(list, { kind: 'error', title: '课程目录暂时无法读取', action: '重新读取', onAction: loadCourseIndex });
+  }
+}
+
+const courseDetails = document.querySelector('#courseIndex');
+courseDetails.addEventListener('toggle', function onOpen() {
+  if (!courseDetails.open) return;
+  courseDetails.removeEventListener('toggle', onOpen);
+  void loadCourseIndex();
+});
