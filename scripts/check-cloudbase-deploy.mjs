@@ -51,6 +51,23 @@ test('HEAD checksum reader preserves all 64 bits without downloading the object'
   assert.equal(await read('file'), '18446744073709551615');
   assert.equal(method, 'HEAD');
 });
+test('CRC64 verification retries a connection timeout through the alternate endpoint', async () => {
+  const domains = [];
+  class COS {
+    constructor(options) { domains.push(options.Domain); }
+    getObjectUrl(_, callback) { callback(null, { Url: 'https://example.com/file' }); }
+  }
+  const reader = createCRCReader({
+    COS, credentials: {}, config: {}, toPhysicalKey: (_, key) => key,
+    request: async () => {
+      if (domains.length === 1) throw new TypeError('fetch failed');
+      return new Response(null, { headers: { 'x-cos-hash-crc64ecma': '123' } });
+    },
+  });
+  assert.equal(await reader('file'), '123');
+  assert.deepEqual(domains, [undefined, '{Bucket}.cos.{Region}.tencentcos.cn']);
+});
+
 test('large files use signed multipart requests and preserve every byte', async () => {
   const bytes = Buffer.alloc(2 * 1024 * 1024 + 17, 7);
   const calls = [], uploaded = [];

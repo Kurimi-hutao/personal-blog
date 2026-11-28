@@ -1,18 +1,36 @@
 import { readFile } from 'node:fs/promises';
+import { setTimeout as delay } from 'node:timers/promises';
+
+function cosEndpoint(attempt) {
+  return attempt % 2 ? { Domain: '{Bucket}.cos.{Region}.tencentcos.cn' } : {};
+}
 
 export function createCRCReader({ COS, config, credentials, toPhysicalKey, request = fetch }) {
   return async key => {
-    const cos = new COS({ ...credentials, Protocol: 'https:' });
-    const { Url } = await new Promise((resolve, reject) => cos.getObjectUrl({
-      Bucket: config.bucket, Region: config.region, Key: toPhysicalKey(config.basePath, key),
-      Method: 'HEAD', Sign: true, Expires: 600,
-    }, (error, response) => error ? reject(error) : resolve(response)));
-    const response = await request(Url, {
-      method: 'HEAD', signal: AbortSignal.timeout(30000), redirect: 'error', headers: { connection: 'close' },
-    });
-    const value = response.headers.get('x-cos-hash-crc64ecma');
-    if (!response.ok || !/^\d+$/.test(value || '')) throw new Error(`Missing remote CRC64: ${key}, HTTP ${response.status}`);
-    return value;
+    for (let attempt = 0; ; attempt++) {
+      const cos = new COS({ ...credentials, Protocol: 'https:', ...cosEndpoint(attempt) });
+      const { Url } = await new Promise((resolve, reject) => cos.getObjectUrl({
+        Bucket: config.bucket, Region: config.region, Key: toPhysicalKey(config.basePath, key),
+        Method: 'HEAD', Sign: true, Expires: 600,
+      }, (error, response) => error ? reject(error) : resolve(response)));
+      let response;
+      try {
+        response = await request(Url, {
+          method: 'HEAD', signal: AbortSignal.timeout(30000), redirect: 'error', headers: { connection: 'close' },
+        });
+      } catch (error) {
+        if (attempt >= 3 || !(error instanceof TypeError || error.name === 'TimeoutError')) throw error;
+      }
+      if (response?.ok) {
+        const value = response.headers.get('x-cos-hash-crc64ecma');
+        if (/^\d+$/.test(value || '')) return value;
+        throw new Error(`Missing remote CRC64: ${key}, HTTP ${response.status}`);
+      }
+      if (response && (attempt >= 3 || !(response.status === 408 || response.status === 429 || response.status >= 500))) {
+        throw new Error(`Cannot read remote CRC64: ${key}, HTTP ${response.status}`);
+      }
+      await delay(500 * 2 ** attempt);
+    }
   };
 }
 
@@ -27,7 +45,7 @@ export function createUploader({ COS, mime, config, credentials, toPhysicalKey, 
         const cos = new COS({
           ...credentials, KeepAlive: false, Timeout: 60000, RetryTimes: 0,
           Protocol: 'https:',
-          ...(attempt % 2 ? { Domain: '{Bucket}.cos.{Region}.tencentcos.cn' } : {}),
+          ...cosEndpoint(attempt),
         });
         report(`${method} ${file.cloudPath} (${data.length} bytes${query?.partNumber ? `, part ${query.partNumber}` : ''}), attempt ${attempt + 1}/4`);
         try {
