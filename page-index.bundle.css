@@ -6184,7 +6184,7 @@ body:has(#articleDetail) .article-body { background: var(--paper); line-height: 
   .site-nav .nav-utilities > button { display: inline-flex; flex-direction: row; justify-content: flex-start; align-items: center; gap: 12px; width: 100%; min-width: 0; min-height: 48px; font: 13px var(--ui-font); color: var(--ink-soft); border: 0; }
   .site-nav .nav-utilities > button:active { background: var(--ui-wash); }
   .site-nav .nav-utilities > button::before { content: ''; display: block; width: 20px; height: 20px; flex-shrink: 0; background: currentColor; mask: var(--ui-icon) center / contain no-repeat; }
-  .nav-utilities .site-search-trigger { --ui-icon: url('./assets/mobile-ui/search.svg'); }
+  .nav-utilities .site-search-trigger { --ui-icon: url('./assets/ink-dock/search.png'); }
   .nav-utilities .theme-toggle { --ui-icon: url('./assets/mobile-ui/moon.svg'); }
   html[data-theme="dark"] .nav-utilities .theme-toggle { --ui-icon: url('./assets/mobile-ui/sun.svg'); }
   .nav-utilities > button:not([class]) { --ui-icon: url('./assets/mobile-ui/bookmark.svg'); }
@@ -8097,22 +8097,23 @@ html body .reading-tools #bookmarkArticle[aria-pressed="true"]::before { backgro
     100% { transform:scaleY(.65); opacity:.54; }
   }
 }
-html body.home-page .site-header > .site-search-trigger {
-  position:relative; display:inline-flex; gap:9px; align-items:center; justify-content:flex-start;
-  min-height:44px; width:clamp(132px,12vw,178px); padding:5px 10px; flex-shrink:0;
-  border:0; border-radius:0; box-shadow:none; backdrop-filter:none;
-  background:linear-gradient(90deg,color-mix(in srgb,var(--ink) 6%,transparent),transparent) center/100% 76% no-repeat;
-  font:15px/1.2 var(--serif); letter-spacing:.06em; color:var(--ink);
+html[data-theme] body .site-header > .site-search-trigger {
+  display:inline-flex; align-items:center; justify-content:center; flex:none;
+  width:auto; min-width:44px; min-height:44px; padding:4px 7px; gap:7px;
+  border:0; box-shadow:none; background:none; backdrop-filter:none;
+  color:var(--ink); font:500 15px/1.25 var(--ui-font, var(--font-body)); letter-spacing:.03em;
 }
-html body.home-page .site-header > .site-search-trigger::after {
-  content:""; position:absolute; inset:auto 0 5px; height:2px; pointer-events:none;
-  background:var(--ink); opacity:.39; clip-path:polygon(0 55%,9% 10%,70% 37%,100% 60%,81% 72%,3% 100%);
+.site-header .site-search-trigger { white-space:nowrap; }
+html[data-theme] body .site-header > .site-search-trigger > .search-lens {
+  display:block; flex:none; width:20px; height:20px; background:currentColor;
+  mask:url('./assets/ink-dock/search.png') center/contain no-repeat;
 }
-html body.home-page .site-header > .site-search-trigger > .search-seal {
-  display:grid;place-items:center; width:22px;height:23px; mask:none; background:#984535;
-  color:#fff3df; border-radius:2px 3px 2px 4px; rotate:-4deg; font:17px/1 var(--brush,var(--serif));
+html[data-theme] body .site-header .site-search-trigger:focus-visible {
+  outline:2px solid var(--cinnabar); outline-offset:2px;
 }
-html body.home-page .site-header > .site-search-trigger kbd {margin-left:auto;padding:0;color:var(--ink-soft);border:0;background:none;font-size:13px;}
+@media (hover:hover) {
+  html[data-theme] body .site-header > .site-search-trigger:hover { color:var(--cinnabar); transform:none; }
+}
 html body.home-page .site-search-dialog .site-search-field {
   position:relative; background:linear-gradient(90deg,color-mix(in srgb,var(--ink) 5%,transparent),transparent);
   border:0;box-shadow:none;padding-inline:14px;gap:12px;
@@ -8125,7 +8126,6 @@ html body.home-page .site-search-dialog .site-search-field {
 @media(max-width:1080px) {
   html body.home-page .site-header > .site-search-trigger {order:1;margin:0 6px 0 auto;width:auto;padding-inline:7px;gap:5px;font-size:13px;}
   html body.home-page .site-header > .site-search-trigger > span:nth-child(2) {display:inline;}
-  html body.home-page .site-header > .site-search-trigger kbd {display:none;}
 }
 @media(max-width:380px) {
   .home-page .site-header .brand-name { white-space:nowrap; }
@@ -8209,15 +8209,14 @@ html body:has(dialog[open]) .mobile-control-dock > button { visibility:hidden; p
 /* Short inscriptions use brush lettering; long titles and prose use Song type. */
 @font-face {
   font-family: "Ink Song";
-  src: local("Songti SC"), local("Noto Serif CJK SC"), local("Source Han Serif SC"),
-       local("SimSun"), url("./assets/fonts/blog-mobile-serif.woff2") format("woff2");
+  src: url("./assets/fonts/blog-mobile-serif.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
 :root {
-  --ink-reading: "Ink Song", "Songti SC", "Noto Serif CJK SC", SimSun, serif;
+  --ink-reading: "Ink Song", "Songti SC", "Noto Serif CJK SC", "Source Han Serif SC", SimSun, serif;
   --ink-inscription: "Blog Brush", "Kaiti SC", KaiTi, var(--ink-reading);
   --ink-title-tracking: .065em;
 }

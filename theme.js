@@ -158,11 +158,11 @@
   searchButton.type = "button";
   searchButton.className = "site-search-trigger";
   searchButton.setAttribute("aria-label", "搜索全站内容");
-  searchButton.innerHTML = '<span aria-hidden="true">⌕</span><span>搜索</span><kbd>/</kbd>';
+  searchButton.setAttribute('aria-haspopup', 'dialog');
+  searchButton.setAttribute('aria-keyshortcuts', '/');
+  searchButton.title = "搜索全站（/）";
+  searchButton.innerHTML = '<span class="search-lens" aria-hidden="true"></span><span>搜索全站</span>';
   const homeSearch = document.body.classList.contains('home-page');
-  if (homeSearch) {
-    searchButton.innerHTML = '<span class="search-seal" aria-hidden="true">寻</span><span>搜索全站</span><kbd aria-hidden="true">/</kbd>';
-  }
   if (header) {
     header.insertBefore(searchButton, navigation || null);
   }
@@ -288,8 +288,16 @@
       image.addEventListener('error', () => { image.src = window.articleService.fallbackCover(article).url; }, { once: true });
       link.className = 'reading-return-card';
       const title = document.createElement('strong'); title.textContent = item.title || record?.title || '继续阅读';
-      const progress = document.createElement('span'); progress.textContent = `上次读到 ${Math.round(item.ratio * 100)}% · 继续阅读 →`;
-      link.append(image, title, progress); list.append(link);
+      const ratio = Math.round(item.ratio * 100);
+      const progress = document.createElement('span');
+      progress.className = 'resume-progress';
+      progress.textContent = `已读 ${ratio}%`;
+      progress.style.setProperty('--read-percent', ratio + '%');
+      const action = document.createElement('span');
+      action.className = 'resume-open';
+      action.textContent = '继续阅读 →';
+      link.append(image, title, progress, action);
+      list.append(link);
       if (list.children.length === 3) break;
     }
     const section = list.closest('.reading-return');

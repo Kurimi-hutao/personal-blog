@@ -1,15 +1,14 @@
 /* Short inscriptions use brush lettering; long titles and prose use Song type. */
 @font-face {
   font-family: "Ink Song";
-  src: local("Songti SC"), local("Noto Serif CJK SC"), local("Source Han Serif SC"),
-       local("SimSun"), url("./assets/fonts/blog-mobile-serif.woff2") format("woff2");
+  src: url("./assets/fonts/blog-mobile-serif.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
 :root {
-  --ink-reading: "Ink Song", "Songti SC", "Noto Serif CJK SC", SimSun, serif;
+  --ink-reading: "Ink Song", "Songti SC", "Noto Serif CJK SC", "Source Han Serif SC", SimSun, serif;
   --ink-inscription: "Blog Brush", "Kaiti SC", KaiTi, var(--ink-reading);
   --ink-title-tracking: .065em;
 }

@@ -11,7 +11,7 @@
     <link rel="manifest" href="./manifest.webmanifest" />
     <link rel="alternate" type="application/rss+xml" title="虎桃不会振刀 RSS" href="./rss.xml" />
     <title>文章 | 虎桃不会振刀</title>
-    <link rel="stylesheet" href="./page-articles.bundle.css?v=bd4f5147a0eb" />
+    <link rel="stylesheet" href="./page-articles.bundle.css?v=b1a92673723c" />
     <script defer src="./site-footer.js?v=20261007-1"></script>
       <link rel="icon" href="./assets/visual-refresh/favicon.ico" sizes="any" />
     <link rel="icon" type="image/png" sizes="32x32" href="./assets/visual-refresh/favicon-32.png" />
@@ -45,17 +45,24 @@
         <h1>文章</h1>
         <p>写下游戏里的故事，也记住生活里慢下来的片刻。</p>
       </section>
-      <section class="reading-return" id="readingReturn" hidden aria-labelledby="readingReturnTitle">
-        <header><h2 id="readingReturnTitle">接着翻阅</h2><button type="button" id="homeBookmarks">我的收藏</button></header>
-        <div class="reading-return-list" id="readingReturnList"></div>
-      </section>
-
-      <section class="reading-return course-index" aria-labelledby="courseTitle">
-        <h2 id="courseTitle">AI 从零开始</h2>
-        <details id="courseIndex"><summary>展开课程目录</summary>
-          <div id="courseList" aria-live="polite">正在读取已发布课程……</div>
-        </details>
-      </section>
+      <div class="article-bookshelf">
+        <section id="readingReturn" class="reading-return resume-sheet" hidden aria-labelledby="readingReturnTitle">
+          <header>
+            <h2 id="readingReturnTitle">接着翻阅</h2>
+            <button type="button" id="homeBookmarks">我的收藏</button>
+          </header>
+          <div id="readingReturnList" class="reading-return-list"></div>
+        </section>
+        <section class="course-volume" aria-labelledby="courseTitle">
+          <details id="courseIndex">
+            <summary aria-labelledby="courseTitle courseAction">
+              <h2 id="courseTitle"><span lang="en">AI</span> 从零开始</h2>
+              <span id="courseAction"><span class="course-closed-label">展开课程目录</span><span class="course-open-label">收起课程目录</span><i aria-hidden="true"></i></span>
+            </summary>
+            <div id="courseList" aria-live="polite">正在读取已发布课程……</div>
+          </details>
+        </section>
+      </div>
 
       <section class="article-filters" aria-label="文章筛选">
         <label>
@@ -100,7 +107,7 @@
     <script src="./ink-assets.js?v=20261008-visual"></script>
     <script src="./content-cache.js?v=20261015"></script>
     <script src="./works-data.js?v=20261019-perf-1"></script>
-    <script src="./theme.js?v=20261119-cursor"></script>
+    <script src="./theme.js?v=20261128-fonts"></script>
     <script src="./articles.js?v=20261111-search-ink"></script>
     <script src="./motion-core.js?v=20261105-controls"></script>
     <script src="./blossoms.js?v=20261127"></script>

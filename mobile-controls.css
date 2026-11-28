@@ -27,7 +27,7 @@
   .site-nav .nav-utilities > button { display: inline-flex; flex-direction: row; justify-content: flex-start; align-items: center; gap: 12px; width: 100%; min-width: 0; min-height: 48px; font: 13px var(--ui-font); color: var(--ink-soft); border: 0; }
   .site-nav .nav-utilities > button:active { background: var(--ui-wash); }
   .site-nav .nav-utilities > button::before { content: ''; display: block; width: 20px; height: 20px; flex-shrink: 0; background: currentColor; mask: var(--ui-icon) center / contain no-repeat; }
-  .nav-utilities .site-search-trigger { --ui-icon: url('./assets/mobile-ui/search.svg'); }
+  .nav-utilities .site-search-trigger { --ui-icon: url('./assets/ink-dock/search.png'); }
   .nav-utilities .theme-toggle { --ui-icon: url('./assets/mobile-ui/moon.svg'); }
   html[data-theme="dark"] .nav-utilities .theme-toggle { --ui-icon: url('./assets/mobile-ui/sun.svg'); }
   .nav-utilities > button:not([class]) { --ui-icon: url('./assets/mobile-ui/bookmark.svg'); }

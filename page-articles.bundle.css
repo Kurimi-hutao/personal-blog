@@ -7899,7 +7899,7 @@ body:has(#articleDetail) .article-body { background: var(--paper); line-height: 
   .site-nav .nav-utilities > button { display: inline-flex; flex-direction: row; justify-content: flex-start; align-items: center; gap: 12px; width: 100%; min-width: 0; min-height: 48px; font: 13px var(--ui-font); color: var(--ink-soft); border: 0; }
   .site-nav .nav-utilities > button:active { background: var(--ui-wash); }
   .site-nav .nav-utilities > button::before { content: ''; display: block; width: 20px; height: 20px; flex-shrink: 0; background: currentColor; mask: var(--ui-icon) center / contain no-repeat; }
-  .nav-utilities .site-search-trigger { --ui-icon: url('./assets/mobile-ui/search.svg'); }
+  .nav-utilities .site-search-trigger { --ui-icon: url('./assets/ink-dock/search.png'); }
   .nav-utilities .theme-toggle { --ui-icon: url('./assets/mobile-ui/moon.svg'); }
   html[data-theme="dark"] .nav-utilities .theme-toggle { --ui-icon: url('./assets/mobile-ui/sun.svg'); }
   .nav-utilities > button:not([class]) { --ui-icon: url('./assets/mobile-ui/bookmark.svg'); }
@@ -9874,22 +9874,23 @@ html body .reading-tools #bookmarkArticle[aria-pressed="true"]::before { backgro
     100% { transform:scaleY(.65); opacity:.54; }
   }
 }
-html body.home-page .site-header > .site-search-trigger {
-  position:relative; display:inline-flex; gap:9px; align-items:center; justify-content:flex-start;
-  min-height:44px; width:clamp(132px,12vw,178px); padding:5px 10px; flex-shrink:0;
-  border:0; border-radius:0; box-shadow:none; backdrop-filter:none;
-  background:linear-gradient(90deg,color-mix(in srgb,var(--ink) 6%,transparent),transparent) center/100% 76% no-repeat;
-  font:15px/1.2 var(--serif); letter-spacing:.06em; color:var(--ink);
+html[data-theme] body .site-header > .site-search-trigger {
+  display:inline-flex; align-items:center; justify-content:center; flex:none;
+  width:auto; min-width:44px; min-height:44px; padding:4px 7px; gap:7px;
+  border:0; box-shadow:none; background:none; backdrop-filter:none;
+  color:var(--ink); font:500 15px/1.25 var(--ui-font, var(--font-body)); letter-spacing:.03em;
 }
-html body.home-page .site-header > .site-search-trigger::after {
-  content:""; position:absolute; inset:auto 0 5px; height:2px; pointer-events:none;
-  background:var(--ink); opacity:.39; clip-path:polygon(0 55%,9% 10%,70% 37%,100% 60%,81% 72%,3% 100%);
+.site-header .site-search-trigger { white-space:nowrap; }
+html[data-theme] body .site-header > .site-search-trigger > .search-lens {
+  display:block; flex:none; width:20px; height:20px; background:currentColor;
+  mask:url('./assets/ink-dock/search.png') center/contain no-repeat;
 }
-html body.home-page .site-header > .site-search-trigger > .search-seal {
-  display:grid;place-items:center; width:22px;height:23px; mask:none; background:#984535;
-  color:#fff3df; border-radius:2px 3px 2px 4px; rotate:-4deg; font:17px/1 var(--brush,var(--serif));
+html[data-theme] body .site-header .site-search-trigger:focus-visible {
+  outline:2px solid var(--cinnabar); outline-offset:2px;
 }
-html body.home-page .site-header > .site-search-trigger kbd {margin-left:auto;padding:0;color:var(--ink-soft);border:0;background:none;font-size:13px;}
+@media (hover:hover) {
+  html[data-theme] body .site-header > .site-search-trigger:hover { color:var(--cinnabar); transform:none; }
+}
 html body.home-page .site-search-dialog .site-search-field {
   position:relative; background:linear-gradient(90deg,color-mix(in srgb,var(--ink) 5%,transparent),transparent);
   border:0;box-shadow:none;padding-inline:14px;gap:12px;
@@ -9902,7 +9903,6 @@ html body.home-page .site-search-dialog .site-search-field {
 @media(max-width:1080px) {
   html body.home-page .site-header > .site-search-trigger {order:1;margin:0 6px 0 auto;width:auto;padding-inline:7px;gap:5px;font-size:13px;}
   html body.home-page .site-header > .site-search-trigger > span:nth-child(2) {display:inline;}
-  html body.home-page .site-header > .site-search-trigger kbd {display:none;}
 }
 @media(max-width:380px) {
   .home-page .site-header .brand-name { white-space:nowrap; }
@@ -9986,15 +9986,14 @@ html body:has(dialog[open]) .mobile-control-dock > button { visibility:hidden; p
 /* Short inscriptions use brush lettering; long titles and prose use Song type. */
 @font-face {
   font-family: "Ink Song";
-  src: local("Songti SC"), local("Noto Serif CJK SC"), local("Source Han Serif SC"),
-       local("SimSun"), url("./assets/fonts/blog-mobile-serif.woff2") format("woff2");
+  src: url("./assets/fonts/blog-mobile-serif.woff2") format("woff2");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 
 :root {
-  --ink-reading: "Ink Song", "Songti SC", "Noto Serif CJK SC", SimSun, serif;
+  --ink-reading: "Ink Song", "Songti SC", "Noto Serif CJK SC", "Source Han Serif SC", SimSun, serif;
   --ink-inscription: "Blog Brush", "Kaiti SC", KaiTi, var(--ink-reading);
   --ink-title-tracking: .065em;
 }
@@ -10184,4 +10183,89 @@ html body .reward-payment .close-payment span {
    attaches that icon through an :is() list that contains ID selectors. */
 @media (max-width: 900px) {
   html body .mobile-scroll-top::before { display: none !important; }
+}
+
+
+/* article-bookshelf.css */
+.article-bookshelf {
+  display:grid; grid-template-columns:minmax(0, 1.35fr) minmax(0, 1fr);
+  align-items:start; gap:clamp(16px,2vw,28px); margin:24px 0 32px;
+}
+.article-bookshelf:has(.resume-sheet[hidden]) { grid-template-columns:minmax(0,1fr); }
+.article-bookshelf .resume-sheet {
+  position:relative; box-sizing:border-box; width:100%; margin:0;
+  padding:22px clamp(16px,2vw,28px); border:1px solid var(--line);
+  color:var(--ink); background:linear-gradient(105deg,var(--paper),var(--paper-deep));
+  box-shadow:0 3px 0 -1px var(--paper),0 4px 0 -1px var(--line);
+}
+.resume-sheet::before {
+  content:""; position:absolute; top:-1px; left:28px; width:11px; height:16px;
+  background:var(--cinnabar); clip-path:polygon(0 0,100% 0,100% 100%,50% 76%,0 100%);
+}
+.article-bookshelf .resume-sheet header { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.article-bookshelf .resume-sheet h2 { margin:0; font:500 clamp(22px,2vw,30px)/1.35 var(--font-heading); letter-spacing:.055em; }
+.resume-sheet #homeBookmarks {
+  display:inline-flex; align-items:center; gap:5px; min-height:44px; padding:0 2px;
+  border:0; background:transparent; color:var(--ink-soft); font:13px/1.5 var(--font-body);
+}
+.resume-sheet #homeBookmarks::before { content:""; width:16px; height:16px; background:currentColor; mask:url('./assets/mobile-ui/bookmark.svg') center/contain no-repeat; }
+.resume-sheet .reading-return-list { display:grid; grid-template-columns:1fr; gap:0; margin:6px 0 0; }
+.resume-sheet .reading-return-list .reading-return-card {
+  display:grid; grid-template-columns:clamp(68px,6vw,88px) minmax(0,1fr) auto;
+  align-items:center; gap:8px 14px; padding:13px 0 3px; border-top:1px solid var(--line); text-decoration:none;
+}
+.resume-sheet .reading-return-card + .reading-return-card { margin-top:10px; }
+.resume-sheet .reading-return-card img {
+  grid-area:1/1/3/2; width:100%; height:auto; aspect-ratio:1.22; object-fit:cover;
+}
+.resume-sheet .reading-return-card strong {
+  grid-column:2/-1; align-self:end; font:600 clamp(16px,1.2vw,20px)/1.45 var(--font-heading); color:var(--ink);
+}
+.resume-sheet .resume-progress {
+  align-self:start; display:grid; gap:5px; font-size:12px; color:var(--ink-soft);
+}
+.resume-sheet .resume-progress::after {
+  content:""; width:min(100%,150px); height:3px; border-radius:3px;
+  background:linear-gradient(to right,var(--cinnabar) var(--read-percent),var(--line) var(--read-percent));
+}
+.resume-sheet .reading-return-card .resume-open { color:var(--cinnabar); font-size:12px; white-space:nowrap; }
+.article-bookshelf .course-volume { min-width:0; }
+.course-volume summary {
+  list-style:none; position:relative; isolation:isolate; overflow:hidden; cursor:pointer;
+  box-sizing:border-box; min-height:176px; padding:30px 30px 24px 42px;
+  display:flex; flex-direction:column; align-items:flex-start; justify-content:space-between; gap:24px;
+  background:#233a3c; color:#fff6df;
+}
+.course-volume summary::-webkit-details-marker { display:none; }
+.course-volume summary::before {
+  content:""; position:absolute; inset:0; z-index:-1;
+  background:linear-gradient(90deg,#192f32 1%,#233a3cf5 29%,#1d303c87 68%,#172b3020),url('./assets/spring-ink/mountains-night.webp') right 58% / cover;
+}
+.course-volume summary::after {
+  content:""; position:absolute; inset:0 auto 0 10px; width:4px;
+  border-inline:1px solid #dbceb16b; pointer-events:none;
+}
+.course-volume #courseTitle { color:inherit; margin:0; font:500 clamp(24px,2.2vw,34px)/1.15 var(--ink-reading); letter-spacing:.045em; }
+.course-volume #courseTitle span { color:#efcea1; }
+.course-volume #courseAction { display:inline-flex; align-items:center; gap:15px; font:14px/1.5 var(--font-body); color:#fff6df; }
+.course-volume #courseAction i { width:7px; height:7px; border:solid currentColor; border-width:0 1px 1px 0; transform:translateY(-2px) rotate(45deg); }
+.course-volume details[open] #courseAction i { transform:translateY(2px) rotate(225deg); }
+.course-volume .course-open-label, .course-volume details[open] .course-closed-label { display:none; }
+.course-volume details[open] .course-open-label { display:inline; }
+.course-volume #courseList { margin:0; padding:8px 20px; max-height:24rem; overflow:auto; display:grid; gap:0; background:var(--paper); border:1px solid var(--line); }
+.course-volume #courseList a { display:flex; align-items:baseline; gap:10px; padding:12px 0; font-size:14px; text-decoration:none; }
+.course-volume #courseList > p { margin:0; }
+.course-volume #courseList a > small:first-child { color:var(--cinnabar); font-family:Georgia,serif; font-variant-numeric:tabular-nums; }
+.course-volume #courseList a > small:last-child:not(:first-child) { margin-left:auto; }
+.article-bookshelf :is(a,button,summary):focus-visible { outline:2px solid var(--cinnabar); outline-offset:2px; }
+@media (hover:hover) {
+  .resume-sheet .reading-return-card:hover strong,.resume-sheet #homeBookmarks:hover,.course-volume #courseList a:hover { color:var(--cinnabar); }
+  .course-volume summary:hover #courseAction { text-decoration:underline; text-underline-offset:5px; }
+}
+@media (max-width:760px) {
+  .article-bookshelf { grid-template-columns:minmax(0,1fr); gap:16px; margin:16px 0 24px; }
+  .article-bookshelf .resume-sheet { padding:14px 16px 18px; }
+  .resume-sheet::before { left:17px; height:10px; }
+  .resume-sheet .reading-return-list .reading-return-card { gap:6px 10px; }
+  .course-volume summary { min-height:136px; padding:22px 22px 20px 32px; gap:18px; }
 }

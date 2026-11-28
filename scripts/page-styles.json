@@ -185,6 +185,9 @@
     },
     {
       "file": "ui-redesign.css"
+    },
+    {
+      "file": "article-bookshelf.css"
     }
   ],
   "article.html": [
